@@ -69,6 +69,7 @@ class _WishTalismanScreenState extends State<WishTalismanScreen> {
         child: Column(
           children: [
             _topBar(),
+            _deliveredChip(),
             Expanded(
               child: Center(
                 child: Padding(
@@ -101,6 +102,27 @@ class _WishTalismanScreenState extends State<WishTalismanScreen> {
             _actions(),
             const SizedBox(height: 12),
           ],
+        ),
+      ),
+    );
+  }
+
+  /// 도감 카드에서 옮겨온 "전달 완료" 정보 — 부적을 열었을 때 보여준다.
+  Widget _deliveredChip() {
+    final l = AppLocalizations.of(context);
+    final date = widget.wish.completedAt;
+    return Padding(
+      padding: const EdgeInsets.only(top: 2, bottom: 8),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        decoration: BoxDecoration(
+          color: AppColors.accentSoft,
+          borderRadius: BorderRadius.circular(AppRadius.chipFull),
+        ),
+        child: Text(
+          date == null ? l.dexDelivered : '${l.dexDelivered}  ·  $date',
+          style: AppText.base(
+              size: 12, weight: FontWeight.w700, color: AppColors.accent),
         ),
       ),
     );

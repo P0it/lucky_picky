@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -42,7 +44,7 @@ class DexScreen extends ConsumerWidget {
                   physics: const NeverScrollableScrollPhysics(),
                   crossAxisSpacing: 12,
                   mainAxisSpacing: 12,
-                  childAspectRatio: 0.92,
+                  childAspectRatio: 0.82,
                   children: [for (final w in done) _DexCard(wish: w)],
                 ),
         ),
@@ -76,53 +78,96 @@ class _DexCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
+    // 도감 카드 자체를 한 장의 미니 부적으로 — 부적 상세와 같은 시각 언어
+    // (그라데이션 + 클로버 워터마크 + 내부 프레임)를 써서 겉에서도 부적으로 읽힌다.
     return Pressable(
       onTap: () => Navigator.of(context).push(wishTalismanRoute(wish)),
-      child: Container(
-        decoration: BoxDecoration(
-          color: AppColors.card,
-          borderRadius: BorderRadius.circular(AppRadius.card),
-        ),
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(AppRadius.card),
+        child: Stack(
           children: [
-            // 달성 배지
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
-              decoration: BoxDecoration(
-                color: AppColors.accentSoft,
-                borderRadius: BorderRadius.circular(AppRadius.chipFull),
+            // 부적 바탕 — 은은한 세로 그라데이션.
+            const Positioned.fill(
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [Color(0xFFF7FBF3), Color(0xFFE9F2DF)],
+                  ),
+                ),
               ),
-              child: Text(l.dexDelivered,
-                  style: AppText.base(
-                      size: 11, weight: FontWeight.w700, color: AppColors.accent)),
             ),
-            const SizedBox(height: 10),
-            Text(wish.text,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: AppText.base(size: 15, weight: FontWeight.w600, height: 1.4)),
-            const Spacer(),
-            Wrap(
-              spacing: 5,
-              runSpacing: 5,
-              children: [for (var i = 0; i < wish.cost; i++) const CloverMark(size: 18)],
+            // 배경에 깔리는 큰 클로버 워터마크.
+            Positioned.fill(
+              child: Center(
+                child: Transform.rotate(
+                  angle: -12 * math.pi / 180,
+                  child: CloverMark(
+                    size: 150,
+                    withStem: true,
+                    color: AppColors.accent.withValues(alpha: 0.06),
+                  ),
+                ),
+              ),
             ),
-            const SizedBox(height: 10),
-            Row(
-              children: [
-                Text(wish.completedAt ?? '',
-                    style: AppText.base(
-                        size: 12, weight: FontWeight.w600, color: AppColors.muted)),
-                const Spacer(),
-                // 부적으로 만들기 힌트
-                Icon(Icons.ios_share_rounded, size: 13, color: AppColors.accent),
-                const SizedBox(width: 3),
-                Text(l.dexTalismanLabel,
-                    style: AppText.base(
-                        size: 11, weight: FontWeight.w700, color: AppColors.accent)),
-              ],
+            // 부적 느낌의 얇은 내부 프레임.
+            Positioned.fill(
+              child: Container(
+                margin: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(
+                      color: AppColors.accent.withValues(alpha: 0.20), width: 1.2),
+                ),
+              ),
+            ),
+            // 본문 — 부적 라벨 / 중앙 클로버 엠블럼 / 소원 한 줄 / 완성일.
+            Positioned.fill(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(16, 18, 16, 16),
+                child: Column(
+                  children: [
+                    Text(
+                      l.talismanLabel,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: AppText.base(
+                        size: 9.5,
+                        weight: FontWeight.w800,
+                        color: AppColors.accent,
+                        letterSpacingEm: 0.24,
+                      ),
+                    ),
+                    Expanded(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const CloverMark(size: 46, withStem: true),
+                          const SizedBox(height: 14),
+                          Text(
+                            wish.text,
+                            textAlign: TextAlign.center,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: AppText.base(
+                              size: 14,
+                              weight: FontWeight.w800,
+                              height: 1.36,
+                              letterSpacingEm: -0.03,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Text(
+                      wish.completedAt ?? '',
+                      style: AppText.base(
+                          size: 11, weight: FontWeight.w700, color: AppColors.muted),
+                    ),
+                  ],
+                ),
+              ),
             ),
           ],
         ),
