@@ -1,6 +1,6 @@
 {
-    "name": "ooloo",
-    "short_name": "ooloo",
+    "name": "LuckyPicky",
+    "short_name": "LuckyPicky",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

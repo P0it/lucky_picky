@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
 
 /// 폰 하단(탭바 위)에 뜨는 토스 스타일 알약 토스트. toastIn 모션 재현.
-void showOolooToast(BuildContext context, String text) {
+void showAppToast(BuildContext context, String text) {
   final overlay = Overlay.of(context);
   late OverlayEntry entry;
   entry = OverlayEntry(

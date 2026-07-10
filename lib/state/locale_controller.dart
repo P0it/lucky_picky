@@ -5,7 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 /// 앱 언어(로케일) 환경설정. 게임 상태(AppController)와는 분리해 관리한다.
 /// - `null`  : 시스템 언어 따르기(자동 감지) — MaterialApp이 OS 로케일로 매칭.
 /// - Locale  : 사용자가 직접 고른 언어(수동 지정).
-const _prefsKey = 'ooloo_locale_v1';
+const _prefsKey = 'luckypicky_locale_v1';
 
 final localeProvider =
     NotifierProvider<LocaleController, Locale?>(LocaleController.new);

@@ -1,4 +1,4 @@
-# ooloo
+# LuckyPicky
 
 A new Flutter project.
 

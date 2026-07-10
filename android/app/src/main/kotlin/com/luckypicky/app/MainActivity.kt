@@ -1,4 +1,4 @@
-package com.ooloo.ooloo
+package com.luckypicky.app
 
 import io.flutter.embedding.android.FlutterActivity
 
