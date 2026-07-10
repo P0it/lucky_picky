@@ -12,10 +12,10 @@ class AppLocalizationsKo extends AppLocalizations {
   String get tabHome => '홈';
 
   @override
-  String get tabStore => '소원 상점';
+  String get tabGacha => '뽑기';
 
   @override
-  String get tabDex => '소원 도감';
+  String get tabDex => '행운 도감';
 
   @override
   String get tabArchive => '나의 기록';
@@ -62,7 +62,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get archiveStatClovers => '탄생한 클로버';
 
   @override
-  String get archiveStatWishes => '이룬 소원';
+  String get archiveStatPulls => '뽑은 행운';
 
   @override
   String get archiveTimeline => '타임라인';
@@ -74,8 +74,8 @@ class AppLocalizationsKo extends AppLocalizations {
   String get archiveEmpty => '아직 기록이 없어요.';
 
   @override
-  String historyWishDone(String text) {
-    return '[소원 성취] $text';
+  String historyPullDone(String text) {
+    return '[행운 뽑기] $text';
   }
 
   @override
@@ -89,84 +89,122 @@ class AppLocalizationsKo extends AppLocalizations {
   }
 
   @override
-  String get storeTitle => '소원 상점';
-
-  @override
-  String get storeOwnedLabel => '보유한 클로버';
-
-  @override
-  String storeCloverCount(int count) {
-    return '$count개';
-  }
-
-  @override
-  String get storeAddWish => '+ 나만의 소원 추가하기';
-
-  @override
-  String get storeWishHint => '이루고 싶은 나만의 소원';
-
-  @override
-  String get storeRequiredClovers => '필요한 클로버';
+  String get historyFreePull => '🍀 무료 뽑기';
 
   @override
   String get commonCancel => '취소';
 
   @override
-  String get storeAddWishConfirm => '소원 추가';
+  String get commonConfirm => '확인';
 
   @override
-  String get storeDepositFull => '담기 완료';
+  String get gachaTitle => '행운 뽑기';
 
   @override
-  String get storeDeposit => '클로버 담기';
+  String get gachaOwnedLabel => '보유한 클로버';
 
   @override
-  String get storeNotEnough => '클로버 부족';
+  String gachaCloverCount(int count) {
+    return '$count개';
+  }
 
   @override
-  String get depositTitleComplete => '소원을 완성할까요?';
+  String get gachaPull => '클로버로 뽑기';
 
   @override
-  String get depositTitle => '클로버를 담을까요?';
+  String get gachaNotEnough => '클로버가 부족해요';
 
   @override
-  String get depositDescComplete => '이 클로버를 담으면 소원이 이루어져요.';
+  String gachaFreePull(int left, int total) {
+    return '광고 보고 무료 뽑기 ($left/$total)';
+  }
 
   @override
-  String get depositDesc => '보유 클로버 1개를 담아요. 담은 클로버는 되돌릴 수 없어요.';
+  String get gachaFreePullNone => '무료 뽑기는 내일 다시 채워져요';
 
   @override
-  String get depositConfirmComplete => '완성하기';
+  String get gachaRatesButton => '확률 정보';
 
   @override
-  String get depositConfirm => '담기';
+  String get gachaTapCapsule => '캡슐을 탭해서 열어보세요!';
 
   @override
-  String get dexTitle => '소원 도감';
+  String get ratesTitle => '획득 확률';
 
   @override
-  String get dexSubtitle => '전한 소원들이 이곳에 모여요';
+  String get ratesDisclaimer => '※ 행운의 효능은 과학적으로 증명되지 않았지만,\n기분이 좋아지는 건 확실합니다.';
 
   @override
-  String get dexEmptyTitle => '아직 전한 소원이 없어요.';
+  String get resultNew => 'NEW!';
 
   @override
-  String get dexEmptyDesc => '클로버를 다 모아 소원을 전하면 이곳에 담겨요.';
+  String resultDup(int count) {
+    return '중복 ×$count';
+  }
 
   @override
-  String get dexDelivered => '전달 완료';
+  String get resultMaterial => '강화 재료 +1';
 
   @override
-  String get dexTalismanLabel => '부적';
+  String get resultConfirm => '좋아요';
 
   @override
-  String get grantTitle => '소원을 전달하고 오겠습니다.';
+  String get resultRerollAd => '광고 보고 한 번 더';
 
   @override
-  String get toastWishDelivered => '소원을 전했어요 · 도감에 담겼어요 🍀';
+  String get dexTitle => '행운 도감';
 
   @override
-  String get talismanTitle => '행운 부적';
+  String get dexSubtitle => '뽑은 행운들이 이곳에 모여요';
+
+  @override
+  String dexProgress(int owned, int total) {
+    return '$owned/$total 수집';
+  }
+
+  @override
+  String get ticketTitle => '행운권';
+
+  @override
+  String ticketOwnedCopies(int count) {
+    return '보유 ×$count';
+  }
+
+  @override
+  String ticketLevel(int level) {
+    return 'Lv.$level';
+  }
+
+  @override
+  String ticketBoost(int mult) {
+    return '행운 ×$mult 증폭';
+  }
+
+  @override
+  String ticketEnhance(int have, int need) {
+    return '강화하기 ($have/$need)';
+  }
+
+  @override
+  String get ticketEnhanceMax => '최대 강화 완료';
+
+  @override
+  String toastEnhanced(int mult) {
+    return '행운이 ×$mult 증폭됐어요! ✨';
+  }
+
+  @override
+  String ticketFirstPulled(String date) {
+    return '$date 획득';
+  }
+
+  @override
+  String get ticketTagline => '선행으로 뽑는 행운';
+
+  @override
+  String ticketShareText(String text) {
+    return '이런 행운을 뽑았어요 🍀 \"$text\"\n당신에게도 이 행운이 닿기를.\n\nLuckyPicky — 선행으로 뽑는 행운';
+  }
 
   @override
   String get talismanPortrait => '세로형';
@@ -190,17 +228,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get talismanRetry => '잠시 후 다시 시도해 주세요.';
 
   @override
-  String get talismanShareText =>
-      '제 소원이 이루어졌어요 🍀\n당신에게도 이 행운이 닿기를.\n\nooloo — 선행으로 채우는 네잎클로버';
-
-  @override
-  String get talismanLabel => '소원 성취 부적';
-
-  @override
-  String get talismanCenterLine => '이 소원이 이루어졌어요';
-
-  @override
-  String get talismanTagline => '선행으로 채우는 네잎클로버';
+  String get errorNeedConnection => '인터넷 연결이 필요해요. 다시 시도해 주세요.';
 
   @override
   String get languageSheetTitle => '언어';

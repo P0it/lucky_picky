@@ -12,10 +12,10 @@ class AppLocalizationsJa extends AppLocalizations {
   String get tabHome => 'ホーム';
 
   @override
-  String get tabStore => '願いストア';
+  String get tabGacha => 'ガチャ';
 
   @override
-  String get tabDex => '願い図鑑';
+  String get tabDex => '幸運図鑑';
 
   @override
   String get tabArchive => 'わたしの記録';
@@ -62,7 +62,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get archiveStatClovers => '生まれたクローバー';
 
   @override
-  String get archiveStatWishes => '叶えた願い';
+  String get archiveStatPulls => '引いた幸運';
 
   @override
   String get archiveTimeline => 'タイムライン';
@@ -74,8 +74,8 @@ class AppLocalizationsJa extends AppLocalizations {
   String get archiveEmpty => 'まだ記録がありません。';
 
   @override
-  String historyWishDone(String text) {
-    return '［願い成就］$text';
+  String historyPullDone(String text) {
+    return '［幸運ガチャ］$text';
   }
 
   @override
@@ -89,84 +89,122 @@ class AppLocalizationsJa extends AppLocalizations {
   }
 
   @override
-  String get storeTitle => '願いストア';
-
-  @override
-  String get storeOwnedLabel => '保有クローバー';
-
-  @override
-  String storeCloverCount(int count) {
-    return '$count個';
-  }
-
-  @override
-  String get storeAddWish => '+ 自分だけの願いを追加';
-
-  @override
-  String get storeWishHint => '叶えたい自分の願い';
-
-  @override
-  String get storeRequiredClovers => '必要なクローバー';
+  String get historyFreePull => '🍀 無料ガチャ';
 
   @override
   String get commonCancel => 'キャンセル';
 
   @override
-  String get storeAddWishConfirm => '願いを追加';
+  String get commonConfirm => 'OK';
 
   @override
-  String get storeDepositFull => '完了';
+  String get gachaTitle => '幸運ガチャ';
 
   @override
-  String get storeDeposit => 'クローバーを入れる';
+  String get gachaOwnedLabel => '保有クローバー';
 
   @override
-  String get storeNotEnough => 'クローバー不足';
+  String gachaCloverCount(int count) {
+    return '$count個';
+  }
 
   @override
-  String get depositTitleComplete => '願いを叶えますか？';
+  String get gachaPull => 'クローバーで引く';
 
   @override
-  String get depositTitle => 'クローバーを入れますか？';
+  String get gachaNotEnough => 'クローバーが足りません';
 
   @override
-  String get depositDescComplete => 'このクローバーを入れると願いが叶います。';
+  String gachaFreePull(int left, int total) {
+    return '広告を見て無料ガチャ（$left/$total）';
+  }
 
   @override
-  String get depositDesc => 'クローバーを1つ入れます。入れたクローバーは元に戻せません。';
+  String get gachaFreePullNone => '無料ガチャは明日また回復します';
 
   @override
-  String get depositConfirmComplete => '叶える';
+  String get gachaRatesButton => '提供割合';
 
   @override
-  String get depositConfirm => '入れる';
+  String get gachaTapCapsule => 'カプセルをタップして開けよう！';
 
   @override
-  String get dexTitle => '願い図鑑';
+  String get ratesTitle => '提供割合';
 
   @override
-  String get dexSubtitle => '叶えた願いがここに集まります';
+  String get ratesDisclaimer => '※ 幸運の効能は科学的に証明されていませんが、\n気分が上がるのは確実です。';
 
   @override
-  String get dexEmptyTitle => 'まだ叶えた願いがありません。';
+  String get resultNew => 'NEW!';
 
   @override
-  String get dexEmptyDesc => 'クローバーを集めて願いを叶えると、ここに収められます。';
+  String resultDup(int count) {
+    return 'かぶり ×$count';
+  }
 
   @override
-  String get dexDelivered => 'お届け完了';
+  String get resultMaterial => '強化素材 +1';
 
   @override
-  String get dexTalismanLabel => 'お守り';
+  String get resultConfirm => 'いいね';
 
   @override
-  String get grantTitle => '願いを届けてまいります。';
+  String get resultRerollAd => '広告を見てもう1回';
 
   @override
-  String get toastWishDelivered => '願いを届けました・図鑑に収めました 🍀';
+  String get dexTitle => '幸運図鑑';
 
   @override
-  String get talismanTitle => '幸運のお守り';
+  String get dexSubtitle => '引いた幸運がここに集まります';
+
+  @override
+  String dexProgress(int owned, int total) {
+    return '$owned/$total コンプ';
+  }
+
+  @override
+  String get ticketTitle => '幸運チケット';
+
+  @override
+  String ticketOwnedCopies(int count) {
+    return '所持 ×$count';
+  }
+
+  @override
+  String ticketLevel(int level) {
+    return 'Lv.$level';
+  }
+
+  @override
+  String ticketBoost(int mult) {
+    return '幸運 ×$mult 増幅';
+  }
+
+  @override
+  String ticketEnhance(int have, int need) {
+    return '強化する（$have/$need）';
+  }
+
+  @override
+  String get ticketEnhanceMax => '最大強化済み';
+
+  @override
+  String toastEnhanced(int mult) {
+    return '幸運が ×$mult 増幅されました！✨';
+  }
+
+  @override
+  String ticketFirstPulled(String date) {
+    return '$date 獲得';
+  }
+
+  @override
+  String get ticketTagline => '善い行いで引く幸運';
+
+  @override
+  String ticketShareText(String text) {
+    return 'こんな幸運を引きました 🍀「$text」\nこの幸運があなたにも届きますように。\n\nLuckyPicky — 善い行いで引く幸運';
+  }
 
   @override
   String get talismanPortrait => '縦型';
@@ -190,17 +228,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get talismanRetry => 'しばらくしてからもう一度お試しください。';
 
   @override
-  String get talismanShareText =>
-      'わたしの願いが叶いました 🍀\nこの幸運があなたにも届きますように。\n\nooloo — 善い行いで満たす四つ葉のクローバー';
-
-  @override
-  String get talismanLabel => '願い成就のお守り';
-
-  @override
-  String get talismanCenterLine => 'この願いが叶いました';
-
-  @override
-  String get talismanTagline => '善い行いで満たす四つ葉のクローバー';
+  String get errorNeedConnection => 'インターネット接続が必要です。もう一度お試しください。';
 
   @override
   String get languageSheetTitle => '言語';

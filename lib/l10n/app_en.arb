@@ -2,8 +2,8 @@
   "@@locale": "en",
 
   "tabHome": "Home",
-  "tabStore": "Wish Store",
-  "tabDex": "Wish Book",
+  "tabGacha": "Gacha",
+  "tabDex": "Luck Dex",
   "tabArchive": "My Record",
 
   "homeStatusEmpty": "Start a new four-leaf clover.\nFour good deeds fill all its leaves.",
@@ -27,13 +27,13 @@
   "archiveTitle": "My Good Deeds",
   "archiveStatLeaves": "Leaves filled",
   "archiveStatClovers": "Clovers born",
-  "archiveStatWishes": "Wishes granted",
+  "archiveStatPulls": "Lucks pulled",
   "archiveTimeline": "Timeline",
   "archiveCalendar": "Calendar",
   "archiveEmpty": "No records yet.",
 
-  "historyWishDone": "[Wish granted] {text}",
-  "@historyWishDone": {
+  "historyPullDone": "[Luck pulled] {text}",
+  "@historyPullDone": {
     "placeholders": {
       "text": { "type": "String" }
     }
@@ -50,42 +50,103 @@
       "count": { "type": "int" }
     }
   },
+  "historyFreePull": "🍀 Free pull",
 
-  "storeTitle": "Wish Store",
-  "storeOwnedLabel": "Clovers owned",
-  "storeCloverCount": "{count}",
-  "@storeCloverCount": {
+  "commonCancel": "Cancel",
+  "commonConfirm": "OK",
+
+  "gachaTitle": "Lucky Gacha",
+  "gachaOwnedLabel": "Clovers owned",
+  "gachaCloverCount": "{count}",
+  "@gachaCloverCount": {
     "placeholders": {
       "count": { "type": "int" }
     }
   },
-  "storeAddWish": "+ Add my own wish",
-  "storeWishHint": "A wish you want to come true",
-  "storeRequiredClovers": "Clovers needed",
-  "commonCancel": "Cancel",
-  "storeAddWishConfirm": "Add wish",
-  "storeDepositFull": "Filled",
-  "storeDeposit": "Add clover",
-  "storeNotEnough": "Not enough",
+  "gachaPull": "Pull with a clover",
+  "gachaNotEnough": "Not enough clovers",
+  "gachaFreePull": "Watch an ad · free pull ({left}/{total})",
+  "@gachaFreePull": {
+    "placeholders": {
+      "left": { "type": "int" },
+      "total": { "type": "int" }
+    }
+  },
+  "gachaFreePullNone": "Free pulls are back tomorrow",
+  "gachaRatesButton": "Drop rates",
+  "gachaTapCapsule": "Tap the capsule to open it!",
 
-  "depositTitleComplete": "Grant this wish?",
-  "depositTitle": "Add a clover?",
-  "depositDescComplete": "Adding this clover will grant your wish.",
-  "depositDesc": "Add one clover. Added clovers can't be undone.",
-  "depositConfirmComplete": "Grant",
-  "depositConfirm": "Add",
+  "ratesTitle": "Drop rates",
+  "ratesDisclaimer": "* Luck effects are not scientifically proven,\nbut the good mood definitely is.",
 
-  "dexTitle": "Wish Book",
-  "dexSubtitle": "Granted wishes gather here",
-  "dexEmptyTitle": "No granted wishes yet.",
-  "dexEmptyDesc": "Gather all the clovers and grant a wish to see it here.",
-  "dexDelivered": "Delivered",
-  "dexTalismanLabel": "Talisman",
+  "resultNew": "NEW!",
+  "resultDup": "Duplicate ×{count}",
+  "@resultDup": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "resultMaterial": "Enhance material +1",
+  "resultConfirm": "Nice",
+  "resultRerollAd": "Watch an ad · pull again",
 
-  "grantTitle": "Off to deliver your wish.",
-  "toastWishDelivered": "Your wish was delivered · saved to your book 🍀",
+  "dexTitle": "Luck Dex",
+  "dexSubtitle": "Every luck you've pulled lives here",
+  "dexProgress": "{owned}/{total} collected",
+  "@dexProgress": {
+    "placeholders": {
+      "owned": { "type": "int" },
+      "total": { "type": "int" }
+    }
+  },
 
-  "talismanTitle": "Lucky Talisman",
+  "ticketTitle": "Luck Ticket",
+  "ticketOwnedCopies": "Owned ×{count}",
+  "@ticketOwnedCopies": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "ticketLevel": "Lv.{level}",
+  "@ticketLevel": {
+    "placeholders": {
+      "level": { "type": "int" }
+    }
+  },
+  "ticketBoost": "Luck ×{mult} amplified",
+  "@ticketBoost": {
+    "placeholders": {
+      "mult": { "type": "int" }
+    }
+  },
+  "ticketEnhance": "Enhance ({have}/{need})",
+  "@ticketEnhance": {
+    "placeholders": {
+      "have": { "type": "int" },
+      "need": { "type": "int" }
+    }
+  },
+  "ticketEnhanceMax": "Fully enhanced",
+  "toastEnhanced": "Luck ×{mult} amplified! ✨",
+  "@toastEnhanced": {
+    "placeholders": {
+      "mult": { "type": "int" }
+    }
+  },
+  "ticketFirstPulled": "Pulled on {date}",
+  "@ticketFirstPulled": {
+    "placeholders": {
+      "date": { "type": "String" }
+    }
+  },
+  "ticketTagline": "luck you earn by doing good",
+  "ticketShareText": "Look what I pulled 🍀 \"{text}\"\nMay this luck reach you too.\n\nLuckyPicky — luck you earn by doing good",
+  "@ticketShareText": {
+    "placeholders": {
+      "text": { "type": "String" }
+    }
+  },
+
   "talismanPortrait": "Portrait",
   "talismanSquare": "Square",
   "talismanSave": "Save to album",
@@ -93,10 +154,7 @@
   "toastSavedToAlbum": "Saved to your photo album 🍀",
   "talismanSaveFail": "Photo access permission is needed to save.",
   "talismanRetry": "Please try again in a moment.",
-  "talismanShareText": "My wish came true 🍀\nMay this luck reach you too.\n\nooloo — a four-leaf clover filled with good deeds",
-  "talismanLabel": "Wish-Granted Talisman",
-  "talismanCenterLine": "This wish has come true",
-  "talismanTagline": "a four-leaf clover filled with good deeds",
+  "errorNeedConnection": "Internet connection is needed. Please try again.",
 
   "languageSheetTitle": "Language",
   "languageSystem": "Follow system settings"

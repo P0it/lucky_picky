@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../data/game_backend.dart';
 import '../l10n/app_localizations.dart';
 import '../state/app_controller.dart';
 import '../theme/app_theme.dart';
-import 'ooloo_toast.dart';
+import 'app_toast.dart';
 import 'pressable.dart';
 
 /// 선행 기록 하프 모달. 홈의 버튼에서 슥 올라온다.
@@ -35,13 +36,25 @@ class _RecordSheetState extends ConsumerState<_RecordSheet> {
     super.dispose();
   }
 
-  void _record() {
+  bool _busy = false;
+
+  Future<void> _record() async {
     final text = _controller.text.trim();
-    if (text.isEmpty) return;
+    if (text.isEmpty || _busy) return;
+    _busy = true;
     final l = AppLocalizations.of(context);
-    final completed = ref.read(appControllerProvider.notifier).recordDeed(text);
-    Navigator.of(context).pop();
-    showOolooToast(context, completed ? l.toastCloverComplete : l.toastLeafFilled);
+    try {
+      final completed =
+          await ref.read(appControllerProvider.notifier).recordDeed(text);
+      if (!mounted) return;
+      Navigator.of(context).pop();
+      showAppToast(
+          context, completed ? l.toastCloverComplete : l.toastLeafFilled);
+    } on GameConnectionException {
+      if (mounted) showAppToast(context, l.errorNeedConnection);
+    } finally {
+      _busy = false;
+    }
   }
 
   @override

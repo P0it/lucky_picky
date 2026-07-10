@@ -12,10 +12,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get tabHome => 'Home';
 
   @override
-  String get tabStore => 'Wish Store';
+  String get tabGacha => 'Gacha';
 
   @override
-  String get tabDex => 'Wish Book';
+  String get tabDex => 'Luck Dex';
 
   @override
   String get tabArchive => 'My Record';
@@ -63,7 +63,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get archiveStatClovers => 'Clovers born';
 
   @override
-  String get archiveStatWishes => 'Wishes granted';
+  String get archiveStatPulls => 'Lucks pulled';
 
   @override
   String get archiveTimeline => 'Timeline';
@@ -75,8 +75,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get archiveEmpty => 'No records yet.';
 
   @override
-  String historyWishDone(String text) {
-    return '[Wish granted] $text';
+  String historyPullDone(String text) {
+    return '[Luck pulled] $text';
   }
 
   @override
@@ -90,86 +90,123 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get storeTitle => 'Wish Store';
-
-  @override
-  String get storeOwnedLabel => 'Clovers owned';
-
-  @override
-  String storeCloverCount(int count) {
-    return '$count';
-  }
-
-  @override
-  String get storeAddWish => '+ Add my own wish';
-
-  @override
-  String get storeWishHint => 'A wish you want to come true';
-
-  @override
-  String get storeRequiredClovers => 'Clovers needed';
+  String get historyFreePull => '🍀 Free pull';
 
   @override
   String get commonCancel => 'Cancel';
 
   @override
-  String get storeAddWishConfirm => 'Add wish';
+  String get commonConfirm => 'OK';
 
   @override
-  String get storeDepositFull => 'Filled';
+  String get gachaTitle => 'Lucky Gacha';
 
   @override
-  String get storeDeposit => 'Add clover';
+  String get gachaOwnedLabel => 'Clovers owned';
 
   @override
-  String get storeNotEnough => 'Not enough';
+  String gachaCloverCount(int count) {
+    return '$count';
+  }
 
   @override
-  String get depositTitleComplete => 'Grant this wish?';
+  String get gachaPull => 'Pull with a clover';
 
   @override
-  String get depositTitle => 'Add a clover?';
+  String get gachaNotEnough => 'Not enough clovers';
 
   @override
-  String get depositDescComplete => 'Adding this clover will grant your wish.';
+  String gachaFreePull(int left, int total) {
+    return 'Watch an ad · free pull ($left/$total)';
+  }
 
   @override
-  String get depositDesc => 'Add one clover. Added clovers can\'t be undone.';
+  String get gachaFreePullNone => 'Free pulls are back tomorrow';
 
   @override
-  String get depositConfirmComplete => 'Grant';
+  String get gachaRatesButton => 'Drop rates';
 
   @override
-  String get depositConfirm => 'Add';
+  String get gachaTapCapsule => 'Tap the capsule to open it!';
 
   @override
-  String get dexTitle => 'Wish Book';
+  String get ratesTitle => 'Drop rates';
 
   @override
-  String get dexSubtitle => 'Granted wishes gather here';
+  String get ratesDisclaimer =>
+      '* Luck effects are not scientifically proven,\nbut the good mood definitely is.';
 
   @override
-  String get dexEmptyTitle => 'No granted wishes yet.';
+  String get resultNew => 'NEW!';
 
   @override
-  String get dexEmptyDesc =>
-      'Gather all the clovers and grant a wish to see it here.';
+  String resultDup(int count) {
+    return 'Duplicate ×$count';
+  }
 
   @override
-  String get dexDelivered => 'Delivered';
+  String get resultMaterial => 'Enhance material +1';
 
   @override
-  String get dexTalismanLabel => 'Talisman';
+  String get resultConfirm => 'Nice';
 
   @override
-  String get grantTitle => 'Off to deliver your wish.';
+  String get resultRerollAd => 'Watch an ad · pull again';
 
   @override
-  String get toastWishDelivered =>
-      'Your wish was delivered · saved to your book 🍀';
+  String get dexTitle => 'Luck Dex';
 
   @override
-  String get talismanTitle => 'Lucky Talisman';
+  String get dexSubtitle => 'Every luck you\'ve pulled lives here';
+
+  @override
+  String dexProgress(int owned, int total) {
+    return '$owned/$total collected';
+  }
+
+  @override
+  String get ticketTitle => 'Luck Ticket';
+
+  @override
+  String ticketOwnedCopies(int count) {
+    return 'Owned ×$count';
+  }
+
+  @override
+  String ticketLevel(int level) {
+    return 'Lv.$level';
+  }
+
+  @override
+  String ticketBoost(int mult) {
+    return 'Luck ×$mult amplified';
+  }
+
+  @override
+  String ticketEnhance(int have, int need) {
+    return 'Enhance ($have/$need)';
+  }
+
+  @override
+  String get ticketEnhanceMax => 'Fully enhanced';
+
+  @override
+  String toastEnhanced(int mult) {
+    return 'Luck ×$mult amplified! ✨';
+  }
+
+  @override
+  String ticketFirstPulled(String date) {
+    return 'Pulled on $date';
+  }
+
+  @override
+  String get ticketTagline => 'luck you earn by doing good';
+
+  @override
+  String ticketShareText(String text) {
+    return 'Look what I pulled 🍀 \"$text\"\nMay this luck reach you too.\n\nLuckyPicky — luck you earn by doing good';
+  }
 
   @override
   String get talismanPortrait => 'Portrait';
@@ -193,17 +230,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get talismanRetry => 'Please try again in a moment.';
 
   @override
-  String get talismanShareText =>
-      'My wish came true 🍀\nMay this luck reach you too.\n\nooloo — a four-leaf clover filled with good deeds';
-
-  @override
-  String get talismanLabel => 'Wish-Granted Talisman';
-
-  @override
-  String get talismanCenterLine => 'This wish has come true';
-
-  @override
-  String get talismanTagline => 'a four-leaf clover filled with good deeds';
+  String get errorNeedConnection =>
+      'Internet connection is needed. Please try again.';
 
   @override
   String get languageSheetTitle => 'Language';

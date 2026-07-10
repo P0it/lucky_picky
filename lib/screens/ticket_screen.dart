@@ -1,37 +1,42 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../config/luck_tickets.dart';
+import '../data/game_backend.dart';
 import '../l10n/app_localizations.dart';
-import '../models/wish.dart';
+import '../models/owned_ticket.dart';
+import '../state/app_controller.dart';
 import '../theme/app_theme.dart';
-import '../widgets/ooloo_toast.dart';
+import '../widgets/app_toast.dart';
 import '../widgets/pressable.dart';
+import '../widgets/rarity_style.dart';
 import '../widgets/talisman_export.dart';
-import '../widgets/wish_talisman.dart';
+import '../widgets/ticket_card.dart';
 
-/// 도감 카드 → 부적 상세. 페이드로 진입.
-Route<void> wishTalismanRoute(Wish wish) => PageRouteBuilder(
+/// 도감 카드 → 행운권 상세. 페이드로 진입.
+Route<void> ticketRoute(String ticketId) => PageRouteBuilder(
       transitionDuration: const Duration(milliseconds: 280),
       reverseTransitionDuration: const Duration(milliseconds: 220),
-      pageBuilder: (_, _, _) => WishTalismanScreen(wish: wish),
+      pageBuilder: (_, _, _) => TicketScreen(ticketId: ticketId),
       transitionsBuilder: (_, anim, _, child) =>
           FadeTransition(opacity: anim, child: child),
     );
 
-/// 완성된 소원을 부적 이미지로 미리보고, 앨범 저장 / 공유한다.
-class WishTalismanScreen extends StatefulWidget {
-  final Wish wish;
-  const WishTalismanScreen({super.key, required this.wish});
+/// 획득한 행운권을 카드 이미지로 미리보고 강화 / 앨범 저장 / 공유한다.
+class TicketScreen extends ConsumerStatefulWidget {
+  final String ticketId;
+  const TicketScreen({super.key, required this.ticketId});
 
   @override
-  State<WishTalismanScreen> createState() => _WishTalismanScreenState();
+  ConsumerState<TicketScreen> createState() => _TicketScreenState();
 }
 
-class _WishTalismanScreenState extends State<WishTalismanScreen> {
+class _TicketScreenState extends ConsumerState<TicketScreen> {
   final _boundaryKey = GlobalKey();
-  TalismanFormat _format = TalismanFormat.portrait;
+  TicketFormat _format = TicketFormat.portrait;
   bool _busy = false;
 
-  String get _fileName => 'ooloo_talisman_${widget.wish.id}_${_format.name}';
+  String get _fileName => 'luckypicky_ticket_${widget.ticketId}_${_format.name}';
 
   Future<void> _withBusy(Future<void> Function() action, {String? failMsg}) async {
     if (_busy) return;
@@ -40,7 +45,7 @@ class _WishTalismanScreenState extends State<WishTalismanScreen> {
       await action();
     } catch (_) {
       if (mounted) {
-        showOolooToast(context, failMsg ?? AppLocalizations.of(context).talismanRetry);
+        showAppToast(context, failMsg ?? AppLocalizations.of(context).talismanRetry);
       }
     } finally {
       if (mounted) setState(() => _busy = false);
@@ -50,26 +55,52 @@ class _WishTalismanScreenState extends State<WishTalismanScreen> {
   Future<void> _save() => _withBusy(() async {
         final bytes = await captureBoundaryPng(_boundaryKey);
         await saveTalismanToGallery(bytes, _fileName);
-        if (mounted) showOolooToast(context, AppLocalizations.of(context).toastSavedToAlbum);
+        if (mounted) showAppToast(context, AppLocalizations.of(context).toastSavedToAlbum);
       }, failMsg: AppLocalizations.of(context).talismanSaveFail);
 
-  Future<void> _share() {
-    final shareText = AppLocalizations.of(context).talismanShareText;
+  Future<void> _share(LuckTicket ticket) {
+    final lang = Localizations.localeOf(context).languageCode;
+    final shareText = AppLocalizations.of(context).ticketShareText(ticket.text(lang));
     return _withBusy(() async {
       final bytes = await captureBoundaryPng(_boundaryKey);
       await shareTalisman(bytes, _fileName, text: shareText);
     });
   }
 
+  Future<void> _enhance() async {
+    final l = AppLocalizations.of(context);
+    try {
+      final up = await ref
+          .read(appControllerProvider.notifier)
+          .enhanceTicket(widget.ticketId);
+      if (up != null && mounted) showAppToast(context, l.toastEnhanced(up.level));
+    } on GameConnectionException {
+      if (mounted) showAppToast(context, l.errorNeedConnection);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
+    final ticket = LuckCatalog.byId(widget.ticketId);
+    final owned = ref.watch(appControllerProvider.select(
+        (s) => s.tickets.where((t) => t.ticketId == widget.ticketId).firstOrNull));
+
+    if (ticket == null || owned == null) {
+      // 방어 — 미획득/알 수 없는 ID 로 진입 시 그냥 닫는다.
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) Navigator.of(context).maybePop();
+      });
+      return const Scaffold(backgroundColor: AppColors.bg, body: SizedBox());
+    }
+
     return Scaffold(
       backgroundColor: AppColors.bg,
       body: SafeArea(
         child: Column(
           children: [
-            _topBar(),
-            _deliveredChip(),
+            _topBar(l),
+            _infoChips(l, ticket, owned),
             Expanded(
               child: Center(
                 child: Padding(
@@ -89,7 +120,7 @@ class _WishTalismanScreenState extends State<WishTalismanScreen> {
                         borderRadius: BorderRadius.circular(28),
                         child: RepaintBoundary(
                           key: _boundaryKey,
-                          child: WishTalisman(wish: widget.wish, format: _format),
+                          child: TicketCard(ticket: ticket, owned: owned, format: _format),
                         ),
                       ),
                     ),
@@ -97,9 +128,11 @@ class _WishTalismanScreenState extends State<WishTalismanScreen> {
                 ),
               ),
             ),
+            _enhanceButton(l, ticket, owned),
+            const SizedBox(height: 12),
             _formatToggle(),
-            const SizedBox(height: 16),
-            _actions(),
+            const SizedBox(height: 14),
+            _actions(ticket),
             const SizedBox(height: 12),
           ],
         ),
@@ -107,28 +140,7 @@ class _WishTalismanScreenState extends State<WishTalismanScreen> {
     );
   }
 
-  /// 도감 카드에서 옮겨온 "전달 완료" 정보 — 부적을 열었을 때 보여준다.
-  Widget _deliveredChip() {
-    final l = AppLocalizations.of(context);
-    final date = widget.wish.completedAt;
-    return Padding(
-      padding: const EdgeInsets.only(top: 2, bottom: 8),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-        decoration: BoxDecoration(
-          color: AppColors.accentSoft,
-          borderRadius: BorderRadius.circular(AppRadius.chipFull),
-        ),
-        child: Text(
-          date == null ? l.dexDelivered : '${l.dexDelivered}  ·  $date',
-          style: AppText.base(
-              size: 12, weight: FontWeight.w700, color: AppColors.accent),
-        ),
-      ),
-    );
-  }
-
-  Widget _topBar() {
+  Widget _topBar(AppLocalizations l) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(8, 8, 20, 4),
       child: Row(
@@ -141,7 +153,7 @@ class _WishTalismanScreenState extends State<WishTalismanScreen> {
             ),
           ),
           const Spacer(),
-          Text(AppLocalizations.of(context).talismanTitle,
+          Text(l.ticketTitle,
               style: AppText.base(size: 17, weight: FontWeight.w800, letterSpacingEm: -0.03)),
           const Spacer(),
           const SizedBox(width: 50), // 닫기 버튼과 대칭
@@ -150,8 +162,107 @@ class _WishTalismanScreenState extends State<WishTalismanScreen> {
     );
   }
 
+  /// 획득일 · 보유 장수 · 강화 레벨 정보 칩.
+  Widget _infoChips(AppLocalizations l, LuckTicket ticket, OwnedTicket owned) {
+    final style = RarityStyle.of(ticket.rarity);
+    Widget chip(String text, {bool filled = false}) => Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          decoration: BoxDecoration(
+            color: filled ? style.color : style.soft,
+            borderRadius: BorderRadius.circular(AppRadius.chipFull),
+          ),
+          child: Text(
+            text,
+            style: AppText.base(
+                size: 12,
+                weight: FontWeight.w700,
+                color: filled ? Colors.white : style.color),
+          ),
+        );
+
+    return Padding(
+      padding: const EdgeInsets.only(top: 2, bottom: 8),
+      child: Wrap(
+        spacing: 6,
+        alignment: WrapAlignment.center,
+        children: [
+          chip(l.ticketLevel(owned.level), filled: owned.level > 1),
+          chip(l.ticketOwnedCopies(owned.copies)),
+          chip(l.ticketFirstPulled(owned.firstPulledAt)),
+        ],
+      ),
+    );
+  }
+
+  /// 강화 버튼 — 재료(중복) 현황과 함께.
+  Widget _enhanceButton(AppLocalizations l, LuckTicket ticket, OwnedTicket owned) {
+    final style = RarityStyle.of(ticket.rarity);
+    if (owned.isMaxLevel) {
+      return Container(
+        margin: const EdgeInsets.symmetric(horizontal: 24),
+        width: double.infinity,
+        height: 48,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          color: style.soft,
+          borderRadius: BorderRadius.circular(AppRadius.button),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.auto_awesome_rounded, size: 18, color: style.color),
+            const SizedBox(width: 7),
+            Text(l.ticketEnhanceMax,
+                style: AppText.base(
+                    size: 15, weight: FontWeight.w700, color: style.color)),
+          ],
+        ),
+      );
+    }
+    final need = OwnedTicket.costForNextLevel(owned.level);
+    final have = owned.spareCopies;
+    final can = owned.canEnhance;
+    return Pressable(
+      onTap: can ? _enhance : null,
+      child: Container(
+        margin: const EdgeInsets.symmetric(horizontal: 24),
+        width: double.infinity,
+        height: 48,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          color: can ? style.color : AppColors.card,
+          borderRadius: BorderRadius.circular(AppRadius.button),
+          boxShadow: can
+              ? [
+                  BoxShadow(
+                      color: style.color.withValues(alpha: 0.28),
+                      blurRadius: 16,
+                      offset: const Offset(0, 6)),
+                ]
+              : null,
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.upgrade_rounded,
+                size: 19, color: can ? Colors.white : AppColors.disabled),
+            const SizedBox(width: 6),
+            Text(
+              l.ticketEnhance(have, need),
+              style: AppText.base(
+                size: 15,
+                weight: FontWeight.w700,
+                color: can ? Colors.white : AppColors.disabled,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _formatToggle() {
-    Widget seg(String label, TalismanFormat f) {
+    Widget seg(String label, TicketFormat f) {
       final active = _format == f;
       return Expanded(
         child: Pressable(
@@ -188,8 +299,8 @@ class _WishTalismanScreenState extends State<WishTalismanScreen> {
           width: 240,
           child: Row(
             children: [
-              seg(AppLocalizations.of(context).talismanPortrait, TalismanFormat.portrait),
-              seg(AppLocalizations.of(context).talismanSquare, TalismanFormat.square),
+              seg(AppLocalizations.of(context).talismanPortrait, TicketFormat.portrait),
+              seg(AppLocalizations.of(context).talismanSquare, TicketFormat.square),
             ],
           ),
         ),
@@ -197,7 +308,7 @@ class _WishTalismanScreenState extends State<WishTalismanScreen> {
     );
   }
 
-  Widget _actions() {
+  Widget _actions(LuckTicket ticket) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24),
       child: Row(
@@ -227,7 +338,7 @@ class _WishTalismanScreenState extends State<WishTalismanScreen> {
           const SizedBox(width: 10),
           Expanded(
             child: Pressable(
-              onTap: _busy ? null : _share,
+              onTap: _busy ? null : () => _share(ticket),
               child: Container(
                 height: 56,
                 alignment: Alignment.center,

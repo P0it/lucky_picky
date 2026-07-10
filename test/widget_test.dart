@@ -3,15 +3,25 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'package:ooloo/config/daily_quotes.dart';
-import 'package:ooloo/l10n/app_localizations.dart';
-import 'package:ooloo/screens/home_shell.dart';
-import 'package:ooloo/state/ads_controller.dart';
-import 'package:ooloo/util/text_wrap.dart';
-import 'package:ooloo/theme/app_theme.dart';
+import 'package:luckypicky/config/daily_quotes.dart';
+import 'package:luckypicky/data/local_game_backend.dart';
+import 'package:luckypicky/l10n/app_localizations.dart';
+import 'package:luckypicky/models/app_state.dart';
+import 'package:luckypicky/screens/home_shell.dart';
+import 'package:luckypicky/state/ads_controller.dart';
+import 'package:luckypicky/state/app_controller.dart';
+import 'package:luckypicky/util/text_wrap.dart';
+import 'package:luckypicky/theme/app_theme.dart';
 
 // 테스트는 한국어 로케일로 고정해 기존 한글 단언을 그대로 검증한다.
+// 백엔드는 서버 RPC 와 동일 규칙의 로컬 구현(시드: 잎 2 / 클로버 5)을 주입한다.
 Widget _app() => ProviderScope(
+      overrides: [
+        gameBackendProvider.overrideWithValue(LocalGameBackend(
+          seed: const AppState(
+              leaves: 2, clovers: 5, statLeaves: 2, statClovers: 1),
+        )),
+      ],
       child: MaterialApp(
         theme: buildAppTheme(),
         locale: const Locale('ko'),
@@ -31,7 +41,8 @@ void main() {
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
     await tester.pumpWidget(_app());
-    await tester.pump();
+    await tester.pump(); // 첫 프레임
+    await tester.pump(); // 백엔드 부트스트랩(비동기) 반영
   }
 
   testWidgets('홈 화면이 렌더링된다 (클로버 페인터 포함)', (tester) async {
@@ -43,20 +54,21 @@ void main() {
   testWidgets('탭으로 네 화면을 모두 오갈 수 있다', (tester) async {
     await pumpApp(tester);
 
-    await tester.tap(find.text('소원 상점'));
+    await tester.tap(find.text('뽑기'));
     await tester.pump(const Duration(milliseconds: 350));
+    expect(find.text('행운 뽑기'), findsOneWidget);
     expect(find.text('보유한 클로버'), findsOneWidget);
-    expect(find.text('면접에서 좋은 결과 받기'), findsOneWidget);
+    expect(find.text('클로버로 뽑기'), findsOneWidget);
 
-    await tester.tap(find.text('소원 도감'));
+    await tester.tap(find.text('행운 도감'));
     await tester.pump(const Duration(milliseconds: 350));
-    expect(find.text('전한 소원들이 이곳에 모여요'), findsOneWidget);
-    expect(find.text('아직 전한 소원이 없어요.'), findsOneWidget);
+    expect(find.text('뽑은 행운들이 이곳에 모여요'), findsOneWidget);
+    expect(find.text('0/70 수집'), findsOneWidget);
 
     await tester.tap(find.text('나의 기록'));
     await tester.pump(const Duration(milliseconds: 350));
     expect(find.text('나의 선행 기록'), findsOneWidget);
-    expect(find.text('총 채운 잎'), findsOneWidget);
+    expect(find.text('뽑은 행운'), findsOneWidget);
 
     await tester.tap(find.text('홈'));
     await tester.pump(const Duration(milliseconds: 350));
@@ -85,42 +97,65 @@ void main() {
     await tester.pump(const Duration(milliseconds: 2200)); // 토스트 타이머 flush
   });
 
-  testWidgets('AdsController 는 비-모바일에서 광고를 스킵하고 onDone 을 호출한다', (tester) async {
+  testWidgets('AdsController 는 비-모바일에서 광고를 스킵하고 보상/완료를 호출한다', (tester) async {
     bool done = false;
     AdsController.instance.showInterstitial(onDone: () => done = true);
     expect(done, true);
+
+    bool rewarded = false;
+    AdsController.instance.showRewarded(onReward: () => rewarded = true);
+    expect(rewarded, true);
   });
 
-  testWidgets('담기 → 완성(전달 연출 → 광고 스킵) → 소원이 도감으로 이동', (tester) async {
+  testWidgets('확률 정보 시트에 등급/확률/비유가 표시된다', (tester) async {
     await pumpApp(tester);
 
-    await tester.tap(find.text('소원 상점'));
-    await tester.pump(const Duration(milliseconds: 400)); // 홈 클로버 dispose 까지 전환 완료
-
-    // 첫 소원(면접, cost 4, deposited 2, 보유 5) → 담기 → 확인 시트 → 담기 → 3/4 (연출 없음)
-    await tester.tap(find.text('클로버 담기').first);
-    await tester.pumpAndSettle(); // 확인 시트 진입
-    expect(find.text('클로버를 담을까요?'), findsOneWidget);
-    await tester.tap(find.text('담기'));
-    await tester.pumpAndSettle(); // 시트 닫힘
-    expect(find.text('3 / 4'), findsOneWidget);
-
-    // 한 번 더 담기 → 확인 시트가 '완성' 문구 → 완성하기 → 전달 연출 진입
-    await tester.tap(find.text('클로버 담기').first);
+    await tester.tap(find.text('뽑기'));
+    await tester.pump(const Duration(milliseconds: 400));
+    await tester.tap(find.text('확률 정보'));
     await tester.pumpAndSettle();
-    expect(find.text('소원을 완성할까요?'), findsOneWidget);
-    await tester.tap(find.text('완성하기'));
-    await tester.pumpAndSettle(); // 전달 오버레이 진입 + 연출 정착
-    expect(find.text('소원을 전달하고 오겠습니다.'), findsOneWidget);
 
-    // 광고 타이머(1.5s) 발화 → 스킵 → completeWish → 오버레이 pop
-    await tester.pump(const Duration(milliseconds: 1700));
-    await tester.pumpAndSettle(); // pop 전환 정착
-    await tester.pump(const Duration(milliseconds: 2200)); // 토스트 타이머 flush
+    expect(find.text('획득 확률'), findsOneWidget);
+    expect(find.text('일반'), findsOneWidget);
+    expect(find.text('신화'), findsOneWidget);
+    expect(find.text('50%'), findsOneWidget);
+    expect(find.text('2%'), findsOneWidget);
+    expect(find.textContaining('로또 1등보다'), findsOneWidget);
+  });
 
-    // 완성 후 자동으로 소원 도감 탭으로 이동하고, 소원이 도감에 담긴다.
-    expect(find.text('전한 소원들이 이곳에 모여요'), findsOneWidget); // 도감 화면이 떠 있음
-    expect(find.text('면접에서 좋은 결과 받기'), findsOneWidget);
-    expect(find.text('전달 완료'), findsWidgets);
+  testWidgets('뽑기 → 캡슐 개봉 → 결과 확인 → 도감에 등록된다', (tester) async {
+    await pumpApp(tester);
+
+    await tester.tap(find.text('뽑기'));
+    await tester.pump(const Duration(milliseconds: 400)); // 탭 전환 완료
+
+    // 뽑기 시작 → 오버레이 진입(코인 → 레버 → 낙하 연출).
+    await tester.tap(find.text('클로버로 뽑기'));
+    await tester.pump(); // 라우트 push
+    await tester.pump(const Duration(milliseconds: 300)); // 페이드 전환
+    await tester.pump(const Duration(milliseconds: 600)); // 코인 투입
+    await tester.pump(const Duration(milliseconds: 900)); // 레버 회전
+    await tester.pump(const Duration(milliseconds: 800)); // 캡슐 낙하
+    await tester.pump(const Duration(milliseconds: 300)); // waitTap 힌트 표시
+    expect(find.text('캡슐을 탭해서 열어보세요!'), findsOneWidget);
+
+    // 캡슐 탭 → 버스트 → 결과 카드.
+    await tester.tap(find.text('캡슐을 탭해서 열어보세요!'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 700)); // 버스트
+    await tester.pump(const Duration(milliseconds: 500)); // 카드 등장
+    expect(find.text('NEW!'), findsOneWidget);
+    expect(find.text('좋아요'), findsOneWidget);
+
+    // 확인 → 오버레이 닫힘 (1회차라 전면광고 차례 아님).
+    await tester.tap(find.text('좋아요'));
+    await tester.pumpAndSettle();
+    expect(find.text('행운 뽑기'), findsOneWidget); // 가챠 화면 복귀
+    expect(find.text('4개'), findsOneWidget); // 클로버 5 → 4
+
+    // 도감에 1종 등록.
+    await tester.tap(find.text('행운 도감'));
+    await tester.pump(const Duration(milliseconds: 400));
+    expect(find.text('1/70 수집'), findsOneWidget);
   });
 }

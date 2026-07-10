@@ -11,8 +11,8 @@ import '../widgets/pressable.dart';
 import '../widgets/tab_icons.dart';
 import 'archive_screen.dart';
 import 'dex_screen.dart';
+import 'gacha_screen.dart';
 import 'home_screen.dart';
-import 'store_screen.dart';
 
 class HomeShell extends ConsumerWidget {
   const HomeShell({super.key});
@@ -42,7 +42,7 @@ class HomeShell extends ConsumerWidget {
                   key: ValueKey(tab),
                   child: switch (tab) {
                     AppTab.home => const HomeScreen(),
-                    AppTab.store => const StoreScreen(),
+                    AppTab.gacha => const GachaScreen(),
                     AppTab.dex => const DexScreen(),
                     AppTab.archive => const ArchiveScreen(),
                   },
@@ -79,7 +79,7 @@ class _TabBar extends StatelessWidget {
           child: Row(
             children: [
               _item(TabIconKind.home, l.tabHome, AppTab.home),
-              _item(TabIconKind.store, l.tabStore, AppTab.store),
+              _item(TabIconKind.store, l.tabGacha, AppTab.gacha),
               _item(TabIconKind.dex, l.tabDex, AppTab.dex),
               _item(TabIconKind.archive, l.tabArchive, AppTab.archive),
             ],

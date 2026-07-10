@@ -106,16 +106,16 @@ abstract class AppLocalizations {
   /// **'Home'**
   String get tabHome;
 
-  /// No description provided for @tabStore.
+  /// No description provided for @tabGacha.
   ///
   /// In en, this message translates to:
-  /// **'Wish Store'**
-  String get tabStore;
+  /// **'Gacha'**
+  String get tabGacha;
 
   /// No description provided for @tabDex.
   ///
   /// In en, this message translates to:
-  /// **'Wish Book'**
+  /// **'Luck Dex'**
   String get tabDex;
 
   /// No description provided for @tabArchive.
@@ -202,11 +202,11 @@ abstract class AppLocalizations {
   /// **'Clovers born'**
   String get archiveStatClovers;
 
-  /// No description provided for @archiveStatWishes.
+  /// No description provided for @archiveStatPulls.
   ///
   /// In en, this message translates to:
-  /// **'Wishes granted'**
-  String get archiveStatWishes;
+  /// **'Lucks pulled'**
+  String get archiveStatPulls;
 
   /// No description provided for @archiveTimeline.
   ///
@@ -226,11 +226,11 @@ abstract class AppLocalizations {
   /// **'No records yet.'**
   String get archiveEmpty;
 
-  /// No description provided for @historyWishDone.
+  /// No description provided for @historyPullDone.
   ///
   /// In en, this message translates to:
-  /// **'[Wish granted] {text}'**
-  String historyWishDone(String text);
+  /// **'[Luck pulled] {text}'**
+  String historyPullDone(String text);
 
   /// No description provided for @historyLeafDelta.
   ///
@@ -244,41 +244,11 @@ abstract class AppLocalizations {
   /// **'🍀 Clover -{count}'**
   String historyCloverDelta(int count);
 
-  /// No description provided for @storeTitle.
+  /// No description provided for @historyFreePull.
   ///
   /// In en, this message translates to:
-  /// **'Wish Store'**
-  String get storeTitle;
-
-  /// No description provided for @storeOwnedLabel.
-  ///
-  /// In en, this message translates to:
-  /// **'Clovers owned'**
-  String get storeOwnedLabel;
-
-  /// No description provided for @storeCloverCount.
-  ///
-  /// In en, this message translates to:
-  /// **'{count}'**
-  String storeCloverCount(int count);
-
-  /// No description provided for @storeAddWish.
-  ///
-  /// In en, this message translates to:
-  /// **'+ Add my own wish'**
-  String get storeAddWish;
-
-  /// No description provided for @storeWishHint.
-  ///
-  /// In en, this message translates to:
-  /// **'A wish you want to come true'**
-  String get storeWishHint;
-
-  /// No description provided for @storeRequiredClovers.
-  ///
-  /// In en, this message translates to:
-  /// **'Clovers needed'**
-  String get storeRequiredClovers;
+  /// **'🍀 Free pull'**
+  String get historyFreePull;
 
   /// No description provided for @commonCancel.
   ///
@@ -286,119 +256,185 @@ abstract class AppLocalizations {
   /// **'Cancel'**
   String get commonCancel;
 
-  /// No description provided for @storeAddWishConfirm.
+  /// No description provided for @commonConfirm.
   ///
   /// In en, this message translates to:
-  /// **'Add wish'**
-  String get storeAddWishConfirm;
+  /// **'OK'**
+  String get commonConfirm;
 
-  /// No description provided for @storeDepositFull.
+  /// No description provided for @gachaTitle.
   ///
   /// In en, this message translates to:
-  /// **'Filled'**
-  String get storeDepositFull;
+  /// **'Lucky Gacha'**
+  String get gachaTitle;
 
-  /// No description provided for @storeDeposit.
+  /// No description provided for @gachaOwnedLabel.
   ///
   /// In en, this message translates to:
-  /// **'Add clover'**
-  String get storeDeposit;
+  /// **'Clovers owned'**
+  String get gachaOwnedLabel;
 
-  /// No description provided for @storeNotEnough.
+  /// No description provided for @gachaCloverCount.
   ///
   /// In en, this message translates to:
-  /// **'Not enough'**
-  String get storeNotEnough;
+  /// **'{count}'**
+  String gachaCloverCount(int count);
 
-  /// No description provided for @depositTitleComplete.
+  /// No description provided for @gachaPull.
   ///
   /// In en, this message translates to:
-  /// **'Grant this wish?'**
-  String get depositTitleComplete;
+  /// **'Pull with a clover'**
+  String get gachaPull;
 
-  /// No description provided for @depositTitle.
+  /// No description provided for @gachaNotEnough.
   ///
   /// In en, this message translates to:
-  /// **'Add a clover?'**
-  String get depositTitle;
+  /// **'Not enough clovers'**
+  String get gachaNotEnough;
 
-  /// No description provided for @depositDescComplete.
+  /// No description provided for @gachaFreePull.
   ///
   /// In en, this message translates to:
-  /// **'Adding this clover will grant your wish.'**
-  String get depositDescComplete;
+  /// **'Watch an ad · free pull ({left}/{total})'**
+  String gachaFreePull(int left, int total);
 
-  /// No description provided for @depositDesc.
+  /// No description provided for @gachaFreePullNone.
   ///
   /// In en, this message translates to:
-  /// **'Add one clover. Added clovers can\'t be undone.'**
-  String get depositDesc;
+  /// **'Free pulls are back tomorrow'**
+  String get gachaFreePullNone;
 
-  /// No description provided for @depositConfirmComplete.
+  /// No description provided for @gachaRatesButton.
   ///
   /// In en, this message translates to:
-  /// **'Grant'**
-  String get depositConfirmComplete;
+  /// **'Drop rates'**
+  String get gachaRatesButton;
 
-  /// No description provided for @depositConfirm.
+  /// No description provided for @gachaTapCapsule.
   ///
   /// In en, this message translates to:
-  /// **'Add'**
-  String get depositConfirm;
+  /// **'Tap the capsule to open it!'**
+  String get gachaTapCapsule;
+
+  /// No description provided for @ratesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Drop rates'**
+  String get ratesTitle;
+
+  /// No description provided for @ratesDisclaimer.
+  ///
+  /// In en, this message translates to:
+  /// **'* Luck effects are not scientifically proven,\nbut the good mood definitely is.'**
+  String get ratesDisclaimer;
+
+  /// No description provided for @resultNew.
+  ///
+  /// In en, this message translates to:
+  /// **'NEW!'**
+  String get resultNew;
+
+  /// No description provided for @resultDup.
+  ///
+  /// In en, this message translates to:
+  /// **'Duplicate ×{count}'**
+  String resultDup(int count);
+
+  /// No description provided for @resultMaterial.
+  ///
+  /// In en, this message translates to:
+  /// **'Enhance material +1'**
+  String get resultMaterial;
+
+  /// No description provided for @resultConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Nice'**
+  String get resultConfirm;
+
+  /// No description provided for @resultRerollAd.
+  ///
+  /// In en, this message translates to:
+  /// **'Watch an ad · pull again'**
+  String get resultRerollAd;
 
   /// No description provided for @dexTitle.
   ///
   /// In en, this message translates to:
-  /// **'Wish Book'**
+  /// **'Luck Dex'**
   String get dexTitle;
 
   /// No description provided for @dexSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Granted wishes gather here'**
+  /// **'Every luck you\'ve pulled lives here'**
   String get dexSubtitle;
 
-  /// No description provided for @dexEmptyTitle.
+  /// No description provided for @dexProgress.
   ///
   /// In en, this message translates to:
-  /// **'No granted wishes yet.'**
-  String get dexEmptyTitle;
+  /// **'{owned}/{total} collected'**
+  String dexProgress(int owned, int total);
 
-  /// No description provided for @dexEmptyDesc.
+  /// No description provided for @ticketTitle.
   ///
   /// In en, this message translates to:
-  /// **'Gather all the clovers and grant a wish to see it here.'**
-  String get dexEmptyDesc;
+  /// **'Luck Ticket'**
+  String get ticketTitle;
 
-  /// No description provided for @dexDelivered.
+  /// No description provided for @ticketOwnedCopies.
   ///
   /// In en, this message translates to:
-  /// **'Delivered'**
-  String get dexDelivered;
+  /// **'Owned ×{count}'**
+  String ticketOwnedCopies(int count);
 
-  /// No description provided for @dexTalismanLabel.
+  /// No description provided for @ticketLevel.
   ///
   /// In en, this message translates to:
-  /// **'Talisman'**
-  String get dexTalismanLabel;
+  /// **'Lv.{level}'**
+  String ticketLevel(int level);
 
-  /// No description provided for @grantTitle.
+  /// No description provided for @ticketBoost.
   ///
   /// In en, this message translates to:
-  /// **'Off to deliver your wish.'**
-  String get grantTitle;
+  /// **'Luck ×{mult} amplified'**
+  String ticketBoost(int mult);
 
-  /// No description provided for @toastWishDelivered.
+  /// No description provided for @ticketEnhance.
   ///
   /// In en, this message translates to:
-  /// **'Your wish was delivered · saved to your book 🍀'**
-  String get toastWishDelivered;
+  /// **'Enhance ({have}/{need})'**
+  String ticketEnhance(int have, int need);
 
-  /// No description provided for @talismanTitle.
+  /// No description provided for @ticketEnhanceMax.
   ///
   /// In en, this message translates to:
-  /// **'Lucky Talisman'**
-  String get talismanTitle;
+  /// **'Fully enhanced'**
+  String get ticketEnhanceMax;
+
+  /// No description provided for @toastEnhanced.
+  ///
+  /// In en, this message translates to:
+  /// **'Luck ×{mult} amplified! ✨'**
+  String toastEnhanced(int mult);
+
+  /// No description provided for @ticketFirstPulled.
+  ///
+  /// In en, this message translates to:
+  /// **'Pulled on {date}'**
+  String ticketFirstPulled(String date);
+
+  /// No description provided for @ticketTagline.
+  ///
+  /// In en, this message translates to:
+  /// **'luck you earn by doing good'**
+  String get ticketTagline;
+
+  /// No description provided for @ticketShareText.
+  ///
+  /// In en, this message translates to:
+  /// **'Look what I pulled 🍀 \"{text}\"\nMay this luck reach you too.\n\nLuckyPicky — luck you earn by doing good'**
+  String ticketShareText(String text);
 
   /// No description provided for @talismanPortrait.
   ///
@@ -442,29 +478,11 @@ abstract class AppLocalizations {
   /// **'Please try again in a moment.'**
   String get talismanRetry;
 
-  /// No description provided for @talismanShareText.
+  /// No description provided for @errorNeedConnection.
   ///
   /// In en, this message translates to:
-  /// **'My wish came true 🍀\nMay this luck reach you too.\n\nooloo — a four-leaf clover filled with good deeds'**
-  String get talismanShareText;
-
-  /// No description provided for @talismanLabel.
-  ///
-  /// In en, this message translates to:
-  /// **'Wish-Granted Talisman'**
-  String get talismanLabel;
-
-  /// No description provided for @talismanCenterLine.
-  ///
-  /// In en, this message translates to:
-  /// **'This wish has come true'**
-  String get talismanCenterLine;
-
-  /// No description provided for @talismanTagline.
-  ///
-  /// In en, this message translates to:
-  /// **'a four-leaf clover filled with good deeds'**
-  String get talismanTagline;
+  /// **'Internet connection is needed. Please try again.'**
+  String get errorNeedConnection;
 
   /// No description provided for @languageSheetTitle.
   ///

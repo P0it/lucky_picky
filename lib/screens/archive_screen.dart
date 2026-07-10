@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../config/luck_tickets.dart';
 import '../l10n/app_localizations.dart';
 import '../models/app_state.dart';
 import '../models/deed.dart';
@@ -62,7 +63,7 @@ class ArchiveScreen extends ConsumerWidget {
                 _divider(),
                 _stat('${s.statClovers}', l.archiveStatClovers, AppColors.accent),
                 _divider(),
-                _stat('${s.statWishes}', l.archiveStatWishes, AppColors.title),
+                _stat('${s.statPulls}', l.archiveStatPulls, AppColors.title),
               ],
             ),
           ),
@@ -181,16 +182,21 @@ class _Timeline extends StatelessWidget {
   }
 
   /// 구버전 데이터는 저장된 원문을, 신규 데이터는 언어별로 포맷한 본문을 만든다.
+  /// 뽑기 기록은 행운권 ID 만 저장하므로 표시 시점에 현재 언어로 풀어낸다.
   String _displayText(AppLocalizations l, HistoryEntry h) {
     if (h.legacyDelta != null) return h.text;
-    return h.kind == HistoryKind.wish ? l.historyWishDone(h.text) : h.text;
+    if (h.kind == HistoryKind.pull) {
+      final text = LuckCatalog.byId(h.text)?.text(l.localeName) ?? h.text;
+      return l.historyPullDone(text);
+    }
+    return h.text;
   }
 
   String _displayDelta(AppLocalizations l, HistoryEntry h) {
     if (h.legacyDelta != null) return h.legacyDelta!;
-    return h.kind == HistoryKind.deed
-        ? l.historyLeafDelta(h.amount)
-        : l.historyCloverDelta(h.amount);
+    if (h.kind == HistoryKind.deed) return l.historyLeafDelta(h.amount);
+    // 무료(광고) 뽑기는 클로버 소모 0.
+    return h.amount > 0 ? l.historyCloverDelta(h.amount) : l.historyFreePull;
   }
 
   Widget _row(AppLocalizations l, HistoryEntry h, bool isFirst, bool isLast) {

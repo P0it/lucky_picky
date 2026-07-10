@@ -1,13 +1,18 @@
 // ════════════════════════════════════════════════════════════════
-//  매일 바뀌는 홈 화면 명언 — 친절·선행·따뜻함에 대한 한마디.
+//  매일 바뀌는 홈 화면 문구 — "선행하면 운이 쌓인다"는 MZ식 드립 한마디.
+//
+//  주의: 이 앱은 뽑기앱이 아니라 선행앱. 유머 톤은 가져가되
+//  가챠·RNG·리세마라 같은 뽑기 프레임은 쓰지 않는다.
+//  핵심 메시지 = 운은 기다리는 게 아니라 선행으로 직접 만드는 것.
 //
 //  날짜(연중 일수)를 기준으로 하나를 고르므로,
 //  같은 날에는 항상 같은 문구가 나오고 날이 바뀌면 다음 문구로 넘어갑니다.
 //
-//  단순 번역이 아니라 각 언어권 정서에 맞춰 "직접 각색"한 문구입니다.
-//  네잎클로버=행운이라는 '설명'에 기대지 않고, "오늘의 작은 행운/다정함"
-//  이라는 보편 감정에 맞춰 작성했습니다. (동아시아권에서 숫자 4를 한자 四로
-//  강조하면 죽음을 연상시키므로 그런 표현은 피했습니다.)
+//  단순 번역이 아니라 각 언어권 밈 감성에 맞춰 "직접 각색"한 문구입니다.
+//  한국어는 짤·유행어 패러디 톤, 영어는 인터넷 밈 톤,
+//  일본어는 徳を積む 넷슬랭 톤으로 작성했습니다.
+//  (동아시아권에서 숫자 4를 한자 四로 강조하면 죽음을 연상시키므로
+//  그런 표현은 피했습니다.)
 //
 //  언어별 문구 개수는 서로 달라도 됩니다(리스트 길이로 순환).
 // ════════════════════════════════════════════════════════════════
@@ -17,64 +22,64 @@ class DailyQuotes {
   // 줄바꿈 지점(\n)은 어구 경계에 맞춰 직접 넣어둡니다.
   static const Map<String, List<String>> _byLang = {
     'ko': [
-      '오늘도 다정한 하루 보내고 있나요',
-      '작은 친절 하나,\n여기 남겨볼까요',
-      '좋은 마음, 천천히 모아가요',
-      '오늘 누군가에게\n건넨 다정함이 있었나요',
-      '조용히 건넨 친절도 충분해요',
-      '천천히 채워도 괜찮아요',
-      '마음 쓴 하루였네요',
-      '당신의 다정함이\n조금씩 쌓이고 있어요',
-      '오늘 한 칸,\n마음을 내어볼까요',
-      '작은 선행도 충분히 의미 있어요',
-      '괜찮아요, 작은 것부터',
-      '여기, 당신의 다정한 기록이에요',
-      '오늘도 마음 한 칸\n내어주셨네요',
-      '잘 지내고 있나요, 오늘도',
-      '누군가에게 건넨 다정함,\n기억하고 있어요',
-      '서두르지 않아도 돼요',
-      '오늘의 다정함을 남겨주세요',
-      '다정한 마음으로 하루를 시작해요',
+      '운은 찾아오는 게 아니라\n찾아가는 거다',
+      '운이 없지\n가오가 없냐',
+      '너 지금 운이 없다고\n우니?',
+      '운도 돈으로\n살 수 있다면?',
+      '저는 님을 도우러 온\n사람입니다',
+      '착한 일 하면 복 받는다?\nㅇㅇ 맞음',
+      '운빨도\n적금처럼 쌓는 거임',
+      '오늘 선행 하나,\n행운 +1. 개이득',
+      '행운은 배달 안 됨.\n직접 만드셈',
+      '노력은 배신해도\n선행은 안 배신함',
+      '될놈될?\n착한놈될임',
+      '오늘의 운세:\n착한 일 하면 좋음',
+      '행운도\n출석체크 하는 거 알지?',
+      '복 짓는 사람이\n복 받는 거임',
+      '어제 운 없었으면\n오늘 만들면 됨',
+      '우주는 다 보고 있다.\n방금 그 선행도',
+      '남 돕고 운 챙기고,\n일석이조 아님?',
+      '행운아 안녕,\n오늘은 뭐 도와줄까',
     ],
     'en': [
-      'Spending a kind day\nagain today?',
-      'One small kindness —\nleave it here?',
-      'Gather the good\nslowly, no rush',
-      'Was there a little warmth\nyou gave someone today?',
-      'A quiet kindness\nis more than enough',
-      'It’s okay\nto fill it slowly',
-      'You spent your heart\nwell today',
-      'Your warmth\nis adding up,\nlittle by little',
-      'One square today —\ncare to share your heart?',
-      'Even a small good deed\nmeans plenty',
-      'It’s okay —\nstart with something small',
-      'Here lies your\ngentle little record',
-      'You spared a square\nof your heart again today',
-      'Hope you’re doing well,\ntoday too',
-      'The warmth you gave someone —\nI remember it',
-      'There’s no need\nto hurry',
-      'Leave behind\ntoday’s little kindness',
-      'Start the day\nwith a gentle heart',
+      'Luck doesn’t knock.\nYou go knock on luck.',
+      'What if you could\nbuy luck? Just asking.',
+      'Hi, I’m literally here\nto help you.',
+      'Crying over bad luck?\nGo do a good deed.',
+      'Karma is just luck\nwith receipts',
+      'Fortune favors the kind.\nIt’s canon.',
+      'Stack kindness\nlike it’s savings',
+      'One good deed a day\nkeeps bad luck away',
+      'Luck doesn’t do delivery.\nYou make it yourself.',
+      'Hard work may betray you.\nKindness won’t.',
+      'The universe saw that.\nNice one.',
+      'Today’s fortune:\ndo good, get good',
+      'Even luck takes\nattendance, you know',
+      'No luck? No problem.\nGo make some.',
+      'Be the plot twist\nin someone’s bad day',
+      'Luck is earned.\nStart earning.',
+      'Help someone today.\nThe math works out.',
+      'Hey lucky one —\nwho are we helping today?',
     ],
     'ja': [
-      '今日もやさしい一日を\n過ごしていますか',
-      '小さな親切ひとつ、\nここに残しませんか',
-      'いい心、\nゆっくり集めていこう',
-      '今日、誰かに\nやさしさを渡しましたか',
-      'そっと渡した親切も\n十分です',
-      'ゆっくり満たしても\n大丈夫',
-      '心をつかった\n一日でしたね',
-      'あなたのやさしさが\n少しずつ積もっています',
-      '今日ひとマス、\n心を差し出してみませんか',
-      '小さな善い行いも\nちゃんと意味がある',
-      '大丈夫、\n小さなことから',
-      'ここに、あなたの\nやさしい記録があります',
-      '今日も心をひとマス\n分けてくれましたね',
-      '元気にしていますか、\n今日も',
-      '誰かに渡したやさしさ、\nちゃんと覚えています',
-      '急がなくても\n大丈夫',
-      '今日のやさしさを\n残してください',
-      'やさしい心で\n一日を始めよう',
+      '運は来ない。\n迎えに行くもの',
+      '運がないって\n泣いてるの?',
+      '運もお金で\n買えたらいいのに?',
+      'わたし、あなたを\n助けに来た者です',
+      '徳を積む。\n運が積もる。以上',
+      '努力は裏切る。\n善行は裏切らない',
+      'カルマとは\nレシート付きの運',
+      '幸運は配達不可。\n自分でつくるもの',
+      '一日一善、\n厄除けになるらしい',
+      '今日の運勢:\n善行すれば良し',
+      '幸運にも\n出席確認があるらしい',
+      '宇宙は見てる。\nさっきのいいことも',
+      '運がない日は\n運をつくればいい',
+      '推しは推せる時に、\n善行はできる時に',
+      '徳ポイント、\n貯まってますか',
+      '誰かの今日を\n救うのはきみかも',
+      'いいことすると\nいいことある。マジで',
+      'やあラッキーなきみ、\n今日は誰を助ける?',
     ],
   };
 
