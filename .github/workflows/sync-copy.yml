@@ -1,0 +1,33 @@
+# 문구 파일이 main 에 머지되면 Supabase copy_lines 로 자동 동기화한다.
+#
+# 문구의 원본은 dart 파일(lib/config/*.dart)이다. 여기서 고치고 PR 리뷰로 승인하면,
+# 이 워크플로가 서버에 미러링해 유저가 앱 업데이트 없이 새 문구를 본다.
+# (서버가 비거나 장애면 앱은 번들 문구로 폴백하므로 사고는 나지 않는다.)
+#
+# 필요한 리포 시크릿 (Settings → Secrets and variables → Actions):
+#   SUPABASE_URL               예: https://xxxx.supabase.co
+#   SUPABASE_SERVICE_ROLE_KEY  Supabase → Settings → API → service_role (절대 앱에 넣지 말 것)
+name: sync copy
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'lib/config/daily_quotes.dart'
+      - 'lib/config/fortune_pool.dart'
+      - 'tool/sync_copy.dart'
+  # 문구를 안 고쳤는데 서버만 되돌리고 싶을 때 수동 실행.
+  workflow_dispatch:
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dart-lang/setup-dart@v1
+      - run: dart pub get
+      - name: Sync copy to Supabase
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: dart run tool/sync_copy.dart

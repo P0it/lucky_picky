@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../config/daily_quotes.dart';
 import '../l10n/app_localizations.dart';
 import '../state/app_controller.dart';
+import '../state/copy_controller.dart';
 import '../util/text_wrap.dart';
 import '../theme/app_theme.dart';
 import '../widgets/clover_mark.dart';
@@ -25,6 +25,7 @@ class HomeScreen extends ConsumerWidget {
     final l = AppLocalizations.of(context);
     final lang = Localizations.localeOf(context).languageCode;
     final s = ref.watch(appControllerProvider);
+    final copy = ref.watch(copyBookProvider);
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(24, 32, 24, 14),
@@ -42,7 +43,7 @@ class HomeScreen extends ConsumerWidget {
                         style: AppText.base(
                             size: 13, weight: FontWeight.w500, color: AppColors.muted)),
                     const SizedBox(height: 5),
-                    Text(DailyQuotes.forToday(lang).keepAll,
+                    Text(copy.dailyQuote(lang).keepAll,
                         style: AppText.base(
                             size: 21, weight: FontWeight.w700, letterSpacingEm: -0.035)),
                   ],
