@@ -2,30 +2,32 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../config/luck_tickets.dart';
-import '../data/game_backend.dart';
 import '../l10n/app_localizations.dart';
-import '../models/owned_ticket.dart';
+import '../models/ticket_instance.dart';
 import '../state/app_controller.dart';
 import '../theme/app_theme.dart';
 import '../widgets/app_toast.dart';
+import '../widgets/clover_mark.dart';
 import '../widgets/pressable.dart';
 import '../widgets/rarity_style.dart';
+import '../widgets/collection_card.dart';
 import '../widgets/talisman_export.dart';
-import '../widgets/ticket_card.dart';
+import 'forge_screen.dart';
 
-/// 도감 카드 → 행운권 상세. 페이드로 진입.
-Route<void> ticketRoute(String ticketId) => PageRouteBuilder(
+/// 지갑 카드 → 행운권 상세. 페이드로 진입. (카드 한 장 = 인스턴스 id)
+Route<void> ticketRoute(String instanceId) => PageRouteBuilder(
       transitionDuration: const Duration(milliseconds: 280),
       reverseTransitionDuration: const Duration(milliseconds: 220),
-      pageBuilder: (_, _, _) => TicketScreen(ticketId: ticketId),
+      pageBuilder: (_, _, _) => TicketScreen(instanceId: instanceId),
       transitionsBuilder: (_, anim, _, child) =>
           FadeTransition(opacity: anim, child: child),
     );
 
-/// 획득한 행운권을 카드 이미지로 미리보고 강화 / 앨범 저장 / 공유한다.
+/// 보유 카드 한 장의 상세 — 지갑과 같은 티켓 실루엣의 대형 버전으로
+/// 전체 문구를 보여주고 강화/공유한다.
 class TicketScreen extends ConsumerStatefulWidget {
-  final String ticketId;
-  const TicketScreen({super.key, required this.ticketId});
+  final String instanceId;
+  const TicketScreen({super.key, required this.instanceId});
 
   @override
   ConsumerState<TicketScreen> createState() => _TicketScreenState();
@@ -33,61 +35,38 @@ class TicketScreen extends ConsumerStatefulWidget {
 
 class _TicketScreenState extends ConsumerState<TicketScreen> {
   final _boundaryKey = GlobalKey();
-  TicketFormat _format = TicketFormat.portrait;
   bool _busy = false;
 
-  String get _fileName => 'luckypicky_ticket_${widget.ticketId}_${_format.name}';
+  String get _fileName => 'luckypicky_ticket_${widget.instanceId}';
 
-  Future<void> _withBusy(Future<void> Function() action, {String? failMsg}) async {
+  Future<void> _share(LuckTicket ticket) async {
     if (_busy) return;
     setState(() => _busy = true);
     try {
-      await action();
+      final lang = Localizations.localeOf(context).languageCode;
+      final shareText =
+          AppLocalizations.of(context).ticketShareText(ticket.text(lang));
+      final bytes = await captureBoundaryPng(_boundaryKey);
+      await shareTalisman(bytes, _fileName, text: shareText);
     } catch (_) {
       if (mounted) {
-        showAppToast(context, failMsg ?? AppLocalizations.of(context).talismanRetry);
+        showAppToast(context, AppLocalizations.of(context).talismanRetry);
       }
     } finally {
       if (mounted) setState(() => _busy = false);
     }
   }
 
-  Future<void> _save() => _withBusy(() async {
-        final bytes = await captureBoundaryPng(_boundaryKey);
-        await saveTalismanToGallery(bytes, _fileName);
-        if (mounted) showAppToast(context, AppLocalizations.of(context).toastSavedToAlbum);
-      }, failMsg: AppLocalizations.of(context).talismanSaveFail);
-
-  Future<void> _share(LuckTicket ticket) {
-    final lang = Localizations.localeOf(context).languageCode;
-    final shareText = AppLocalizations.of(context).ticketShareText(ticket.text(lang));
-    return _withBusy(() async {
-      final bytes = await captureBoundaryPng(_boundaryKey);
-      await shareTalisman(bytes, _fileName, text: shareText);
-    });
-  }
-
-  Future<void> _enhance() async {
-    final l = AppLocalizations.of(context);
-    try {
-      final up = await ref
-          .read(appControllerProvider.notifier)
-          .enhanceTicket(widget.ticketId);
-      if (up != null && mounted) showAppToast(context, l.toastEnhanced(up.level));
-    } on GameConnectionException {
-      if (mounted) showAppToast(context, l.errorNeedConnection);
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
-    final ticket = LuckCatalog.byId(widget.ticketId);
+    final lang = Localizations.localeOf(context).languageCode;
     final owned = ref.watch(appControllerProvider.select(
-        (s) => s.tickets.where((t) => t.ticketId == widget.ticketId).firstOrNull));
+        (s) => s.tickets.where((t) => t.id == widget.instanceId).firstOrNull));
+    final ticket = owned == null ? null : LuckCatalog.byId(owned.ticketId);
 
     if (ticket == null || owned == null) {
-      // 방어 — 미획득/알 수 없는 ID 로 진입 시 그냥 닫는다.
+      // 방어 — 강화 재료로 사라졌거나 알 수 없는 카드면 그냥 닫는다.
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) Navigator.of(context).maybePop();
       });
@@ -100,40 +79,19 @@ class _TicketScreenState extends ConsumerState<TicketScreen> {
         child: Column(
           children: [
             _topBar(l),
-            _infoChips(l, ticket, owned),
-            Expanded(
-              child: Center(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 8),
-                  child: FittedBox(
-                    fit: BoxFit.contain,
-                    child: Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(28),
-                        boxShadow: const [
-                          BoxShadow(color: Color(0x22191F28), blurRadius: 44, offset: Offset(0, 20)),
-                        ],
-                      ),
-                      // ClipRRect/그림자는 미리보기 전용 — 캡처되는 RepaintBoundary는
-                      // 모서리까지 꽉 찬 원본 사각형이라 배경화면 시 빈틈이 없다.
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(28),
-                        child: RepaintBoundary(
-                          key: _boundaryKey,
-                          child: TicketCard(ticket: ticket, owned: owned, format: _format),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
+            const Spacer(),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: RepaintBoundary(
+                key: _boundaryKey,
+                child: _TicketFace(ticket: ticket, owned: owned, lang: lang),
               ),
             ),
+            const Spacer(),
             _enhanceButton(l, ticket, owned),
-            const SizedBox(height: 12),
-            _formatToggle(),
-            const SizedBox(height: 14),
-            _actions(ticket),
-            const SizedBox(height: 12),
+            const SizedBox(height: 10),
+            _shareButton(l, ticket),
+            const SizedBox(height: 16),
           ],
         ),
       ),
@@ -162,46 +120,15 @@ class _TicketScreenState extends ConsumerState<TicketScreen> {
     );
   }
 
-  /// 획득일 · 보유 장수 · 강화 레벨 정보 칩.
-  Widget _infoChips(AppLocalizations l, LuckTicket ticket, OwnedTicket owned) {
-    final style = RarityStyle.of(ticket.rarity);
-    Widget chip(String text, {bool filled = false}) => Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-          decoration: BoxDecoration(
-            color: filled ? style.color : style.soft,
-            borderRadius: BorderRadius.circular(AppRadius.chipFull),
-          ),
-          child: Text(
-            text,
-            style: AppText.base(
-                size: 12,
-                weight: FontWeight.w700,
-                color: filled ? Colors.white : style.color),
-          ),
-        );
-
-    return Padding(
-      padding: const EdgeInsets.only(top: 2, bottom: 8),
-      child: Wrap(
-        spacing: 6,
-        alignment: WrapAlignment.center,
-        children: [
-          chip(l.ticketLevel(owned.level), filled: owned.level > 1),
-          chip(l.ticketOwnedCopies(owned.copies)),
-          chip(l.ticketFirstPulled(owned.firstPulledAt)),
-        ],
-      ),
-    );
-  }
-
-  /// 강화 버튼 — 재료(중복) 현황과 함께.
-  Widget _enhanceButton(AppLocalizations l, LuckTicket ticket, OwnedTicket owned) {
+  /// 강화 버튼 — 누르면 이 카드를 대상으로 한 포지 화면(재료 고르기)이 열린다.
+  Widget _enhanceButton(
+      AppLocalizations l, LuckTicket ticket, TicketInstance owned) {
     final style = RarityStyle.of(ticket.rarity);
     if (owned.isMaxLevel) {
       return Container(
         margin: const EdgeInsets.symmetric(horizontal: 24),
         width: double.infinity,
-        height: 48,
+        height: 52,
         alignment: Alignment.center,
         decoration: BoxDecoration(
           color: style.soft,
@@ -219,40 +146,35 @@ class _TicketScreenState extends ConsumerState<TicketScreen> {
         ),
       );
     }
-    final need = OwnedTicket.costForNextLevel(owned.level);
-    final have = owned.spareCopies;
-    final can = owned.canEnhance;
     return Pressable(
-      onTap: can ? _enhance : null,
+      onTap: () => Navigator.of(context)
+          .push(forgeRoute(ForgeMode.enhance, targetId: owned.id)),
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 24),
         width: double.infinity,
-        height: 48,
+        height: 52,
         alignment: Alignment.center,
         decoration: BoxDecoration(
-          color: can ? style.color : AppColors.card,
+          color: style.color,
           borderRadius: BorderRadius.circular(AppRadius.button),
-          boxShadow: can
-              ? [
-                  BoxShadow(
-                      color: style.color.withValues(alpha: 0.28),
-                      blurRadius: 16,
-                      offset: const Offset(0, 6)),
-                ]
-              : null,
+          boxShadow: [
+            BoxShadow(
+                color: style.color.withValues(alpha: 0.28),
+                blurRadius: 16,
+                offset: const Offset(0, 6)),
+          ],
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.upgrade_rounded,
-                size: 19, color: can ? Colors.white : AppColors.disabled),
+            const Icon(Icons.upgrade_rounded, size: 19, color: Colors.white),
             const SizedBox(width: 6),
             Text(
-              l.ticketEnhance(have, need),
+              l.forgeEnhanceCta,
               style: AppText.base(
                 size: 15,
                 weight: FontWeight.w700,
-                color: can ? Colors.white : AppColors.disabled,
+                color: Colors.white,
               ),
             ),
           ],
@@ -261,111 +183,115 @@ class _TicketScreenState extends ConsumerState<TicketScreen> {
     );
   }
 
-  Widget _formatToggle() {
-    Widget seg(String label, TicketFormat f) {
-      final active = _format == f;
-      return Expanded(
-        child: Pressable(
-          onTap: active ? null : () => setState(() => _format = f),
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 160),
-            height: 40,
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-              color: active ? AppColors.white : Colors.transparent,
-              borderRadius: BorderRadius.circular(AppRadius.chipFull),
-              boxShadow: active
-                  ? const [BoxShadow(color: Color(0x14191F28), blurRadius: 8, offset: Offset(0, 2))]
-                  : null,
-            ),
-            child: Text(label,
-                style: AppText.base(
-                    size: 14,
-                    weight: FontWeight.w700,
-                    color: active ? AppColors.title : AppColors.muted)),
-          ),
-        ),
-      );
-    }
-
-    return Center(
+  Widget _shareButton(AppLocalizations l, LuckTicket ticket) {
+    return Pressable(
+      onTap: _busy ? null : () => _share(ticket),
       child: Container(
-        padding: const EdgeInsets.all(4),
+        margin: const EdgeInsets.symmetric(horizontal: 24),
+        width: double.infinity,
+        height: 52,
+        alignment: Alignment.center,
         decoration: BoxDecoration(
-          color: AppColors.card,
-          borderRadius: BorderRadius.circular(AppRadius.chipFull),
+          color: AppColors.accent,
+          borderRadius: BorderRadius.circular(AppRadius.button),
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.accent.withValues(alpha: 0.28),
+              blurRadius: 18,
+              offset: const Offset(0, 8),
+            ),
+          ],
         ),
-        child: SizedBox(
-          width: 240,
-          child: Row(
-            children: [
-              seg(AppLocalizations.of(context).talismanPortrait, TicketFormat.portrait),
-              seg(AppLocalizations.of(context).talismanSquare, TicketFormat.square),
-            ],
-          ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(Icons.ios_share_rounded, size: 19, color: Colors.white),
+            const SizedBox(width: 7),
+            Text(l.talismanShare,
+                style: AppText.base(
+                    size: 16, weight: FontWeight.w700, color: Colors.white)),
+          ],
         ),
       ),
     );
   }
+}
 
-  Widget _actions(LuckTicket ticket) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24),
-      child: Row(
-        children: [
-          Expanded(
-            child: Pressable(
-              onTap: _busy ? null : _save,
-              child: Container(
-                height: 56,
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                  color: AppColors.card,
-                  borderRadius: BorderRadius.circular(AppRadius.button),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Icon(Icons.download_rounded, size: 19, color: AppColors.sub),
-                    const SizedBox(width: 7),
-                    Text(AppLocalizations.of(context).talismanSave,
-                        style: AppText.base(size: 16, weight: FontWeight.w700, color: AppColors.sub)),
-                  ],
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Pressable(
-              onTap: _busy ? null : () => _share(ticket),
-              child: Container(
-                height: 56,
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                  color: AppColors.accent,
-                  borderRadius: BorderRadius.circular(AppRadius.button),
-                  boxShadow: [
-                    BoxShadow(
-                      color: AppColors.accent.withValues(alpha: 0.28),
-                      blurRadius: 18,
-                      offset: const Offset(0, 8),
+/// 지갑 카드와 같은 플랫 컬렉션 카드의 대형 버전 — 문구 전체와 획득 정보를 담는다.
+/// 이 위젯이 그대로 공유 이미지가 된다.
+class _TicketFace extends StatelessWidget {
+  final LuckTicket ticket;
+  final TicketInstance owned;
+  final String lang;
+
+  const _TicketFace({required this.ticket, required this.owned, required this.lang});
+
+  @override
+  Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
+    final style = RarityStyle.of(ticket.rarity);
+
+    return SizedBox(
+      height: 220,
+      width: double.infinity,
+      child: CollectionCard(
+        style: style,
+        borderRadius: 24,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(22, 20, 22, 18),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  CloverMark(size: 15, color: style.color),
+                  const SizedBox(width: 6),
+                  Text(
+                    LuckCatalog.rarityName(ticket.rarity, lang),
+                    style: AppText.base(
+                        size: 12, weight: FontWeight.w800, color: style.color),
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    'No.${ticket.id.substring(1)}',
+                    style: AppText.base(
+                        size: 12,
+                        weight: FontWeight.w700,
+                        color: AppColors.sub,
+                        letterSpacingEm: 0),
+                  ),
+                  const Spacer(),
+                  if (owned.plus > 0)
+                    Text(
+                      l.dexPlus(owned.plus),
+                      style: AppText.base(
+                        size: 22,
+                        weight: FontWeight.w800,
+                        color: style.color,
+                        letterSpacingEm: 0,
+                      ),
                     ),
-                  ],
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Icon(Icons.ios_share_rounded, size: 19, color: Colors.white),
-                    const SizedBox(width: 7),
-                    Text(AppLocalizations.of(context).talismanShare,
-                        style: AppText.base(size: 16, weight: FontWeight.w700, color: Colors.white)),
-                  ],
+                ],
+              ),
+              const Spacer(),
+              Text(
+                ticket.text(lang),
+                style: AppText.base(
+                  size: 19,
+                  weight: FontWeight.w800,
+                  height: 1.4,
+                  letterSpacingEm: -0.03,
                 ),
               ),
-            ),
+              const Spacer(),
+              Text(
+                l.ticketFirstPulled(owned.pulledAt),
+                style: AppText.base(
+                    size: 11.5, weight: FontWeight.w600, color: AppColors.sub),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
