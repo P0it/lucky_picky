@@ -1,32 +1,42 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../data/game_backend.dart';
 import '../l10n/app_localizations.dart';
 import '../state/ads_controller.dart';
 import '../state/app_controller.dart';
 import '../theme/app_theme.dart';
+import '../widgets/app_toast.dart';
 import '../widgets/clover_mark.dart';
 import '../widgets/gacha_machine.dart';
 import '../widgets/gacha_pull_overlay.dart';
 import '../widgets/gacha_rates_sheet.dart';
 import '../widgets/pressable.dart';
 
-/// 행운 뽑기 화면 — 캡슐 머신 + 클로버 뽑기 / 무료(광고) 뽑기.
+/// 행운 뽑기 화면 — 캡슐 머신 + 클로버로 뽑기 / 광고 보고 클로버 받기.
+/// 클로버가 곧 뽑기 코인이다. 광고는 뽑기를 대신 돌리지 않고 클로버를 채워준다.
 class GachaScreen extends ConsumerWidget {
   const GachaScreen({super.key});
 
   void _pull(BuildContext context, WidgetRef ref) {
     final s = ref.read(appControllerProvider);
     if (s.clovers <= 0) return;
-    runGachaPullFlow(context, ref, free: false);
+    runGachaPullFlow(context, ref);
   }
 
-  void _freePull(BuildContext context, WidgetRef ref) {
+  /// 광고 시청 → 클로버 1개 적립. 뽑기는 사용자가 직접 돌린다.
+  /// 적립 성공은 상단 보유 클로버 칩이 올라가는 것으로 보여준다 — 별도 알림 없음.
+  void _watchAdForClover(BuildContext context, WidgetRef ref) {
     final n = ref.read(appControllerProvider.notifier);
-    if (n.freePullsLeft <= 0) return;
-    AdsController.instance.showRewarded(onReward: () {
-      if (!context.mounted) return;
-      runGachaPullFlow(context, ref, free: true);
+    if (n.adCloversLeft <= 0) return;
+    AdsController.instance.showRewarded(onReward: () async {
+      try {
+        await n.grantAdClover();
+      } on GameConnectionException {
+        if (context.mounted) {
+          showAppToast(context, AppLocalizations.of(context).errorNeedConnection);
+        }
+      }
     });
   }
 
@@ -35,7 +45,7 @@ class GachaScreen extends ConsumerWidget {
     final l = AppLocalizations.of(context);
     final s = ref.watch(appControllerProvider);
     final n = ref.read(appControllerProvider.notifier);
-    final freeLeft = n.freePullsLeft;
+    final adCloversLeft = n.adCloversLeft;
     final canPull = s.clovers > 0;
 
     return ListView(
@@ -161,7 +171,9 @@ class GachaScreen extends ConsumerWidget {
               ),
               const SizedBox(height: 10),
               Pressable(
-                onTap: freeLeft > 0 ? () => _freePull(context, ref) : null,
+                onTap: adCloversLeft > 0
+                    ? () => _watchAdForClover(context, ref)
+                    : null,
                 child: Container(
                   width: double.infinity,
                   height: 50,
@@ -175,16 +187,20 @@ class GachaScreen extends ConsumerWidget {
                     children: [
                       Icon(Icons.play_circle_outline_rounded,
                           size: 19,
-                          color: freeLeft > 0 ? AppColors.sub : AppColors.disabled),
+                          color: adCloversLeft > 0
+                              ? AppColors.sub
+                              : AppColors.disabled),
                       const SizedBox(width: 7),
                       Text(
-                        freeLeft > 0
-                            ? l.gachaFreePull(freeLeft, kFreePullsPerDay)
-                            : l.gachaFreePullNone,
+                        adCloversLeft > 0
+                            ? l.gachaAdClover(adCloversLeft, kAdCloversPerDay)
+                            : l.gachaAdCloverNone,
                         style: AppText.base(
                           size: 14.5,
                           weight: FontWeight.w700,
-                          color: freeLeft > 0 ? AppColors.sub : AppColors.disabled,
+                          color: adCloversLeft > 0
+                              ? AppColors.sub
+                              : AppColors.disabled,
                         ),
                       ),
                     ],

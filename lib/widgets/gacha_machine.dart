@@ -8,9 +8,9 @@ import '../theme/app_theme.dart';
 ///
 /// 애니메이션 파라미터(0~1)를 밖에서 넘겨 단계별 연출을 만든다.
 /// - [coinT]  : 클로버 코인이 투입구로 들어가는 진행도
-/// - [leverT] : 레버(다이얼)가 한 바퀴 도는 진행도 — 돔 속 캡슐도 들썩인다
-/// - [dropT]  : 결과 캡슐이 배출구로 떨어지는 진행도 (바운스 포함)
-/// - [capsuleColor] : 결과 캡슐 윗면 색 (등급색)
+/// - [leverT] : 레버(다이얼)가 한 바퀴 도는 진행도 — 돔 속 더미가 뒤섞인다
+/// - [dropT]  : 뽑힌 캡슐이 더미 → 목 링 → 슈트 → 배출구로 내려가는 진행도
+/// - [capsuleColor] : 뽑힌 캡슐 윗면 색 (등급색)
 class GachaMachine extends StatelessWidget {
   final double coinT;
   final double leverT;
@@ -25,12 +25,13 @@ class GachaMachine extends StatelessWidget {
     this.capsuleColor = AppColors.accent,
   });
 
-  /// 논리 캔버스 크기. 배출구 캡슐의 탭 판정에도 쓴다.
-  static const Size canvas = Size(300, 400);
+  /// 논리 캔버스 크기. 아래 여백은 기계 앞으로 튀어나온 캡슐이 구르는 자리다.
+  static const Size canvas = Size(300, 442);
 
-  /// 배출구에 떨어진 캡슐의 중심 (논리 좌표).
-  static const Offset droppedCapsuleCenter = Offset(197, 342);
-  static const double droppedCapsuleRadius = 26;
+  /// 배출구를 빠져나와 기계 앞에 멈춘 캡슐의 중심 (논리 좌표).
+  /// 앞으로 나온 만큼 크게 그린다 — 가까이 있다는 신호.
+  static const Offset droppedCapsuleCenter = Offset(150, 402);
+  static const double droppedCapsuleRadius = 30;
 
   @override
   Widget build(BuildContext context) {
@@ -48,6 +49,16 @@ class GachaMachine extends StatelessWidget {
   }
 }
 
+/// 돔 안에 쌓인 캡슐 한 알.
+class _PileCapsule {
+  final Offset pos; // 논리 좌표(캔버스 기준)
+  final double radius;
+  final double angle; // 분할선 기울기 (rad)
+  final Color color;
+  final double phase; // 흔들림 위상 — 더미가 한 몸처럼 움직이지 않게
+  const _PileCapsule(this.pos, this.radius, this.angle, this.color, this.phase);
+}
+
 class _MachinePainter extends CustomPainter {
   final double coinT;
   final double leverT;
@@ -61,26 +72,85 @@ class _MachinePainter extends CustomPainter {
     required this.capsuleColor,
   });
 
-  // 돔 속 장식 캡슐 배치 (중심 상대 좌표, 반지름, 색 인덱스).
-  static const _domeCapsules = [
-    (-52.0, 28.0, 17.0, 0),
-    (-18.0, 42.0, 18.0, 1),
-    (20.0, 34.0, 17.0, 2),
-    (52.0, 24.0, 15.0, 3),
-    (-38.0, -4.0, 16.0, 4),
-    (2.0, 6.0, 18.0, 0),
-    (40.0, -2.0, 15.0, 1),
-    (-12.0, -28.0, 15.0, 2),
-    (24.0, -32.0, 14.0, 3),
-  ];
+  static const _domeCenter = Offset(150, 118);
+  static const _domeRadius = 102.0;
 
-  static const _capsuleColors = [
-    Color(0xFF6FC143), // 그린
+  static const _green = Color(0xFF6FC143);
+
+  /// 더미 색 — 클로버 앱이니 그린이 다수를 차지하고 나머지는 악센트로 섞인다.
+  static const _pileColors = [
+    _green, _green, _green,
     Color(0xFF7B6FDE), // 퍼플
     Color(0xFFE0A32E), // 골드
     Color(0xFFE06FA8), // 핑크
     Color(0xFF57A8E0), // 블루
   ];
+
+  /// 돔 바닥에 쌓인 캡슐 더미. 시드 고정이라 매번 같은 모양 — 정물처럼 안정적이다.
+  ///
+  /// 아래 행은 빽빽하게, 위 행은 성기게 채워서 "부어놓은 무더기" 실루엣을 만든다.
+  static final List<_PileCapsule> _pile = _buildPile();
+
+  /// 더미에서 뽑혀 나가는 캡슐 — 맨 위(가장 y가 작은) 알을 고른다.
+  static final int _pulledIndex = () {
+    var best = 0;
+    for (var i = 1; i < _pile.length; i++) {
+      if (_pile[i].pos.dy < _pile[best].pos.dy) best = i;
+    }
+    return best;
+  }();
+
+  static List<_PileCapsule> _buildPile() {
+    // 결정적 LCG — dart:math의 Random(seed)와 달리 플랫폼 간에도 동일하다.
+    var seed = 20260713;
+    double rnd() {
+      seed = (seed * 1103515245 + 12345) & 0x7FFFFFFF;
+      return seed / 0x7FFFFFFF;
+    }
+
+    const r = 14.5; // 볼 기본 반지름
+    const wall = _domeRadius - 5; // 유리 안쪽 면
+    const bottom = 202.0; // 목 링 위 = 더미가 얹히는 바닥
+    const stepX = r * 1.78; // 살짝 겹치는 육각 격자
+    const stepY = r * 1.58;
+
+    /// 무더기 표면 — 가운데가 봉긋하고 가장자리로 흘러내리는 곡선.
+    /// 이 아래의 격자점만 볼로 채우므로 바닥은 반드시 꽉 찬다.
+    double surfaceY(double x) {
+      final k = (x - _domeCenter.dx) / wall; // -1..1
+      return 96 + 52 * k * k;
+    }
+
+    final out = <_PileCapsule>[];
+    var rowIndex = 0;
+    for (var y = bottom; y > 60; y -= stepY, rowIndex++) {
+      final offset = rowIndex.isEven ? 0.0 : stepX / 2; // 육각 엇갈림
+      for (var x = _domeCenter.dx - wall + offset;
+          x <= _domeCenter.dx + wall;
+          x += stepX) {
+        final jx = x + (rnd() - 0.5) * 4;
+        final jy = y + (rnd() - 0.5) * 4;
+        final p = Offset(jx, jy);
+
+        // 유리 밖으로 나가는 볼은 버린다.
+        if ((p - _domeCenter).distance + r * 0.92 > wall) continue;
+
+        // 표면 위쪽은 빈 공간. 표면 근처는 듬성듬성 남겨 능선을 울퉁불퉁하게.
+        final surface = surfaceY(jx);
+        if (jy < surface) continue;
+        if (jy < surface + r && rnd() < 0.45) continue;
+
+        out.add(_PileCapsule(
+          p,
+          r + (rnd() - 0.5) * 2.2,
+          (rnd() - 0.5) * 0.9, // 하이라이트 각이 제각각 — 정렬감이 사라진다
+          _pileColors[(rnd() * _pileColors.length).floor() % _pileColors.length],
+          rnd() * math.pi * 2,
+        ));
+      }
+    }
+    return out;
+  }
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -88,11 +158,16 @@ class _MachinePainter extends CustomPainter {
     canvas.scale(sx, sx);
 
     _drawBody(canvas);
-    _drawDome(canvas);
+    _drawDome(canvas); // 유리 안에서 빠져나가는 캡슐도 여기서(돔 클립 안에서) 그린다
     _drawFace(canvas);
     if (coinT > 0 && coinT < 1) _drawCoin(canvas);
-    if (dropT > 0) _drawDroppedCapsule(canvas);
+    // 몸통 속(_suckEnd~_exitStart)에서는 캡슐이 보이면 안 된다 — 기계를 관통해 보인다.
+    if (dropT >= _exitStart) _drawEjectedCapsule(canvas);
   }
+
+  // 낙하 구간: 더미→목(빨려 들어감) / 목→배출구(몸통 속, 안 보임) / 배출구→기계 앞(튀어나옴).
+  static const _suckEnd = 0.26;
+  static const _exitStart = 0.6;
 
   void _drawBody(Canvas canvas) {
     // 본체 — 포인트 그린, 아래로 갈수록 진한 발판.
@@ -121,30 +196,27 @@ class _MachinePainter extends CustomPainter {
     );
   }
 
+
   void _drawDome(Canvas canvas) {
-    const center = Offset(150, 118);
-    const r = 102.0;
-
     // 유리 돔.
-    canvas.drawCircle(center, r, Paint()..color = Colors.white);
-    canvas.drawCircle(
-        center, r, Paint()..color = const Color(0xFFF2F4F6).withValues(alpha: 0.6));
+    canvas.drawCircle(_domeCenter, _domeRadius, Paint()..color = Colors.white);
+    canvas.drawCircle(_domeCenter, _domeRadius,
+        Paint()..color = const Color(0xFFF2F4F6).withValues(alpha: 0.6));
 
-    // 돔 속 캡슐 — 레버 진행도에 맞춰 들썩인다.
-    final jiggle = math.sin(leverT * math.pi * 4) * 5 * (leverT > 0 && leverT < 1 ? 1 : 0);
-    for (final (dx, dy, cr, ci) in _domeCapsules) {
-      final wob = math.sin((leverT * math.pi * 4) + dx) * 4 *
-          (leverT > 0 && leverT < 1 ? 1 : 0);
-      final c = center + Offset(dx, dy + jiggle * 0.4 + wob * 0.5);
-      _drawCapsule(canvas, c, cr, _capsuleColors[ci]);
-    }
+    // 더미는 유리 안쪽으로 클립 — 가장자리 알이 유리에 눌린 것처럼 보인다.
+    canvas.save();
+    canvas.clipPath(
+        Path()..addOval(Rect.fromCircle(center: _domeCenter, radius: _domeRadius - 3)));
+    _drawPile(canvas);
+    if (dropT > 0 && dropT < _suckEnd) _drawSuckedCapsule(canvas);
+    canvas.restore();
 
     // 유리 반사광.
-    canvas.drawCircle(center, r,
-        Paint()..color = Colors.white.withValues(alpha: 0.08));
+    canvas.drawCircle(
+        _domeCenter, _domeRadius, Paint()..color = Colors.white.withValues(alpha: 0.08));
     final gloss = Path()
-      ..addArc(Rect.fromCircle(center: center, radius: r - 14),
-          -2.4, 0.9);
+      ..addArc(
+          Rect.fromCircle(center: _domeCenter, radius: _domeRadius - 14), -2.4, 0.9);
     canvas.drawPath(
       gloss,
       Paint()
@@ -155,8 +227,8 @@ class _MachinePainter extends CustomPainter {
     );
     // 돔 테두리 + 목 링.
     canvas.drawCircle(
-      center,
-      r,
+      _domeCenter,
+      _domeRadius,
       Paint()
         ..color = const Color(0xFFDDE3E9)
         ..style = PaintingStyle.stroke
@@ -167,6 +239,39 @@ class _MachinePainter extends CustomPainter {
           const Rect.fromLTRB(72, 196, 228, 216), const Radius.circular(10)),
       Paint()..color = const Color(0xFF57993A),
     );
+  }
+
+  void _drawPile(Canvas canvas) {
+    // 레버를 돌리는 동안만 더미가 뒤섞인다. 알마다 위상이 달라 한 몸으로 흔들리지 않는다.
+    final churning = leverT > 0 && leverT < 1;
+    // 시작/끝에서 부드럽게 붙었다 떨어지도록 강도를 감쌌다.
+    final energy = churning ? math.sin(leverT * math.pi) : 0.0;
+    // 캡슐 하나가 빠져나가면 더미가 그만큼 내려앉는다.
+    final settle = Curves.easeOut.transform(dropT.clamp(0.0, 1.0)) * 3;
+
+    // 뒤(위층) → 앞(아래층) 순서. 앞쪽 볼이 뒤쪽을 덮어야 쌓인 깊이가 보인다.
+    for (var i = _pile.length - 1; i >= 0; i--) {
+      if (i == _pulledIndex && dropT > 0) continue; // 뽑힌 알은 더미에서 빠진다
+      final cap = _pile[i];
+      // 위쪽 알일수록 크게 요동친다 (아래는 눌려 있다).
+      final depth = ((200 - cap.pos.dy) / 105).clamp(0.0, 1.0);
+      final amp = energy * (2 + depth * 7);
+      final wobble = Offset(
+        math.sin(leverT * math.pi * 6 + cap.phase) * amp,
+        math.cos(leverT * math.pi * 5 + cap.phase * 1.7) * amp * 0.7,
+      );
+      final angle =
+          cap.angle + math.sin(leverT * math.pi * 4 + cap.phase) * energy * 0.5;
+
+      _drawCapsule(
+        canvas,
+        cap.pos + wobble + Offset(0, settle * depth),
+        cap.radius,
+        cap.color,
+        angle: angle,
+        contactShadow: true,
+      );
+    }
   }
 
   void _drawFace(Canvas canvas) {
@@ -234,49 +339,108 @@ class _MachinePainter extends CustomPainter {
     );
   }
 
-  void _drawDroppedCapsule(Canvas canvas) {
-    // 배출구 안에서 아래로 떨어지며 바운스.
-    final t = Curves.bounceOut.transform(dropT.clamp(0.0, 1.0));
-    final start = const Offset(197, 300);
-    final end = GachaMachine.droppedCapsuleCenter;
-    final c = Offset.lerp(start, end, t)!;
-    _drawCapsule(canvas, c, GachaMachine.droppedCapsuleRadius, capsuleColor,
-        outline: true);
+  /// 더미에서 빠져나와 목 링으로 빨려 들어가는 구간(0~_suckEnd).
+  /// 유리 안에서 벌어지는 일이라 돔 클립 안에서 그린다.
+  void _drawSuckedCapsule(Canvas canvas) {
+    final from = _pile[_pulledIndex];
+    const neck = Offset(150, 214);
+    final k = Curves.easeIn.transform((dropT / _suckEnd).clamp(0.0, 1.0));
+    _drawCapsule(
+      canvas,
+      Offset.lerp(from.pos, neck, k)!,
+      from.radius * (1 - k * 0.15), // 목으로 갈수록 작아진다 — 관 속으로 들어가는 원근
+      capsuleColor,
+      angle: from.angle + k * 1.2,
+    );
   }
 
-  void _drawCapsule(Canvas canvas, Offset c, double r, Color top,
-      {bool outline = false}) {
-    // 아랫면(흰색 반구).
-    final lower = Path()
-      ..addArc(Rect.fromCircle(center: c, radius: r), 0, math.pi)
-      ..close();
-    canvas.drawPath(lower, Paint()..color = Colors.white);
-    // 윗면(컬러 반구).
-    final upper = Path()
-      ..addArc(Rect.fromCircle(center: c, radius: r), math.pi, math.pi)
-      ..close();
-    canvas.drawPath(upper, Paint()..color = top);
-    // 분할선 + 하이라이트.
-    canvas.drawLine(
-      Offset(c.dx - r, c.dy),
-      Offset(c.dx + r, c.dy),
+  /// 배출구 밖으로 튀어나와 기계 앞까지 통통 굴러오는 구간(_exitStart~1).
+  void _drawEjectedCapsule(Canvas canvas) {
+    final from = _pile[_pulledIndex];
+    const mouth = Offset(197, 320); // 배출구 입구 — 여기서 튀어나온다
+    const rest = GachaMachine.droppedCapsuleCenter;
+
+    final k = ((dropT - _exitStart) / (1 - _exitStart)).clamp(0.0, 1.0);
+    final x = mouth.dx + (rest.dx - mouth.dx) * Curves.easeOut.transform(k);
+    final ground = mouth.dy + (rest.dy - mouth.dy) * Curves.easeIn.transform(k);
+    // 세 번 튀며 진폭이 죽는다 — bounceOut 한 방보다 "통통" 하는 리듬이 산다.
+    final hop = math.sin(k * math.pi * 3).abs() * 34 * (1 - k) * (1 - k);
+    final r = from.radius * 0.85 +
+        (GachaMachine.droppedCapsuleRadius - from.radius * 0.85) *
+            Curves.easeOut.transform(k);
+
+    // 바닥 그림자 — 튀어오를수록 옅고 작아진다.
+    final lift = (hop / 34).clamp(0.0, 1.0);
+    canvas.drawOval(
+      Rect.fromCenter(
+        center: Offset(x, rest.dy + r * 0.85),
+        width: r * (1.7 - lift * 0.5),
+        height: r * (0.5 - lift * 0.15),
+      ),
       Paint()
-        ..color = Colors.black.withValues(alpha: 0.06)
-        ..strokeWidth = 1.6,
+        ..color =
+            const Color(0xFF8B95A1).withValues(alpha: 0.22 * (1 - lift * 0.6) * k),
     );
-    canvas.drawCircle(
-        Offset(c.dx - r * 0.35, c.dy - r * 0.45), r * 0.16,
-        Paint()..color = Colors.white.withValues(alpha: 0.75));
-    if (outline) {
+
+    _drawCapsule(
+      canvas,
+      Offset(x, ground - hop),
+      r,
+      capsuleColor,
+      angle: from.angle + 3.6 + k * 3.4, // 굴러 나온다
+      outline: true,
+    );
+  }
+
+
+  /// 캡슐은 통색 볼 — 반쪽이 흰색이면 겹쳤을 때 서로 녹아붙어 형태가 안 읽힌다.
+  /// [angle]은 하이라이트 위치를 돌려서 굴러가는 느낌을 준다.
+  void _drawCapsule(
+    Canvas canvas,
+    Offset c,
+    double r,
+    Color color, {
+    double angle = 0,
+    bool outline = false,
+    bool contactShadow = false,
+  }) {
+    // 겹쳐 쌓인 알들 사이에 무게를 주는 접점 그림자.
+    if (contactShadow) {
       canvas.drawCircle(
-        c,
+        c + const Offset(1.5, 2.5),
         r,
-        Paint()
-          ..color = Colors.black.withValues(alpha: 0.08)
-          ..style = PaintingStyle.stroke
-          ..strokeWidth = 2,
+        Paint()..color = const Color(0xFF8B95A1).withValues(alpha: 0.13),
       );
     }
+
+    canvas.save();
+    canvas.translate(c.dx, c.dy);
+    canvas.rotate(angle);
+
+    const zero = Offset.zero;
+    canvas.drawCircle(zero, r, Paint()..color = color);
+    // 아래쪽에 같은 색 그림자 — 플랫하되 구(球)로 읽히게.
+    canvas.save();
+    canvas.clipPath(Path()..addOval(Rect.fromCircle(center: zero, radius: r)));
+    canvas.drawCircle(
+      Offset(r * 0.3, r * 0.55),
+      r,
+      Paint()..color = Colors.black.withValues(alpha: 0.09),
+    );
+    canvas.restore();
+    // 하이라이트.
+    canvas.drawCircle(Offset(-r * 0.34, -r * 0.36), r * 0.2,
+        Paint()..color = Colors.white.withValues(alpha: 0.7));
+    // 이웃한 알과 경계를 세워주는 옅은 테두리.
+    canvas.drawCircle(
+      zero,
+      r,
+      Paint()
+        ..color = Colors.black.withValues(alpha: outline ? 0.1 : 0.07)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = outline ? 2 : 1.2,
+    );
+    canvas.restore();
   }
 
   @override

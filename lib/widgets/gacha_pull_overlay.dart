@@ -7,25 +7,24 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../config/luck_tickets.dart';
 import '../data/game_backend.dart';
 import '../l10n/app_localizations.dart';
-import '../state/ads_controller.dart';
 import '../state/app_controller.dart';
 import '../theme/app_theme.dart';
 import 'app_toast.dart';
 import 'clover_mark.dart';
+import 'collection_card.dart';
 import 'gacha_machine.dart';
 import 'pressable.dart';
 import 'rarity_style.dart';
 
 /// 뽑기 전체 플로우: 코인 투입 → 레버 → 캡슐 낙하 → 탭 개봉 → 결과 카드.
-/// 결과 확정 후 [kPullAdInterval] 회차마다 전면광고, 결과 화면에서 광고 리롤 제공.
-/// 호출 전에 뽑기 가능 여부(클로버/무료 한도)를 확인해야 한다.
-Future<void> runGachaPullFlow(BuildContext context, WidgetRef ref,
-    {required bool free}) async {
+/// 뽑기 도중에는 어떤 광고도 끼어들지 않는다 — 광고는 뽑기 화면에서 사용자가
+/// 직접 누르는 '광고 보고 클로버 받기' 하나뿐이다.
+/// 호출 전에 클로버 보유 여부를 확인해야 한다 (뽑기는 언제나 클로버 1개).
+Future<void> runGachaPullFlow(BuildContext context, WidgetRef ref) async {
   // 뽑기는 라우트 진입 전에 서버에서 확정한다 (빌드 중 상태 변경 방지).
   final PullResult? result;
   try {
-    result =
-        await ref.read(appControllerProvider.notifier).pullGacha(free: free);
+    result = await ref.read(appControllerProvider.notifier).pullGacha();
   } on GameConnectionException {
     if (context.mounted) {
       showAppToast(context, AppLocalizations.of(context).errorNeedConnection);
@@ -45,6 +44,10 @@ Future<void> runGachaPullFlow(BuildContext context, WidgetRef ref,
 }
 
 enum _Phase { coin, lever, drop, waitTap, open, reveal }
+
+/// 머신 렌더 폭과, 논리 캔버스 → 화면 좌표 배율.
+const double _machineWidth = 280;
+const double _machineScale = _machineWidth / 300; // GachaMachine.canvas.width
 
 class _GachaPullOverlay extends ConsumerStatefulWidget {
   final PullResult firstResult;
@@ -102,8 +105,12 @@ class _GachaPullOverlayState extends ConsumerState<_GachaPullOverlay>
       case _Phase.lever:
         _phase = _Phase.drop;
         HapticFeedback.lightImpact();
+        // 캡슐이 슈트를 빠져나와 배출구에 닿는 순간(≈72%)에 한 번 더.
+        Future.delayed(const Duration(milliseconds: 720), () {
+          if (mounted && _phase == _Phase.drop) HapticFeedback.lightImpact();
+        });
         _machine
-          ..duration = const Duration(milliseconds: 750)
+          ..duration = const Duration(milliseconds: 1000)
           ..forward(from: 0);
       case _Phase.drop:
         setState(() => _phase = _Phase.waitTap);
@@ -133,41 +140,9 @@ class _GachaPullOverlayState extends ConsumerState<_GachaPullOverlay>
   }
 
   void _confirm() {
-    if (_closing) return;
+    if (_closing || !mounted) return;
     _closing = true;
-    final n = ref.read(appControllerProvider.notifier);
-    if (n.shouldShowPullAd) {
-      AdsController.instance.showInterstitial(onDone: _popSafely);
-    } else {
-      _popSafely();
-    }
-  }
-
-  void _popSafely() {
-    if (!mounted) return;
     Navigator.of(context).maybePop();
-  }
-
-  /// 광고 보고 한 번 더 — 무료(광고) 뽑기 한도를 공유한다.
-  void _reroll() {
-    final n = ref.read(appControllerProvider.notifier);
-    if (n.freePullsLeft <= 0) return;
-    AdsController.instance.showRewarded(onReward: () async {
-      if (!mounted) return;
-      final PullResult? r;
-      try {
-        r = await ref
-            .read(appControllerProvider.notifier)
-            .pullGacha(free: true);
-      } on GameConnectionException {
-        if (mounted) {
-          showAppToast(context, AppLocalizations.of(context).errorNeedConnection);
-        }
-        return;
-      }
-      if (r == null || !mounted) return;
-      setState(() => _startSequence(r!));
-    });
   }
 
   @override
@@ -221,7 +196,7 @@ class _GachaPullOverlayState extends ConsumerState<_GachaPullOverlay>
             alignment: Alignment.center,
             children: [
               SizedBox(
-                width: 280,
+                width: _machineWidth,
                 child: GachaMachine(
                   coinT: _phase == _Phase.coin ? t : (_phase.index > 0 ? 1 : 0),
                   leverT: _phase == _Phase.lever
@@ -235,11 +210,11 @@ class _GachaPullOverlayState extends ConsumerState<_GachaPullOverlay>
                   capsuleColor: style.color,
                 ),
               ),
-              // 개봉 버스트 — 캡슐 위치에서 퍼진다.
+              // 개봉 버스트 — 기계 앞에 멈춘 캡슐 위치에서 퍼진다.
               if (_phase == _Phase.open)
                 Positioned(
-                  left: 280 * 197 / 300 - 90,
-                  top: 280 / 300 * 400 * 342 / 400 - 90,
+                  left: GachaMachine.droppedCapsuleCenter.dx * _machineScale - 90,
+                  top: GachaMachine.droppedCapsuleCenter.dy * _machineScale - 90,
                   child: SizedBox(
                     width: 180,
                     height: 180,
@@ -265,75 +240,106 @@ class _GachaPullOverlayState extends ConsumerState<_GachaPullOverlay>
   }
 
   // ---- 결과 카드 ----
+  /// 지갑에 들어갈 그 카드를 그대로 보여준다 — 도감/상세와 같은 [CollectionCard].
+  /// "방금 이 카드를 얻었다"가 한눈에 읽히도록 배지는 카드 밖 위쪽에 띄운다.
   Widget _resultCard(AppLocalizations l, PullResult result, RarityStyle style) {
     final lang = Localizations.localeOf(context).languageCode;
     final rarityName = LuckCatalog.rarityName(result.ticket.rarity, lang);
-    final scale = CurvedAnimation(parent: _card, curve: Curves.easeOutBack);
+    final text = result.ticket.text(lang);
+    // 긴 문구는 한 단계 줄여서 카드 안에 자연스럽게 앉힌다.
+    final textSize = text.length > 46
+        ? 17.0
+        : text.length > 30
+            ? 19.0
+            : 21.0;
 
     return ScaleTransition(
-      scale: scale,
-      child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 36),
-        padding: const EdgeInsets.fromLTRB(26, 30, 26, 26),
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: style.panel,
-          ),
-          borderRadius: BorderRadius.circular(AppRadius.card + 6),
-          border: Border.all(color: style.color.withValues(alpha: 0.3), width: 1.4),
-          boxShadow: [
-            BoxShadow(
-              color: style.color.withValues(alpha: 0.22),
-              blurRadius: 36,
-              offset: const Offset(0, 14),
-            ),
-          ],
-        ),
+      scale: CurvedAnimation(parent: _card, curve: Curves.easeOutBack),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 30),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // 등급 + NEW/중복 배지 줄.
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                _chip(rarityName.toUpperCase(), style.color, filled: false),
-                const SizedBox(width: 8),
-                if (result.isNew)
-                  _chip(l.resultNew, style.color, filled: true)
-                else
-                  _chip(l.resultDup(result.owned.copies), AppColors.sub,
-                      filled: false),
-              ],
-            ),
-            const SizedBox(height: 26),
-            const CloverMark(size: 84, withStem: true),
-            const SizedBox(height: 24),
-            Text(
-              result.ticket.text(lang),
-              textAlign: TextAlign.center,
-              style: AppText.base(
-                size: 20,
-                weight: FontWeight.w800,
-                height: 1.45,
-                letterSpacingEm: -0.03,
-              ),
-            ),
-            if (!result.isNew) ...[
-              const SizedBox(height: 14),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                decoration: BoxDecoration(
-                  color: style.soft,
-                  borderRadius: BorderRadius.circular(AppRadius.chipFull),
+            // NEW / 중복 배지 — 이번 뽑기에서만 의미 있는 정보라 카드 밖에 둔다.
+            if (result.isNew)
+              _chip(l.resultNew, style.color, filled: true)
+            else
+              _chip(l.resultDup(result.copies), AppColors.sub, filled: false),
+            const SizedBox(height: 16),
+            SizedBox(
+              height: 250,
+              width: double.infinity,
+              child: CollectionCard(
+                style: style,
+                borderRadius: 24,
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(24, 22, 24, 20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // 등급 + 번호 — 지갑 카드와 같은 머리글.
+                      Row(
+                        children: [
+                          CloverMark(size: 15, color: style.color),
+                          const SizedBox(width: 6),
+                          Text(
+                            rarityName,
+                            style: AppText.base(
+                                size: 12,
+                                weight: FontWeight.w800,
+                                color: style.color),
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            'No.${result.ticket.id.substring(1)}',
+                            style: AppText.base(
+                                size: 12,
+                                weight: FontWeight.w700,
+                                color: AppColors.sub,
+                                letterSpacingEm: 0),
+                          ),
+                        ],
+                      ),
+                      const Spacer(),
+                      Text(
+                        text,
+                        style: AppText.base(
+                          size: textSize,
+                          weight: FontWeight.w800,
+                          height: 1.4,
+                          letterSpacingEm: -0.03,
+                        ),
+                      ),
+                      const Spacer(),
+                      // 중복이면 강화 재료로 쓸 수 있다는 안내를 카드 발치에.
+                      if (result.isNew)
+                        Text(
+                          l.ticketFirstPulled(result.instance.pulledAt),
+                          style: AppText.base(
+                              size: 11.5,
+                              weight: FontWeight.w600,
+                              color: AppColors.sub),
+                        )
+                      else
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 10, vertical: 5),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withValues(alpha: 0.7),
+                            borderRadius:
+                                BorderRadius.circular(AppRadius.chipFull),
+                          ),
+                          child: Text(l.resultMaterial,
+                              style: AppText.base(
+                                  size: 11.5,
+                                  weight: FontWeight.w800,
+                                  color: style.color)),
+                        ),
+                    ],
+                  ),
                 ),
-                child: Text(l.resultMaterial,
-                    style: AppText.base(
-                        size: 12.5, weight: FontWeight.w800, color: style.color)),
               ),
-            ],
-            const SizedBox(height: 6),
+            ),
           ],
         ),
       ),
@@ -361,60 +367,29 @@ class _GachaPullOverlayState extends ConsumerState<_GachaPullOverlay>
   }
 
   Widget _resultButtons(AppLocalizations l) {
-    final n = ref.read(appControllerProvider.notifier);
-    final canReroll = n.freePullsLeft > 0;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24),
-      child: Column(
-        children: [
-          if (canReroll)
-            Pressable(
-              onTap: _reroll,
-              child: Container(
-                width: double.infinity,
-                height: 50,
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                  color: AppColors.card,
-                  borderRadius: BorderRadius.circular(AppRadius.button),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Icon(Icons.play_circle_outline_rounded,
-                        size: 19, color: AppColors.sub),
-                    const SizedBox(width: 7),
-                    Text(l.resultRerollAd,
-                        style: AppText.base(
-                            size: 15, weight: FontWeight.w700, color: AppColors.sub)),
-                  ],
-                ),
+      child: Pressable(
+        onTap: _confirm,
+        child: Container(
+          width: double.infinity,
+          height: 56,
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            color: AppColors.accent,
+            borderRadius: BorderRadius.circular(AppRadius.button),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.accent.withValues(alpha: 0.28),
+                blurRadius: 18,
+                offset: const Offset(0, 8),
               ),
-            ),
-          if (canReroll) const SizedBox(height: 10),
-          Pressable(
-            onTap: _confirm,
-            child: Container(
-              width: double.infinity,
-              height: 56,
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                color: AppColors.accent,
-                borderRadius: BorderRadius.circular(AppRadius.button),
-                boxShadow: [
-                  BoxShadow(
-                    color: AppColors.accent.withValues(alpha: 0.28),
-                    blurRadius: 18,
-                    offset: const Offset(0, 8),
-                  ),
-                ],
-              ),
-              child: Text(l.resultConfirm,
-                  style: AppText.base(
-                      size: 17, weight: FontWeight.w700, color: Colors.white)),
-            ),
+            ],
           ),
-        ],
+          child: Text(l.resultConfirm,
+              style: AppText.base(
+                  size: 17, weight: FontWeight.w700, color: Colors.white)),
+        ),
       ),
     );
   }

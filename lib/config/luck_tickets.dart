@@ -5,8 +5,8 @@
 //  각 언어권 밈 감성에 맞춰 "직접 각색"한 문구입니다.
 //  한국어는 짤·유행어 톤, 영어는 인터넷 밈 톤, 일본어는 넷슬랭 톤.
 //
-//  ID 규칙: c=일반(common), r=희귀(rare), e=영웅(epic),
-//           l=전설(legendary), m=신화(mythic) + 2자리 번호.
+//  ID 규칙: c=노멀(common), r=레어(rare), e=유니크(epic),
+//           l=레전드(legendary), m=미스틱(mythic) + 2자리 번호.
 //  ID 는 영속 데이터(도감/기록)에 저장되므로 바꾸지 않습니다.
 // ════════════════════════════════════════════════════════════════
 
@@ -38,13 +38,13 @@ class LuckCatalog {
   /// 강화 최대 레벨. Lv.L → Lv.L+1 에 필요한 중복 수 = L.
   static const int maxLevel = 5;
 
-  /// 등급 표시명.
+  /// 등급 표시명 — 게임 감성의 외래어 티어명으로 통일 (enum/ID 는 불변).
   static const Map<Rarity, Map<String, String>> _rarityNames = {
-    Rarity.common: {'ko': '일반', 'en': 'Common', 'ja': 'ノーマル'},
-    Rarity.rare: {'ko': '희귀', 'en': 'Rare', 'ja': 'レア'},
-    Rarity.epic: {'ko': '영웅', 'en': 'Epic', 'ja': 'エピック'},
-    Rarity.legendary: {'ko': '전설', 'en': 'Legendary', 'ja': 'レジェンド'},
-    Rarity.mythic: {'ko': '신화', 'en': 'Mythic', 'ja': 'ミシック'},
+    Rarity.common: {'ko': '노멀', 'en': 'Normal', 'ja': 'ノーマル'},
+    Rarity.rare: {'ko': '레어', 'en': 'Rare', 'ja': 'レア'},
+    Rarity.epic: {'ko': '유니크', 'en': 'Unique', 'ja': 'ユニーク'},
+    Rarity.legendary: {'ko': '레전드', 'en': 'Legend', 'ja': 'レジェンド'},
+    Rarity.mythic: {'ko': '미스틱', 'en': 'Mythic', 'ja': 'ミスティック'},
   };
 
   /// 등급별 해학적 확률 비유 — 확률 정보 시트에 % 옆에 표기.
