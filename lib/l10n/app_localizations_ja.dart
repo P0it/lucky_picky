@@ -15,7 +15,10 @@ class AppLocalizationsJa extends AppLocalizations {
   String get tabGacha => 'ガチャ';
 
   @override
-  String get tabDex => '幸運図鑑';
+  String get tabFortune => '運勢';
+
+  @override
+  String get tabDex => '幸運の財布';
 
   @override
   String get tabArchive => 'わたしの記録';
@@ -115,12 +118,15 @@ class AppLocalizationsJa extends AppLocalizations {
   String get gachaNotEnough => 'クローバーが足りません';
 
   @override
-  String gachaFreePull(int left, int total) {
-    return '広告を見て無料ガチャ（$left/$total）';
+  String gachaAdClover(int left, int total) {
+    return '広告を見てクローバーをもらう（$left/$total）';
   }
 
   @override
-  String get gachaFreePullNone => '無料ガチャは明日また回復します';
+  String get gachaAdCloverNone => '広告クローバーは明日また回復します';
+
+  @override
+  String get gachaAdCloverGained => 'クローバー +1！マシンを回してみましょう';
 
   @override
   String get gachaRatesButton => '提供割合';
@@ -152,15 +158,114 @@ class AppLocalizationsJa extends AppLocalizations {
   String get resultRerollAd => '広告を見てもう1回';
 
   @override
-  String get dexTitle => '幸運図鑑';
+  String get dexTitle => '幸運の財布';
 
   @override
   String get dexSubtitle => '引いた幸運がここに集まります';
 
   @override
-  String dexProgress(int owned, int total) {
-    return '$owned/$total コンプ';
+  String get dexEmpty => 'お財布はまだ空っぽ — 最初の幸運を引いてみましょう！';
+
+  @override
+  String get dexEnhanceMax => 'MAX';
+
+  @override
+  String dexPlus(int plus) {
+    return '+$plus';
   }
+
+  @override
+  String dexOwnedCount(int count) {
+    return '$count枚 所持';
+  }
+
+  @override
+  String dexRarityCount(int count) {
+    return '$count枚';
+  }
+
+  @override
+  String get forgeEnhanceCta => '強化する';
+
+  @override
+  String get forgeReforgeCta => '再構成';
+
+  @override
+  String get forgeStepTarget => '強化するカードを選んでください';
+
+  @override
+  String get forgeStepMaterial => '素材にするカードを選んでください';
+
+  @override
+  String forgeStepReforge(int need) {
+    return '溶かすカードを$need枚選んでください';
+  }
+
+  @override
+  String get forgeNext => '次へ';
+
+  @override
+  String get forgeBack => '戻る';
+
+  @override
+  String forgeRunEnhance(int have, int need) {
+    return '強化する ($have/$need)';
+  }
+
+  @override
+  String forgeRunReforge(int have, int need) {
+    return '再構成する ($have/$need)';
+  }
+
+  @override
+  String forgeRate(int rate) {
+    return '成功確率 $rate%';
+  }
+
+  @override
+  String get forgeRateHint => '同じカード +15%p ・ 上位等級 +10%p ・ 下位等級 -10%p';
+
+  @override
+  String get forgeWarn => '失敗しても素材は消えます';
+
+  @override
+  String forgeReforgeHint(int rate) {
+    return '素材の中で最も高い等級で出て、$rate%の確率で一段階上がります';
+  }
+
+  @override
+  String get forgeNoEnhanceable => '強化できるカードがありません';
+
+  @override
+  String forgeNotEnoughCards(int need) {
+    return 'カードが$need枚以上必要です';
+  }
+
+  @override
+  String get forgeNoMaterial => '素材にできるカードがありません';
+
+  @override
+  String get forgeSuccess => '強化成功！';
+
+  @override
+  String forgeSuccessPlus(int plus) {
+    return '+$plus';
+  }
+
+  @override
+  String get forgeFail => '強化失敗…';
+
+  @override
+  String get forgeFailHint => '素材は消えましたが、幸運はまだ残っています';
+
+  @override
+  String get forgeReforged => '新しい幸運が出ました';
+
+  @override
+  String get forgeUpgraded => '等級が上がりました！';
+
+  @override
+  String get forgeConfirm => '確認';
 
   @override
   String get ticketTitle => '幸運チケット';
@@ -229,6 +334,57 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get errorNeedConnection => 'インターネット接続が必要です。もう一度お試しください。';
+
+  @override
+  String get fortuneTitle => '今日のラッキー指数';
+
+  @override
+  String get fortuneSubtitle => '運はもらうものじゃなく、掴むもの。';
+
+  @override
+  String get fortuneGaugeHint => '好きな瞬間にタップして運を掴もう！';
+
+  @override
+  String get fortuneStartCta => '運メーターを回す';
+
+  @override
+  String get fortuneCta => '今しかない…!?';
+
+  @override
+  String get fortuneAdviceLabel => '今日の善行おすすめ';
+
+  @override
+  String get fortuneScoreLabel => '今日のラッキー指数';
+
+  @override
+  String fortuneScorePoints(int score) {
+    return '$score点';
+  }
+
+  @override
+  String get fortuneRetryAd => '広告を見てもう1回掴む';
+
+  @override
+  String get fortuneTomorrow => 'また明日、新しい運を掴みに来てね 🍀';
+
+  @override
+  String fortuneDeedCheer(int count) {
+    return 'これまでの善行$count個が応援しています';
+  }
+
+  @override
+  String get fortuneLuckyColor => 'ラッキーカラー';
+
+  @override
+  String get fortuneLuckyNumber => 'ラッキーナンバー';
+
+  @override
+  String get fortuneLuckyItem => 'ラッキーアイテム';
+
+  @override
+  String fortuneShareText(int score) {
+    return '今日のわたしのラッキー指数は$score点 🍀\nきみも掴んでみて。\n\nLuckyPicky — 善い行いで引く幸運';
+  }
 
   @override
   String get languageSheetTitle => '言語';

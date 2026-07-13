@@ -3,7 +3,8 @@
 
   "tabHome": "Home",
   "tabGacha": "Gacha",
-  "tabDex": "Luck Dex",
+  "tabFortune": "Fortune",
+  "tabDex": "Lucky Wallet",
   "tabArchive": "My Record",
 
   "homeStatusEmpty": "Start a new four-leaf clover.\nFour good deeds fill all its leaves.",
@@ -65,14 +66,15 @@
   },
   "gachaPull": "Pull with a clover",
   "gachaNotEnough": "Not enough clovers",
-  "gachaFreePull": "Watch an ad · free pull ({left}/{total})",
-  "@gachaFreePull": {
+  "gachaAdClover": "Watch an ad · get a clover ({left}/{total})",
+  "@gachaAdClover": {
     "placeholders": {
       "left": { "type": "int" },
       "total": { "type": "int" }
     }
   },
-  "gachaFreePullNone": "Free pulls are back tomorrow",
+  "gachaAdCloverNone": "Ad clovers are back tomorrow",
+  "gachaAdCloverGained": "Clover +1! Give the machine a spin",
   "gachaRatesButton": "Drop rates",
   "gachaTapCapsule": "Tap the capsule to open it!",
 
@@ -90,15 +92,89 @@
   "resultConfirm": "Nice",
   "resultRerollAd": "Watch an ad · pull again",
 
-  "dexTitle": "Luck Dex",
+  "dexTitle": "Lucky Wallet",
   "dexSubtitle": "Every luck you've pulled lives here",
-  "dexProgress": "{owned}/{total} collected",
-  "@dexProgress": {
+  "dexEmpty": "Your wallet is empty — go pull your first luck!",
+  "dexEnhanceMax": "MAX",
+  "dexPlus": "+{plus}",
+  "@dexPlus": {
     "placeholders": {
-      "owned": { "type": "int" },
-      "total": { "type": "int" }
+      "plus": { "type": "int" }
     }
   },
+  "dexOwnedCount": "{count} cards",
+  "@dexOwnedCount": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "dexRarityCount": "{count}",
+  "@dexRarityCount": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+
+  "forgeEnhanceCta": "Enhance",
+  "forgeReforgeCta": "Reforge",
+  "forgeStepTarget": "Pick a card to enhance",
+  "forgeStepMaterial": "Pick the cards to burn",
+  "forgeStepReforge": "Pick {need} cards to melt down",
+  "@forgeStepReforge": {
+    "placeholders": {
+      "need": { "type": "int" }
+    }
+  },
+  "forgeNext": "Next",
+  "forgeBack": "Back",
+  "forgeRunEnhance": "Enhance ({have}/{need})",
+  "@forgeRunEnhance": {
+    "placeholders": {
+      "have": { "type": "int" },
+      "need": { "type": "int" }
+    }
+  },
+  "forgeRunReforge": "Reforge ({have}/{need})",
+  "@forgeRunReforge": {
+    "placeholders": {
+      "have": { "type": "int" },
+      "need": { "type": "int" }
+    }
+  },
+  "forgeRate": "{rate}% success",
+  "@forgeRate": {
+    "placeholders": {
+      "rate": { "type": "int" }
+    }
+  },
+  "forgeRateHint": "Same card +15%p · higher tier +10%p · lower tier -10%p",
+  "forgeWarn": "Materials burn even if it fails",
+  "forgeReforgeHint": "You get the highest tier among the materials, with a {rate}% chance to tier up",
+  "@forgeReforgeHint": {
+    "placeholders": {
+      "rate": { "type": "int" }
+    }
+  },
+  "forgeNoEnhanceable": "No card can be enhanced yet",
+  "forgeNotEnoughCards": "You need at least {need} cards",
+  "@forgeNotEnoughCards": {
+    "placeholders": {
+      "need": { "type": "int" }
+    }
+  },
+  "forgeNoMaterial": "No other card to use as material",
+  "forgeSuccess": "Enhanced!",
+  "forgeSuccessPlus": "+{plus}",
+  "@forgeSuccessPlus": {
+    "placeholders": {
+      "plus": { "type": "int" }
+    }
+  },
+  "forgeFail": "It didn't take…",
+  "forgeFailHint": "The materials are gone, but your luck isn't",
+  "forgeReforged": "A new luck came out",
+  "forgeUpgraded": "Tier up!",
+  "forgeConfirm": "OK",
 
   "ticketTitle": "Luck Ticket",
   "ticketOwnedCopies": "Owned ×{count}",
@@ -155,6 +231,37 @@
   "talismanSaveFail": "Photo access permission is needed to save.",
   "talismanRetry": "Please try again in a moment.",
   "errorNeedConnection": "Internet connection is needed. Please try again.",
+
+  "fortuneTitle": "Today's Luck Meter",
+  "fortuneSubtitle": "Luck isn't given — you catch it.",
+  "fortuneGaugeHint": "Tap at the right moment to catch your luck!",
+  "fortuneStartCta": "Start the luck meter",
+  "fortuneCta": "Now...!?",
+  "fortuneAdviceLabel": "Today's good deed",
+  "fortuneScoreLabel": "Today's luck meter",
+  "fortuneScorePoints": "{score} pts",
+  "@fortuneScorePoints": {
+    "placeholders": {
+      "score": { "type": "int" }
+    }
+  },
+  "fortuneRetryAd": "Watch an ad · one more try",
+  "fortuneTomorrow": "Come back tomorrow to catch a new one 🍀",
+  "fortuneDeedCheer": "Your {count} good deeds are cheering for you",
+  "@fortuneDeedCheer": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "fortuneLuckyColor": "Lucky color",
+  "fortuneLuckyNumber": "Lucky number",
+  "fortuneLuckyItem": "Lucky item",
+  "fortuneShareText": "My luck meter today: {score}/100 🍀\nCatch yours too.\n\nLuckyPicky — luck you earn by doing good",
+  "@fortuneShareText": {
+    "placeholders": {
+      "score": { "type": "int" }
+    }
+  },
 
   "languageSheetTitle": "Language",
   "languageSystem": "Follow system settings"

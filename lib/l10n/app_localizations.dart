@@ -112,10 +112,16 @@ abstract class AppLocalizations {
   /// **'Gacha'**
   String get tabGacha;
 
+  /// No description provided for @tabFortune.
+  ///
+  /// In en, this message translates to:
+  /// **'Fortune'**
+  String get tabFortune;
+
   /// No description provided for @tabDex.
   ///
   /// In en, this message translates to:
-  /// **'Luck Dex'**
+  /// **'Lucky Wallet'**
   String get tabDex;
 
   /// No description provided for @tabArchive.
@@ -292,17 +298,23 @@ abstract class AppLocalizations {
   /// **'Not enough clovers'**
   String get gachaNotEnough;
 
-  /// No description provided for @gachaFreePull.
+  /// No description provided for @gachaAdClover.
   ///
   /// In en, this message translates to:
-  /// **'Watch an ad · free pull ({left}/{total})'**
-  String gachaFreePull(int left, int total);
+  /// **'Watch an ad · get a clover ({left}/{total})'**
+  String gachaAdClover(int left, int total);
 
-  /// No description provided for @gachaFreePullNone.
+  /// No description provided for @gachaAdCloverNone.
   ///
   /// In en, this message translates to:
-  /// **'Free pulls are back tomorrow'**
-  String get gachaFreePullNone;
+  /// **'Ad clovers are back tomorrow'**
+  String get gachaAdCloverNone;
+
+  /// No description provided for @gachaAdCloverGained.
+  ///
+  /// In en, this message translates to:
+  /// **'Clover +1! Give the machine a spin'**
+  String get gachaAdCloverGained;
 
   /// No description provided for @gachaRatesButton.
   ///
@@ -361,7 +373,7 @@ abstract class AppLocalizations {
   /// No description provided for @dexTitle.
   ///
   /// In en, this message translates to:
-  /// **'Luck Dex'**
+  /// **'Lucky Wallet'**
   String get dexTitle;
 
   /// No description provided for @dexSubtitle.
@@ -370,11 +382,173 @@ abstract class AppLocalizations {
   /// **'Every luck you\'ve pulled lives here'**
   String get dexSubtitle;
 
-  /// No description provided for @dexProgress.
+  /// No description provided for @dexEmpty.
   ///
   /// In en, this message translates to:
-  /// **'{owned}/{total} collected'**
-  String dexProgress(int owned, int total);
+  /// **'Your wallet is empty — go pull your first luck!'**
+  String get dexEmpty;
+
+  /// No description provided for @dexEnhanceMax.
+  ///
+  /// In en, this message translates to:
+  /// **'MAX'**
+  String get dexEnhanceMax;
+
+  /// No description provided for @dexPlus.
+  ///
+  /// In en, this message translates to:
+  /// **'+{plus}'**
+  String dexPlus(int plus);
+
+  /// No description provided for @dexOwnedCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} cards'**
+  String dexOwnedCount(int count);
+
+  /// No description provided for @dexRarityCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count}'**
+  String dexRarityCount(int count);
+
+  /// No description provided for @forgeEnhanceCta.
+  ///
+  /// In en, this message translates to:
+  /// **'Enhance'**
+  String get forgeEnhanceCta;
+
+  /// No description provided for @forgeReforgeCta.
+  ///
+  /// In en, this message translates to:
+  /// **'Reforge'**
+  String get forgeReforgeCta;
+
+  /// No description provided for @forgeStepTarget.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick a card to enhance'**
+  String get forgeStepTarget;
+
+  /// No description provided for @forgeStepMaterial.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick the cards to burn'**
+  String get forgeStepMaterial;
+
+  /// No description provided for @forgeStepReforge.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick {need} cards to melt down'**
+  String forgeStepReforge(int need);
+
+  /// No description provided for @forgeNext.
+  ///
+  /// In en, this message translates to:
+  /// **'Next'**
+  String get forgeNext;
+
+  /// No description provided for @forgeBack.
+  ///
+  /// In en, this message translates to:
+  /// **'Back'**
+  String get forgeBack;
+
+  /// No description provided for @forgeRunEnhance.
+  ///
+  /// In en, this message translates to:
+  /// **'Enhance ({have}/{need})'**
+  String forgeRunEnhance(int have, int need);
+
+  /// No description provided for @forgeRunReforge.
+  ///
+  /// In en, this message translates to:
+  /// **'Reforge ({have}/{need})'**
+  String forgeRunReforge(int have, int need);
+
+  /// No description provided for @forgeRate.
+  ///
+  /// In en, this message translates to:
+  /// **'{rate}% success'**
+  String forgeRate(int rate);
+
+  /// No description provided for @forgeRateHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Same card +15%p · higher tier +10%p · lower tier -10%p'**
+  String get forgeRateHint;
+
+  /// No description provided for @forgeWarn.
+  ///
+  /// In en, this message translates to:
+  /// **'Materials burn even if it fails'**
+  String get forgeWarn;
+
+  /// No description provided for @forgeReforgeHint.
+  ///
+  /// In en, this message translates to:
+  /// **'You get the highest tier among the materials, with a {rate}% chance to tier up'**
+  String forgeReforgeHint(int rate);
+
+  /// No description provided for @forgeNoEnhanceable.
+  ///
+  /// In en, this message translates to:
+  /// **'No card can be enhanced yet'**
+  String get forgeNoEnhanceable;
+
+  /// No description provided for @forgeNotEnoughCards.
+  ///
+  /// In en, this message translates to:
+  /// **'You need at least {need} cards'**
+  String forgeNotEnoughCards(int need);
+
+  /// No description provided for @forgeNoMaterial.
+  ///
+  /// In en, this message translates to:
+  /// **'No other card to use as material'**
+  String get forgeNoMaterial;
+
+  /// No description provided for @forgeSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Enhanced!'**
+  String get forgeSuccess;
+
+  /// No description provided for @forgeSuccessPlus.
+  ///
+  /// In en, this message translates to:
+  /// **'+{plus}'**
+  String forgeSuccessPlus(int plus);
+
+  /// No description provided for @forgeFail.
+  ///
+  /// In en, this message translates to:
+  /// **'It didn\'t take…'**
+  String get forgeFail;
+
+  /// No description provided for @forgeFailHint.
+  ///
+  /// In en, this message translates to:
+  /// **'The materials are gone, but your luck isn\'t'**
+  String get forgeFailHint;
+
+  /// No description provided for @forgeReforged.
+  ///
+  /// In en, this message translates to:
+  /// **'A new luck came out'**
+  String get forgeReforged;
+
+  /// No description provided for @forgeUpgraded.
+  ///
+  /// In en, this message translates to:
+  /// **'Tier up!'**
+  String get forgeUpgraded;
+
+  /// No description provided for @forgeConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'OK'**
+  String get forgeConfirm;
 
   /// No description provided for @ticketTitle.
   ///
@@ -483,6 +657,96 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Internet connection is needed. Please try again.'**
   String get errorNeedConnection;
+
+  /// No description provided for @fortuneTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Today\'s Luck Meter'**
+  String get fortuneTitle;
+
+  /// No description provided for @fortuneSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Luck isn\'t given — you catch it.'**
+  String get fortuneSubtitle;
+
+  /// No description provided for @fortuneGaugeHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap at the right moment to catch your luck!'**
+  String get fortuneGaugeHint;
+
+  /// No description provided for @fortuneStartCta.
+  ///
+  /// In en, this message translates to:
+  /// **'Start the luck meter'**
+  String get fortuneStartCta;
+
+  /// No description provided for @fortuneCta.
+  ///
+  /// In en, this message translates to:
+  /// **'Now...!?'**
+  String get fortuneCta;
+
+  /// No description provided for @fortuneAdviceLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Today\'s good deed'**
+  String get fortuneAdviceLabel;
+
+  /// No description provided for @fortuneScoreLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Today\'s luck meter'**
+  String get fortuneScoreLabel;
+
+  /// No description provided for @fortuneScorePoints.
+  ///
+  /// In en, this message translates to:
+  /// **'{score} pts'**
+  String fortuneScorePoints(int score);
+
+  /// No description provided for @fortuneRetryAd.
+  ///
+  /// In en, this message translates to:
+  /// **'Watch an ad · one more try'**
+  String get fortuneRetryAd;
+
+  /// No description provided for @fortuneTomorrow.
+  ///
+  /// In en, this message translates to:
+  /// **'Come back tomorrow to catch a new one 🍀'**
+  String get fortuneTomorrow;
+
+  /// No description provided for @fortuneDeedCheer.
+  ///
+  /// In en, this message translates to:
+  /// **'Your {count} good deeds are cheering for you'**
+  String fortuneDeedCheer(int count);
+
+  /// No description provided for @fortuneLuckyColor.
+  ///
+  /// In en, this message translates to:
+  /// **'Lucky color'**
+  String get fortuneLuckyColor;
+
+  /// No description provided for @fortuneLuckyNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Lucky number'**
+  String get fortuneLuckyNumber;
+
+  /// No description provided for @fortuneLuckyItem.
+  ///
+  /// In en, this message translates to:
+  /// **'Lucky item'**
+  String get fortuneLuckyItem;
+
+  /// No description provided for @fortuneShareText.
+  ///
+  /// In en, this message translates to:
+  /// **'My luck meter today: {score}/100 🍀\nCatch yours too.\n\nLuckyPicky — luck you earn by doing good'**
+  String fortuneShareText(int score);
 
   /// No description provided for @languageSheetTitle.
   ///
