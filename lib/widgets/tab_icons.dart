@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 /// 하단 탭 아이콘 — Clover.dc.html 의 인라인 SVG(24x24, stroke 1.8, round)를
 /// Flutter Path 로 그대로 옮겨 그린다.
-enum TabIconKind { home, store, dex, archive }
+enum TabIconKind { home, store, fortune, dex, archive }
 
 class TabIcon extends StatelessWidget {
   final TabIconKind kind;
@@ -91,6 +91,29 @@ class _TabIconPainter extends CustomPainter {
             ..cubicTo(12, 9.5, 13.4, 5, 16, 5.6)
             ..cubicTo(18, 6, 17.6, 9.5, 14.8, 9.5)
             ..close(),
+        ];
+      case TabIconKind.fortune:
+        // 반짝이 별(행운지수) — 중앙 4포인트 스파클 + 작은 트윙클.
+        return [
+          Path()
+            ..moveTo(11, 4.6)
+            ..quadraticBezierTo(12.5, 10.5, 18.4, 12)
+            ..quadraticBezierTo(12.5, 13.5, 11, 19.4)
+            ..quadraticBezierTo(9.5, 13.5, 3.6, 12)
+            ..quadraticBezierTo(9.5, 10.5, 11, 4.6)
+            ..close(),
+          Path()
+            ..moveTo(18.7, 3.8)
+            ..lineTo(18.7, 7.4),
+          Path()
+            ..moveTo(16.9, 5.6)
+            ..lineTo(20.5, 5.6),
+          Path()
+            ..moveTo(19.6, 16.6)
+            ..lineTo(19.6, 19.4),
+          Path()
+            ..moveTo(18.2, 18)
+            ..lineTo(21, 18),
         ];
       case TabIconKind.dex:
         return [
