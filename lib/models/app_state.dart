@@ -1,7 +1,7 @@
 import 'deed.dart';
-import 'owned_ticket.dart';
+import 'ticket_instance.dart';
 
-enum AppTab { home, gacha, dex, archive }
+enum AppTab { home, gacha, fortune, dex, archive }
 
 enum ArchiveView { timeline, calendar }
 
@@ -18,11 +18,11 @@ class AppState {
   final int statClovers; // 탄생한 클로버
   final int statPulls; // 총 뽑기 횟수
 
-  final List<OwnedTicket> tickets; // 도감에 등록된 행운권 (최신 획득순)
+  final List<TicketInstance> tickets; // 보유 카드 (한 장 = 한 인스턴스, 최신 획득순)
   final List<HistoryEntry> history;
 
-  final int freePullsUsedToday; // 오늘 사용한 무료(광고) 뽑기 수
-  final String lastFreePullDate; // 무료 뽑기 카운트 기준일 'YYYY.MM.DD'
+  final int adCloversToday; // 오늘 광고로 받은 클로버 수
+  final String lastAdCloverDate; // 광고 클로버 카운트 기준일 'YYYY.MM.DD'
 
   const AppState({
     this.tab = AppTab.home,
@@ -36,8 +36,8 @@ class AppState {
     this.statPulls = 0,
     this.tickets = const [],
     this.history = const [],
-    this.freePullsUsedToday = 0,
-    this.lastFreePullDate = '',
+    this.adCloversToday = 0,
+    this.lastAdCloverDate = '',
   });
 
   /// 빈 초기 상태 — 실데이터는 서버에서 로드된다.
@@ -53,10 +53,10 @@ class AppState {
     int? statLeaves,
     int? statClovers,
     int? statPulls,
-    List<OwnedTicket>? tickets,
+    List<TicketInstance>? tickets,
     List<HistoryEntry>? history,
-    int? freePullsUsedToday,
-    String? lastFreePullDate,
+    int? adCloversToday,
+    String? lastAdCloverDate,
   }) {
     return AppState(
       tab: tab ?? this.tab,
@@ -70,8 +70,8 @@ class AppState {
       statPulls: statPulls ?? this.statPulls,
       tickets: tickets ?? this.tickets,
       history: history ?? this.history,
-      freePullsUsedToday: freePullsUsedToday ?? this.freePullsUsedToday,
-      lastFreePullDate: lastFreePullDate ?? this.lastFreePullDate,
+      adCloversToday: adCloversToday ?? this.adCloversToday,
+      lastAdCloverDate: lastAdCloverDate ?? this.lastAdCloverDate,
     );
   }
 
@@ -84,8 +84,8 @@ class AppState {
         'statPulls': statPulls,
         'tickets': tickets.map((t) => t.toJson()).toList(),
         'history': history.map((h) => h.toJson()).toList(),
-        'freePullsUsedToday': freePullsUsedToday,
-        'lastFreePullDate': lastFreePullDate,
+        'adCloversToday': adCloversToday,
+        'lastAdCloverDate': lastAdCloverDate,
       };
 
   factory AppState.fromJson(Map<String, dynamic> j) => AppState(
@@ -94,15 +94,41 @@ class AppState {
         statLeaves: j['statLeaves'] as int? ?? 0,
         statClovers: j['statClovers'] as int? ?? 0,
         statPulls: j['statPulls'] as int? ?? 0,
-        tickets: (j['tickets'] as List<dynamic>?)
-                ?.map((e) => OwnedTicket.fromJson(e as Map<String, dynamic>))
-                .toList() ??
-            const [],
+        tickets: _ticketsFromJson(j['tickets'] as List<dynamic>?),
         history: (j['history'] as List<dynamic>?)
                 ?.map((e) => HistoryEntry.fromJson(e as Map<String, dynamic>))
                 .toList() ??
             const [],
-        freePullsUsedToday: j['freePullsUsedToday'] as int? ?? 0,
-        lastFreePullDate: j['lastFreePullDate'] as String? ?? '',
+        adCloversToday: j['adCloversToday'] as int? ?? 0,
+        lastAdCloverDate: j['lastAdCloverDate'] as String? ?? '',
       );
+
+  /// 카드 목록 복원. 구버전 payload 는 {ticketId, copies, level} 합산 형태라
+  /// (강화된 1장 + 남은 여분) 인스턴스로 펼친다 — 서버 import_local_state 와 동일 규칙.
+  static List<TicketInstance> _ticketsFromJson(List<dynamic>? raw) {
+    if (raw == null) return const [];
+    final out = <TicketInstance>[];
+    for (final e in raw) {
+      final j = e as Map<String, dynamic>;
+      final copies = j['copies'] as int?;
+      if (copies == null) {
+        out.add(TicketInstance.fromJson(j));
+        continue;
+      }
+      final ticketId = j['ticketId'] as String;
+      final date = j['firstPulledAt'] as String? ?? '';
+      var level = j['level'] as int? ?? 1;
+      while (level > 1 && level * (level - 1) ~/ 2 > copies - 1) {
+        level--;
+      }
+      final spare = copies - 1 - (level * (level - 1) ~/ 2);
+      out.add(TicketInstance(
+          id: '${ticketId}_0', ticketId: ticketId, level: level, pulledAt: date));
+      for (var i = 0; i < (spare < 0 ? 0 : spare); i++) {
+        out.add(TicketInstance(
+            id: '${ticketId}_${i + 1}', ticketId: ticketId, pulledAt: date));
+      }
+    }
+    return out;
+  }
 }

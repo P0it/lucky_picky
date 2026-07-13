@@ -4,7 +4,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../models/app_state.dart';
 import '../models/deed.dart';
-import '../models/owned_ticket.dart';
+import '../models/ticket_instance.dart';
 import 'game_backend.dart';
 
 /// Supabase 실구현 — 모든 상태 변경은 서버 RPC(서버 권위)를 호출한다.
@@ -28,10 +28,9 @@ class SupabaseGameBackend implements GameBackend {
   Future<BackendSnapshot> fetchState() => _guard(() async {
         final profile = await _client.from('profiles').select().single();
         final tickets = await _client
-            .from('owned_tickets')
+            .from('ticket_instances')
             .select()
-            .order('first_pulled_at', ascending: false)
-            .order('ticket_id');
+            .order('created_at', ascending: false);
         final history = await _client
             .from('history')
             .select()
@@ -46,16 +45,16 @@ class SupabaseGameBackend implements GameBackend {
             statLeaves: profile['stat_leaves'] as int? ?? 0,
             statClovers: profile['stat_clovers'] as int? ?? 0,
             statPulls: profile['stat_pulls'] as int? ?? 0,
-            freePullsUsedToday: profile['free_pulls_used_today'] as int? ?? 0,
-            lastFreePullDate:
-                _dotDate(profile['last_free_pull_date'] as String?),
+            adCloversToday: profile['ad_clovers_today'] as int? ?? 0,
+            lastAdCloverDate:
+                _dotDate(profile['last_ad_clover_date'] as String?),
             tickets: [
               for (final t in tickets)
-                OwnedTicket(
+                TicketInstance(
+                  id: t['id'] as String,
                   ticketId: t['ticket_id'] as String,
-                  copies: t['copies'] as int? ?? 1,
                   level: t['level'] as int? ?? 1,
-                  firstPulledAt: _dotDate(t['first_pulled_at'] as String?),
+                  pulledAt: _dotDate(t['pulled_at'] as String?),
                 ),
             ],
             history: [
@@ -89,24 +88,55 @@ class SupabaseGameBackend implements GameBackend {
       });
 
   @override
-  Future<GachaOutcome> pullGacha({required bool free}) => _guard(() async {
-        final r = await _rpc('pull_gacha', {'p_free': free});
+  Future<GachaOutcome> pullGacha() => _guard(() async {
+        final r = await _rpc('pull_gacha');
         return GachaOutcome(
+          instanceId: r['instance_id'] as String,
           ticketId: r['ticket_id'] as String,
           isNew: r['is_new'] as bool,
           copies: r['copies'] as int,
           level: r['level'] as int,
-          free: r['free'] as bool,
         );
       });
 
   @override
-  Future<EnhanceOutcome> enhanceTicket(String ticketId) => _guard(() async {
-        final r = await _rpc('enhance_ticket', {'p_ticket_id': ticketId});
+  Future<AdCloverResult> grantAdClover() => _guard(() async {
+        final r = await _rpc('grant_ad_clover');
+        return AdCloverResult(
+          clovers: r['clovers'] as int,
+          usedToday: r['ad_clovers_today'] as int,
+        );
+      });
+
+  @override
+  Future<EnhanceOutcome> enhanceTicket(
+          String instanceId, List<String> materialIds) =>
+      _guard(() async {
+        final r = await _rpc('enhance_ticket', {
+          'p_target': instanceId,
+          'p_materials': materialIds,
+        });
         return EnhanceOutcome(
+          instanceId: r['instance_id'] as String,
           ticketId: r['ticket_id'] as String,
-          copies: r['copies'] as int,
+          success: r['success'] as bool,
           level: r['level'] as int,
+          rate: r['rate'] as int,
+        );
+      });
+
+  @override
+  Future<ReforgeOutcome> reforgeTickets(List<String> materialIds) =>
+      _guard(() async {
+        final r = await _rpc('reforge_tickets', {'p_materials': materialIds});
+        return ReforgeOutcome(
+          instance: TicketInstance(
+            id: r['instance_id'] as String,
+            ticketId: r['ticket_id'] as String,
+            pulledAt: '',
+          ),
+          isNew: r['is_new'] as bool,
+          upgraded: r['upgraded'] as bool,
         );
       });
 

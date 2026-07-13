@@ -11,18 +11,15 @@ import '../data/game_backend.dart';
 import '../data/supabase_game_backend.dart';
 import '../models/app_state.dart';
 import '../models/deed.dart';
-import '../models/owned_ticket.dart';
+import '../models/ticket_instance.dart';
 import 'ads_controller.dart';
 
 /// 서버 도입 전 로컬 저장 키 — 최초 로그인 시 서버로 1회 이관하는 데만 쓴다.
 const _legacyPrefsKey = 'luckypicky_app_state_v1';
 
-/// 하루에 광고 시청으로 뽑을 수 있는 무료 뽑기 수.
-/// (서버 game_config 의 free_pulls_per_day 와 동치 — UI 표시/사전 차단용)
-const int kFreePullsPerDay = 3;
-
-/// 몇 회 뽑을 때마다 결과 확정 후 전면광고를 보여줄지.
-const int kPullAdInterval = 3;
+/// 하루에 광고 시청으로 받을 수 있는 클로버 수.
+/// (서버 game_config 의 ad_clovers_per_day 와 동치 — UI 표시/사전 차단용)
+const int kAdCloversPerDay = 3;
 
 /// 게임 상태 백엔드 — 실서비스는 Supabase RPC(서버 권위).
 /// 테스트는 LocalGameBackend 로 override 한다.
@@ -35,15 +32,15 @@ final appControllerProvider =
 /// 뽑기 1회의 결과.
 class PullResult {
   final LuckTicket ticket;
-  final OwnedTicket owned; // 반영 후의 보유 상태
+  final TicketInstance instance; // 이번에 얻은 카드 한 장
+  final int copies; // 반영 후 같은 행운권 보유 장수
   final bool isNew; // 첫 획득 여부
-  final bool free; // 무료(광고) 뽑기였는지
 
   const PullResult({
     required this.ticket,
-    required this.owned,
+    required this.instance,
+    required this.copies,
     required this.isNew,
-    required this.free,
   });
 }
 
@@ -102,8 +99,8 @@ class AppController extends Notifier<AppState> {
       statPulls: data.statPulls,
       tickets: data.tickets,
       history: data.history,
-      freePullsUsedToday: data.freePullsUsedToday,
-      lastFreePullDate: data.lastFreePullDate,
+      adCloversToday: data.adCloversToday,
+      lastAdCloverDate: data.lastAdCloverDate,
     );
     // 지난 세션에서 클로버 확정(finish_clover)이 오프라인으로 끊겼다면 복구.
     if (data.leaves >= 4) {
@@ -202,25 +199,41 @@ class AppController extends Notifier<AppState> {
   }
 
   // ---- 가챠 ----
-  /// 오늘 남은 무료(광고) 뽑기 횟수 (서버 기준일=UTC 과 동일 규칙).
-  int get freePullsLeft {
+  /// 오늘 광고로 더 받을 수 있는 클로버 수 (서버 기준일=UTC 과 동일 규칙).
+  int get adCloversLeft {
     final used =
-        state.lastFreePullDate == _todayUtc() ? state.freePullsUsedToday : 0;
-    return (kFreePullsPerDay - used).clamp(0, kFreePullsPerDay);
+        state.lastAdCloverDate == _todayUtc() ? state.adCloversToday : 0;
+    return (kAdCloversPerDay - used).clamp(0, kAdCloversPerDay);
   }
 
-  /// 이번 뽑기 결과 확정 후 전면광고를 보여줄 차례인지.
-  bool get shouldShowPullAd =>
-      state.statPulls > 0 && state.statPulls % kPullAdInterval == 0;
+  /// 광고 시청 보상으로 클로버 1개를 받는다 (하루 [kAdCloversPerDay] 회).
+  /// 한도 초과면 false, 오프라인이면 [GameConnectionException].
+  Future<bool> grantAdClover() async {
+    await _ensureReady();
 
-  /// 뽑기 1회 — 추첨은 서버에서 실행된다.
-  /// 뽑을 수 없으면(재화/한도 부족) null, 오프라인이면 [GameConnectionException].
-  Future<PullResult?> pullGacha({bool free = false}) async {
+    final AdCloverResult r;
+    try {
+      r = await _backend.grantAdClover();
+    } on GameRuleException {
+      return false;
+    }
+
+    state = state.copyWith(
+      clovers: r.clovers,
+      adCloversToday: r.usedToday,
+      lastAdCloverDate: _todayUtc(),
+    );
+    return true;
+  }
+
+  /// 뽑기 1회 — 클로버 1개를 소모하고, 추첨은 서버에서 실행된다.
+  /// 뽑을 수 없으면(클로버 부족) null, 오프라인이면 [GameConnectionException].
+  Future<PullResult?> pullGacha() async {
     await _ensureReady();
 
     final GachaOutcome r;
     try {
-      r = await _backend.pullGacha(free: free);
+      r = await _backend.pullGacha();
     } on GameRuleException {
       return null;
     }
@@ -232,62 +245,83 @@ class AppController extends Notifier<AppState> {
       return null;
     }
 
-    final today = _todayUtc();
-    final tickets = [...state.tickets];
-    final idx = tickets.indexWhere((t) => t.ticketId == r.ticketId);
-    final OwnedTicket owned;
-    if (idx < 0) {
-      owned = OwnedTicket(
-          ticketId: r.ticketId,
-          copies: r.copies,
-          level: r.level,
-          firstPulledAt: _todayLocal());
-      tickets.insert(0, owned);
-    } else {
-      owned = tickets[idx].copyWith(copies: r.copies, level: r.level);
-      tickets[idx] = owned;
-    }
+    final instance = TicketInstance(
+      id: r.instanceId,
+      ticketId: r.ticketId,
+      level: r.level,
+      pulledAt: _todayLocal(),
+    );
 
     state = state.copyWith(
-      clovers: free ? state.clovers : state.clovers - 1,
+      clovers: state.clovers - 1,
       statPulls: state.statPulls + 1,
-      tickets: tickets,
-      freePullsUsedToday: free
-          ? (state.lastFreePullDate == today ? state.freePullsUsedToday : 0) + 1
-          : state.freePullsUsedToday,
-      lastFreePullDate: free ? today : state.lastFreePullDate,
+      tickets: [instance, ...state.tickets],
       history: [
         HistoryEntry(
             id: DateTime.now().millisecondsSinceEpoch,
             date: _todayLocal(),
             kind: HistoryKind.pull,
             text: r.ticketId,
-            amount: free ? 0 : 1),
+            amount: 1),
         ...state.history,
       ],
     );
-    return PullResult(ticket: ticket, owned: owned, isNew: r.isNew, free: free);
+    return PullResult(
+      ticket: ticket,
+      instance: instance,
+      copies: r.copies,
+      isNew: r.isNew,
+    );
   }
 
-  /// 행운권 강화 — 여분 중복을 소모해 레벨 +1 (서버 검증).
-  /// 성공 시 반영 후 보유 상태, 불가하면 null, 오프라인이면 예외.
-  Future<OwnedTicket?> enhanceTicket(String ticketId) async {
+  /// 카드 [instanceId] 강화 — 같은 행운권 카드 [materialIds] 를 재료로 소모한다.
+  /// 판정은 서버가 하고, 실패해도 재료는 사라진다.
+  /// 규칙 위반(재료 불일치/최고 단계)이면 null, 오프라인이면 예외.
+  Future<EnhanceOutcome?> enhanceTicket(
+      String instanceId, List<String> materialIds) async {
     await _ensureReady();
 
     final EnhanceOutcome r;
     try {
-      r = await _backend.enhanceTicket(ticketId);
+      r = await _backend.enhanceTicket(instanceId, materialIds);
     } on GameRuleException {
       return null;
     }
 
-    final tickets = [...state.tickets];
-    final idx = tickets.indexWhere((t) => t.ticketId == ticketId);
-    if (idx < 0) return null;
-    final upgraded = tickets[idx].copyWith(copies: r.copies, level: r.level);
-    tickets[idx] = upgraded;
+    final consumed = materialIds.toSet()..remove(instanceId);
+    final tickets = [
+      for (final t in state.tickets)
+        if (!consumed.contains(t.id))
+          t.id == instanceId ? t.copyWith(level: r.level) : t,
+    ];
     state = state.copyWith(tickets: tickets);
-    return upgraded;
+    return r;
+  }
+
+  /// 재조합 — 카드 [materialIds] 를 갈아 새 카드 1장을 만든다(서버 추첨).
+  /// 규칙 위반(장수 불일치)이면 null, 오프라인이면 예외.
+  Future<ReforgeOutcome?> reforgeTickets(List<String> materialIds) async {
+    await _ensureReady();
+
+    final ReforgeOutcome r;
+    try {
+      r = await _backend.reforgeTickets(materialIds);
+    } on GameRuleException {
+      return null;
+    }
+
+    final consumed = materialIds.toSet();
+    final made = TicketInstance(
+      id: r.instance.id,
+      ticketId: r.instance.ticketId,
+      pulledAt: _todayLocal(),
+    );
+    state = state.copyWith(tickets: [
+      made,
+      for (final t in state.tickets)
+        if (!consumed.contains(t.id)) t,
+    ]);
+    return ReforgeOutcome(instance: made, isNew: r.isNew, upgraded: r.upgraded);
   }
 
   /// 서버 상태 강제 재동기화.
