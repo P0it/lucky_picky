@@ -43,7 +43,10 @@ class ForgeReforgeResult extends ForgeResult {
 
 /// 강화 플로우: 서버에서 결과를 **먼저** 확정하고, 확정된 결과로 연출을 재생한다.
 /// (가챠 `runGachaPullFlow` 와 같은 패턴 — 빌드 중 상태 변경 방지)
-Future<void> runEnhanceFlow(
+///
+/// 서버 판정이 나고 연출까지 띄웠으면 true. 오프라인(연결 실패)이거나 규칙에 걸려
+/// 아무 일도 일어나지 않았으면 false — 호출자는 고른 카드를 지우면 안 된다.
+Future<bool> runEnhanceFlow(
   BuildContext context,
   WidgetRef ref, {
   required String targetId,
@@ -59,9 +62,9 @@ Future<void> runEnhanceFlow(
     if (context.mounted) {
       showAppToast(context, AppLocalizations.of(context).errorNeedConnection);
     }
-    return;
+    return false;
   }
-  if (r == null || !context.mounted) return;
+  if (r == null || !context.mounted) return false;
   final result = ForgeEnhanceResult(outcome: r, ticketId: r.ticketId, rate: rate);
   final rarity = LuckCatalog.byId(r.ticketId)?.rarity ?? Rarity.common;
   await _pushOverlay(
@@ -70,10 +73,12 @@ Future<void> runEnhanceFlow(
     materialCount: materialIds.length,
     accent: RarityStyle.of(rarity).color,
   );
+  return true;
 }
 
 /// 재조합 플로우 — 재료를 갈아 새 카드를 만든다. 액센트는 결과 카드 등급색.
-Future<void> runReforgeFlow(
+/// 반환값의 의미는 [runEnhanceFlow] 와 같다.
+Future<bool> runReforgeFlow(
   BuildContext context,
   WidgetRef ref, {
   required List<String> materialIds,
@@ -87,9 +92,9 @@ Future<void> runReforgeFlow(
     if (context.mounted) {
       showAppToast(context, AppLocalizations.of(context).errorNeedConnection);
     }
-    return;
+    return false;
   }
-  if (r == null || !context.mounted) return;
+  if (r == null || !context.mounted) return false;
   final rarity =
       LuckCatalog.byId(r.instance.ticketId)?.rarity ?? Rarity.common;
   await _pushOverlay(
@@ -98,6 +103,7 @@ Future<void> runReforgeFlow(
     materialCount: materialIds.length,
     accent: RarityStyle.of(rarity).color,
   );
+  return true;
 }
 
 Future<void> _pushOverlay(

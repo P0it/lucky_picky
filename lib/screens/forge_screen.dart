@@ -56,6 +56,9 @@ class _ForgeScreenState extends ConsumerState<ForgeScreen> {
 
   bool _busy = false;
 
+  /// 대상이 사라져 화면을 닫는 중 — maybePop 이 두 번 예약되지 않게 한 번만 잠근다.
+  bool _popping = false;
+
   bool get _isEnhance => widget.mode == ForgeMode.enhance;
 
   /// 대상이 처음부터 주어진 경우 — STEP 2 에서 뒤로 가면 STEP 1 이 아니라 화면을 닫는다.
@@ -76,7 +79,7 @@ class _ForgeScreenState extends ConsumerState<ForgeScreen> {
   Future<void> _runEnhance(TicketInstance target, int rate) async {
     if (_busy) return;
     setState(() => _busy = true);
-    await runEnhanceFlow(
+    final ran = await runEnhanceFlow(
       context,
       ref,
       targetId: target.id,
@@ -84,16 +87,25 @@ class _ForgeScreenState extends ConsumerState<ForgeScreen> {
       rate: rate,
     );
     if (!mounted) return;
-    // 연출까지 끝났으면 지갑으로 돌아간다.
-    Navigator.of(context).maybePop();
+    if (ran) {
+      // 연출까지 끝났으면 지갑으로 돌아간다.
+      Navigator.of(context).maybePop();
+    } else {
+      // 오프라인이거나 규칙에 걸려 아무 일도 없었다 — 고른 카드를 그대로 두고 다시 누를 수 있게.
+      setState(() => _busy = false);
+    }
   }
 
   Future<void> _runReforge() async {
     if (_busy) return;
     setState(() => _busy = true);
-    await runReforgeFlow(context, ref, materialIds: _picked.toList());
+    final ran = await runReforgeFlow(context, ref, materialIds: _picked.toList());
     if (!mounted) return;
-    Navigator.of(context).maybePop();
+    if (ran) {
+      Navigator.of(context).maybePop();
+    } else {
+      setState(() => _busy = false);
+    }
   }
 
   /// STEP 2 → STEP 1. 대상이 고정된 진입(상세 화면 경로)에서는 되돌릴 STEP 1 이 없다.
@@ -135,11 +147,15 @@ class _ForgeScreenState extends ConsumerState<ForgeScreen> {
     final l = AppLocalizations.of(context);
     final tickets = ref.watch(appControllerProvider.select((s) => s.tickets));
 
+    // 지갑에서 사라진 카드의 id 는 붙들고 있지 않는다 — CTA 가 유령 선택으로 열리면 안 된다.
+    _picked.retainWhere((id) => tickets.any((t) => t.id == id));
+
     final target =
         tickets.where((t) => t.id == _targetId).firstOrNull; // 사라졌으면 null
 
     // 강화 대상이 재료로 소모되었거나 알 수 없는 카드면 대상 단계로 되돌린다.
-    if (_isEnhance && _onMaterialStep && target == null && !_busy) {
+    if (_isEnhance && _onMaterialStep && target == null && !_busy && !_popping) {
+      if (_targetLocked) _popping = true; // 닫는 중 재빌드가 pop 을 또 예약하지 않게.
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (!mounted) return;
         if (_targetLocked) {
@@ -338,7 +354,8 @@ class _ForgeScreenState extends ConsumerState<ForgeScreen> {
         tickets.where((t) => _picked.contains(t.id)).toList(growable: false);
     // 화면에 보여주는 확률과 연출 게이지가 어긋나면 안 된다 — 같은 값을 그대로 넘긴다.
     final rate = target.successRateWith(pickedCards);
-    final ready = _picked.length == need;
+    // 보여준 확률과 넘기는 재료가 같은 목록에서 나와야 한다 — 개수도 그 목록으로 센다.
+    final ready = pickedCards.length == need;
 
     return Column(
       children: [
@@ -391,7 +408,7 @@ class _ForgeScreenState extends ConsumerState<ForgeScreen> {
                 ]),
         ),
         _cta(
-          l.forgeRunEnhance(_picked.length, need),
+          l.forgeRunEnhance(pickedCards.length, need),
           style.color,
           ready: ready,
           onTap: () => _runEnhance(target, rate),
@@ -413,11 +430,13 @@ class _ForgeScreenState extends ConsumerState<ForgeScreen> {
         return a.level.compareTo(b.level);
       });
 
-    final picked = tickets.where((t) => _picked.contains(t.id));
+    // 지갑에 실제로 남아 있는 카드만 재료로 센다 (id 만 보고 세면 유령 선택이 생긴다).
+    final pickedCards =
+        tickets.where((t) => _picked.contains(t.id)).toList(growable: false);
     // 결과 등급 미리보기 — 재료 중 최고 등급.
-    final topRarity = picked.isEmpty
+    final topRarity = pickedCards.isEmpty
         ? null
-        : Rarity.values[picked
+        : Rarity.values[pickedCards
             .map((t) => LuckCatalog.byId(t.ticketId)?.rarity.index ?? 0)
             .reduce((a, b) => a > b ? a : b)];
     final accent =
@@ -442,9 +461,9 @@ class _ForgeScreenState extends ConsumerState<ForgeScreen> {
                 ]),
         ),
         _cta(
-          l.forgeRunReforge(_picked.length, need),
+          l.forgeRunReforge(pickedCards.length, need),
           accent,
-          ready: _picked.length == need,
+          ready: pickedCards.length == need,
           onTap: _runReforge,
         ),
       ],
