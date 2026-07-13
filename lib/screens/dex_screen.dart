@@ -3,16 +3,20 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../config/luck_tickets.dart';
 import '../l10n/app_localizations.dart';
-import '../models/owned_ticket.dart';
+import '../models/ticket_instance.dart';
 import '../state/app_controller.dart';
 import '../theme/app_theme.dart';
+import '../theme/toss_face.dart';
+import '../widgets/app_toast.dart';
 import '../widgets/clover_mark.dart';
+import '../widgets/collection_card.dart';
 import '../widgets/pressable.dart';
 import '../widgets/rarity_style.dart';
+import 'forge_screen.dart';
 import 'ticket_screen.dart';
 
-/// 행운 도감 — 카탈로그 전체(70종)를 등급별 섹션으로 보여준다.
-/// 미획득은 ??? 실루엣, 획득은 컬러 + 중복 카운트 + 강화 레벨.
+/// 행운 지갑 — 보유한 카드를 한 장씩 보여준다.
+/// 같은 행운권이라도 뽑은 장수만큼 따로 존재하고, 그 카드들이 서로의 강화 재료가 된다.
 class DexScreen extends ConsumerWidget {
   const DexScreen({super.key});
 
@@ -20,8 +24,7 @@ class DexScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l = AppLocalizations.of(context);
     final lang = Localizations.localeOf(context).languageCode;
-    final owned = ref.watch(appControllerProvider.select((s) => s.tickets));
-    final ownedById = {for (final t in owned) t.ticketId: t};
+    final tickets = ref.watch(appControllerProvider.select((s) => s.tickets));
 
     return ListView(
       padding: EdgeInsets.zero,
@@ -30,18 +33,21 @@ class DexScreen extends ConsumerWidget {
         Padding(
           padding: const EdgeInsets.fromLTRB(24, 36, 24, 4),
           child: Text(l.dexTitle,
-              style: AppText.base(size: 30, weight: FontWeight.w800, letterSpacingEm: -0.035)),
+              style: AppText.base(
+                  size: 30, weight: FontWeight.w800, letterSpacingEm: -0.035)),
         ),
         Padding(
-          padding: const EdgeInsets.fromLTRB(24, 0, 24, 8),
+          padding: const EdgeInsets.fromLTRB(24, 0, 24, 14),
           child: Row(
             children: [
               Expanded(
                 child: Text(l.dexSubtitle,
                     style: AppText.base(
-                        size: 14, weight: FontWeight.w500, color: AppColors.muted)),
+                        size: 14,
+                        weight: FontWeight.w500,
+                        color: AppColors.muted)),
               ),
-              // 수집률 칩.
+              // 도감 전체 수는 알 필요 없다 — 내가 가진 장수만.
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
@@ -49,175 +55,108 @@ class DexScreen extends ConsumerWidget {
                   borderRadius: BorderRadius.circular(AppRadius.chipFull),
                 ),
                 child: Text(
-                  l.dexProgress(owned.length, LuckCatalog.tickets.length),
+                  l.dexOwnedCount(tickets.length),
                   style: AppText.base(
-                      size: 12.5, weight: FontWeight.w800, color: AppColors.accent),
+                      size: 12.5,
+                      weight: FontWeight.w800,
+                      color: AppColors.accent),
                 ),
               ),
             ],
           ),
         ),
-        for (final rarity in Rarity.values)
-          _raritySection(context, lang, rarity, ownedById),
+        // 지갑의 두 기능 — 카드 고르기는 포지 화면이 맡는다.
+        Padding(
+          padding: const EdgeInsets.fromLTRB(24, 0, 24, 6),
+          child: Row(
+            children: [
+              Expanded(
+                child: _actionButton(
+                  context,
+                  emoji: TossFace.recycle,
+                  label: l.forgeReforgeCta,
+                  enabled: tickets.length >= TicketInstance.reforgeMaterials,
+                  primary: false,
+                  mode: ForgeMode.reforge,
+                  blockedMessage:
+                      l.forgeNotEnoughCards(TicketInstance.reforgeMaterials),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: _actionButton(
+                  context,
+                  emoji: TossFace.star,
+                  label: l.forgeEnhanceCta,
+                  enabled: tickets.any((t) => !t.isMaxLevel),
+                  primary: true,
+                  mode: ForgeMode.enhance,
+                  blockedMessage: l.forgeNoEnhanceable,
+                ),
+              ),
+            ],
+          ),
+        ),
+        if (tickets.isEmpty)
+          Padding(
+            padding: const EdgeInsets.fromLTRB(24, 60, 24, 0),
+            child: Center(
+              child: Text(
+                l.dexEmpty,
+                textAlign: TextAlign.center,
+                style: AppText.base(
+                    size: 14, weight: FontWeight.w600, color: AppColors.muted),
+              ),
+            ),
+          )
+        else
+          for (final rarity in Rarity.values)
+            _raritySection(context, lang, rarity, tickets),
         const SizedBox(height: 30),
       ],
     );
   }
 
-  Widget _raritySection(BuildContext context, String lang, Rarity rarity,
-      Map<String, OwnedTicket> ownedById) {
-    final style = RarityStyle.of(rarity);
-    final pool = LuckCatalog.byRarity(rarity);
-    final ownedCount = pool.where((t) => ownedById.containsKey(t.id)).length;
-
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(24, 18, 24, 4),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                width: 10,
-                height: 10,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: style.color,
-                  gradient: style.aura,
-                ),
-              ),
-              const SizedBox(width: 7),
-              Text(
-                LuckCatalog.rarityName(rarity, lang),
-                style: AppText.base(
-                    size: 16, weight: FontWeight.w800, color: style.color),
-              ),
-              const SizedBox(width: 8),
-              Text('$ownedCount/${pool.length}',
-                  style: AppText.base(
-                      size: 12.5, weight: FontWeight.w700, color: AppColors.muted)),
-            ],
-          ),
-          const SizedBox(height: 12),
-          GridView.count(
-            crossAxisCount: 3,
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            crossAxisSpacing: 10,
-            mainAxisSpacing: 10,
-            childAspectRatio: 0.72,
-            children: [
-              for (final t in pool)
-                _DexCard(ticket: t, owned: ownedById[t.id], lang: lang),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _DexCard extends StatelessWidget {
-  final LuckTicket ticket;
-  final OwnedTicket? owned; // null = 미획득
-  final String lang;
-
-  const _DexCard({required this.ticket, required this.owned, required this.lang});
-
-  @override
-  Widget build(BuildContext context) {
-    final style = RarityStyle.of(ticket.rarity);
-    final unlocked = owned != null;
+  /// 지갑 상단 기능 버튼. 조건을 못 채우면 회색으로 두되 이유는 토스트로 알려준다
+  /// — 눌러도 아무 반응이 없으면 고장으로 보인다.
+  Widget _actionButton(
+    BuildContext context, {
+    required String emoji,
+    required String label,
+    required bool enabled,
+    required bool primary,
+    required ForgeMode mode,
+    required String blockedMessage,
+  }) {
+    final bg = enabled && primary ? AppColors.accent : AppColors.card;
+    final fg = !enabled
+        ? AppColors.disabled
+        : (primary ? AppColors.white : AppColors.sub);
 
     return Pressable(
-      onTap: unlocked
-          ? () => Navigator.of(context).push(ticketRoute(ticket.id))
-          : null,
+      onTap: () {
+        if (!enabled) {
+          showAppToast(context, blockedMessage);
+          return;
+        }
+        Navigator.of(context).push(forgeRoute(mode));
+      },
       child: Container(
+        height: 52,
+        alignment: Alignment.center,
         decoration: BoxDecoration(
-          color: AppColors.white,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: unlocked
-                ? style.color.withValues(alpha: 0.35)
-                : AppColors.border,
-          ),
-          boxShadow: unlocked
-              ? [
-                  BoxShadow(
-                      color: style.color.withValues(alpha: 0.12),
-                      blurRadius: 12,
-                      offset: const Offset(0, 5)),
-                ]
-              : null,
+          color: bg,
+          borderRadius: BorderRadius.circular(AppRadius.button),
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
           children: [
-            // ---- 상단 패널 ----
-            Expanded(
-              flex: 5,
-              child: ClipRRect(
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
-                child: Stack(
-                  fit: StackFit.expand,
-                  children: [
-                    DecoratedBox(
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
-                          colors: unlocked
-                              ? style.panel
-                              : const [Color(0xFFF2F4F6), Color(0xFFE9EDF1)],
-                        ),
-                      ),
-                    ),
-                    Center(
-                      child: CloverMark(
-                        size: 44,
-                        withStem: true,
-                        color: unlocked ? null : AppColors.dashed,
-                      ),
-                    ),
-                    // 중복 카운트 / 강화 레벨 배지.
-                    if (unlocked && owned!.copies > 1)
-                      Positioned(
-                        top: 6,
-                        right: 6,
-                        child: _badge('×${owned!.copies}', style.color),
-                      ),
-                    if (unlocked && owned!.level > 1)
-                      Positioned(
-                        top: 6,
-                        left: 6,
-                        child: _badge('Lv.${owned!.level}', style.color, filled: true),
-                      ),
-                  ],
-                ),
-              ),
-            ),
-            // ---- 본문 ----
-            Expanded(
-              flex: 4,
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(9, 8, 9, 8),
-                child: Center(
-                  child: Text(
-                    unlocked ? ticket.text(lang) : '???',
-                    maxLines: 3,
-                    overflow: TextOverflow.ellipsis,
-                    textAlign: TextAlign.center,
-                    style: AppText.base(
-                      size: 11,
-                      weight: FontWeight.w700,
-                      height: 1.32,
-                      letterSpacingEm: -0.03,
-                      color: unlocked ? AppColors.title : AppColors.disabled,
-                    ),
-                  ),
-                ),
-              ),
+            TossEmoji(emoji, size: 18),
+            const SizedBox(width: 7),
+            Text(
+              label,
+              style: AppText.base(
+                  size: 15, weight: FontWeight.w800, color: fg),
             ),
           ],
         ),
@@ -225,20 +164,150 @@ class _DexCard extends StatelessWidget {
     );
   }
 
-  Widget _badge(String text, Color color, {bool filled = false}) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
-      decoration: BoxDecoration(
-        color: filled ? color : Colors.white.withValues(alpha: 0.85),
-        borderRadius: BorderRadius.circular(AppRadius.chipFull),
+  Widget _raritySection(BuildContext context, String lang, Rarity rarity,
+      List<TicketInstance> tickets) {
+    final l = AppLocalizations.of(context);
+    final style = RarityStyle.of(rarity);
+    final poolIds = {for (final t in LuckCatalog.byRarity(rarity)) t.id};
+
+    // 같은 행운권끼리 묶어 보여주되, 카드는 한 장씩 따로 — 강화가 잘 된 순.
+    final cards = tickets.where((t) => poolIds.contains(t.ticketId)).toList()
+      ..sort((a, b) {
+        final byKind = a.ticketId.compareTo(b.ticketId);
+        return byKind != 0 ? byKind : b.level.compareTo(a.level);
+      });
+    if (cards.isEmpty) return const SizedBox.shrink();
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 18, 20, 4),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(left: 4),
+            child: Row(
+              children: [
+                Container(
+                  width: 10,
+                  height: 10,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: style.color,
+                    gradient: style.aura,
+                  ),
+                ),
+                const SizedBox(width: 7),
+                Text(
+                  LuckCatalog.rarityName(rarity, lang),
+                  style: AppText.base(
+                      size: 16, weight: FontWeight.w800, color: style.color),
+                ),
+                const SizedBox(width: 8),
+                Text(l.dexRarityCount(cards.length),
+                    style: AppText.base(
+                        size: 12.5,
+                        weight: FontWeight.w700,
+                        color: AppColors.muted)),
+              ],
+            ),
+          ),
+          const SizedBox(height: 8),
+          // 가로형 티켓이라 한 줄에 하나 — 문구가 어색하게 꺾이지 않는다.
+          for (final card in cards)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 10),
+              child: _TicketRow(card: card, lang: lang),
+            ),
+        ],
       ),
-      child: Text(
-        text,
-        style: AppText.base(
-          size: 9.5,
-          weight: FontWeight.w800,
-          color: filled ? Colors.white : color,
-          letterSpacingEm: 0,
+    );
+  }
+}
+
+class _TicketRow extends ConsumerWidget {
+  final TicketInstance card;
+  final String lang;
+
+  const _TicketRow({required this.card, required this.lang});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l = AppLocalizations.of(context);
+    final ticket = LuckCatalog.byId(card.ticketId);
+    if (ticket == null) return const SizedBox.shrink();
+    final style = RarityStyle.of(ticket.rarity);
+
+    // 플랫 컬렉션 카드 — 등급색이 카드 전체를 칠한다. 강화는 상세에서.
+    return Pressable(
+      onTap: () => Navigator.of(context).push(ticketRoute(card.id)),
+      child: SizedBox(
+        height: 96,
+        child: CollectionCard(
+          style: style,
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(16, 13, 16, 13),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    CloverMark(size: 13, color: style.color),
+                    const SizedBox(width: 5),
+                    Text(
+                      LuckCatalog.rarityName(ticket.rarity, lang),
+                      style: AppText.base(
+                        size: 10,
+                        weight: FontWeight.w800,
+                        color: style.color,
+                      ),
+                    ),
+                    const SizedBox(width: 6),
+                    Text(
+                      'No.${card.ticketId.substring(1)}',
+                      style: AppText.base(
+                        size: 10,
+                        weight: FontWeight.w700,
+                        color: AppColors.sub,
+                        letterSpacingEm: 0,
+                      ),
+                    ),
+                    const Spacer(),
+                    // 스텁은 강화 상태만 말한다 — 기능 버튼은 지갑 상단에 있다.
+                    if (card.plus > 0)
+                      Text(
+                        l.dexPlus(card.plus),
+                        style: AppText.base(
+                          size: 15,
+                          weight: FontWeight.w800,
+                          color: style.color,
+                          letterSpacingEm: 0,
+                        ),
+                      ),
+                    if (card.isMaxLevel) ...[
+                      const SizedBox(width: 4),
+                      const TossEmoji(TossFace.crown, size: 18),
+                    ] else if (card.plus == 0)
+                      // 빈칸 방지 — 무강화 카드는 등급색 클로버 한 장.
+                      CloverMark(size: 22, color: style.color),
+                  ],
+                ),
+                const Spacer(),
+                Text(
+                  ticket.text(lang),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: AppText.base(
+                    size: 14,
+                    weight: FontWeight.w700,
+                    height: 1.32,
+                    letterSpacingEm: -0.03,
+                    color: AppColors.title,
+                  ),
+                ),
+                const Spacer(),
+              ],
+            ),
+          ),
         ),
       ),
     );
