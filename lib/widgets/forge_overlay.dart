@@ -314,9 +314,14 @@ class _ForgeOverlayState extends State<ForgeOverlay>
     return math.sin(t * math.pi * 5) * 6 * (1 - t);
   }
 
-  /// 재조합 카드 플립(Y축) — 0.5회전에서 앞면으로 뒤집힌다.
+  /// 재조합 카드 플립(Y축).
+  ///
+  /// 결과 이전 페이즈에서는 계속 π(=뒷면)에 머무르고, 결과 페이즈에서 π → 0 으로
+  /// **한 번만** 앞으로 돌아간다. 결과 시작 시점의 값이 정확히 π 라서 스냅이 없다.
+  /// 강화는 항상 앞면이므로 0.
   double get _flipY {
-    if (!_isReforge || _phase != _Phase.result) return 0;
+    if (!_isReforge) return 0;
+    if (_phase != _Phase.result) return math.pi;
     final t = Curves.easeOutCubic
         .transform((_resultMs / _flipMs).clamp(0.0, 1.0));
     return (1 - t) * math.pi;
@@ -337,15 +342,16 @@ class _ForgeOverlayState extends State<ForgeOverlay>
 
     return Scaffold(
       backgroundColor: AppColors.white,
-      body: Stack(
-        children: [
-          SafeArea(
-            child: Column(
-              children: [
-                Expanded(
-                  child: Center(
-                    child: Transform.translate(
-                      offset: Offset(_shakeDx, 0),
+      // 실패 쉐이크는 카드 무대가 아니라 **화면 전체**(뱃지·CTA·연출 레이어)를 흔든다.
+      body: Transform.translate(
+        offset: Offset(_shakeDx, 0),
+        child: Stack(
+          children: [
+            SafeArea(
+              child: Column(
+                children: [
+                  Expanded(
+                    child: Center(
                       child: SizedBox(
                         width: 320,
                         height: 320,
@@ -395,24 +401,24 @@ class _ForgeOverlayState extends State<ForgeOverlay>
                       ),
                     ),
                   ),
-                ),
-                if (_showResultUi) _badge(l),
-                const SizedBox(height: 20),
-                if (_showResultUi) _confirmCta(l),
-                const SizedBox(height: 28),
-              ],
-            ),
-          ),
-          // 성공 순간의 흰 플래시.
-          if (_flash > 0)
-            Positioned.fill(
-              child: IgnorePointer(
-                child: ColoredBox(
-                  color: AppColors.white.withValues(alpha: _flash),
-                ),
+                  if (_showResultUi) _badge(l),
+                  const SizedBox(height: 20),
+                  if (_showResultUi) _confirmCta(l),
+                  const SizedBox(height: 28),
+                ],
               ),
             ),
-        ],
+            // 성공 순간의 흰 플래시.
+            if (_flash > 0)
+              Positioned.fill(
+                child: IgnorePointer(
+                  child: ColoredBox(
+                    color: AppColors.white.withValues(alpha: _flash),
+                  ),
+                ),
+              ),
+          ],
+        ),
       ),
     );
   }
@@ -434,8 +440,10 @@ class _ForgeOverlayState extends State<ForgeOverlay>
 
   Widget _targetCard(AppLocalizations l) {
     final accent = widget.accent;
-    // 재조합은 결과 페이즈에서 뒤집히기 전까지 뒷면(문구를 감춘다).
-    final faceDown = _isReforge && _flipY > math.pi / 2;
+    // 재조합은 결과 페이즈에서 절반쯤 뒤집힐 때까지 계속 뒷면 — 그 전 페이즈(흡수·충전·정지)
+    // 에서는 문구가 절대 새지 않는다. 강화는 언제나 앞면.
+    final faceDown =
+        _isReforge && (_phase != _Phase.result || _flipY > math.pi / 2);
 
     return Stack(
       alignment: Alignment.center,
@@ -465,7 +473,12 @@ class _ForgeOverlayState extends State<ForgeOverlay>
             ],
           ),
           child: faceDown
-              ? TossEmoji(TossFace.recycle, size: 40)
+              // 카드 자체가 Y축으로 뒤집혀 있으니, 뒷면 문양은 되돌려서 거울상이 되지 않게.
+              ? Transform(
+                  alignment: Alignment.center,
+                  transform: Matrix4.identity()..rotateY(math.pi),
+                  child: TossEmoji(TossFace.recycle, size: 40),
+                )
               : Text(
                   _cardText(),
                   textAlign: TextAlign.center,

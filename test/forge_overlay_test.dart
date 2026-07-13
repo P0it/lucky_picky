@@ -36,6 +36,11 @@ void main() {
       accent: const Color(0xFF6FC143),
     )));
 
+    // 프레임 0 — 아직 흡수 페이즈다. 결과 UI 가 미리 보이면 연출이 통째로 건너뛴 것.
+    await tester.pump();
+    expect(find.text('강화 성공!'), findsNothing);
+    expect(find.text('확인'), findsNothing);
+
     // 시퀀스를 끝까지 돌린다.
     await tester.pump(const Duration(seconds: 5));
     await tester.pumpAndSettle();
@@ -85,5 +90,26 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('등급이 올랐어요!'), findsOneWidget);
+  });
+
+  testWidgets('plain reforge ends on the new-ticket line, not the tier-up line',
+      (tester) async {
+    await tester.pumpWidget(_host(ForgeOverlay(
+      result: ForgeReforgeResult(
+        outcome: const ReforgeOutcome(
+          instance: TicketInstance(id: 'n2', ticketId: 'c02', pulledAt: ''),
+          isNew: false,
+          upgraded: false,
+        ),
+      ),
+      materialCount: 3,
+      accent: const Color(0xFF6FC143),
+    )));
+
+    await tester.pump(const Duration(seconds: 5));
+    await tester.pumpAndSettle();
+
+    expect(find.text('새 행운이 나왔어요'), findsOneWidget);
+    expect(find.text('등급이 올랐어요!'), findsNothing);
   });
 }
