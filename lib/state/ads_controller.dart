@@ -6,6 +6,8 @@ import 'package:google_mobile_ads/google_mobile_ads.dart';
 import '../config/ad_config.dart';
 
 /// 전면(인터스티셜) + 보상형(리워드) 광고 관리.
+/// 전면광고는 선행 클로버 완성 때만 — 뽑기 흐름에는 끼어들지 않는다.
+/// 보상형은 사용자가 '광고 보고 클로버 받기'를 직접 누를 때만 재생된다.
 /// 광고 ID 설정은 [AdConfig] (lib/config/ad_config.dart) 한 곳에서 관리합니다.
 class AdsController {
   AdsController._();
