@@ -268,6 +268,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String get forgeConfirm => '確認';
 
   @override
+  String get forgeCardBase => '未強化';
+
+  @override
   String get ticketTitle => '幸運チケット';
 
   @override

@@ -86,6 +86,7 @@
   "forgeReforged": "新しい幸運が出ました",
   "forgeUpgraded": "等級が上がりました！",
   "forgeConfirm": "確認",
+  "forgeCardBase": "未強化",
 
   "ticketTitle": "幸運チケット",
   "ticketOwnedCopies": "所持 ×{count}",

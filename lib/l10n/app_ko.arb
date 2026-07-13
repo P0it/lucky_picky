@@ -86,6 +86,7 @@
   "forgeReforged": "새 행운이 나왔어요",
   "forgeUpgraded": "등급이 올랐어요!",
   "forgeConfirm": "확인",
+  "forgeCardBase": "무강화",
 
   "ticketTitle": "행운권",
   "ticketOwnedCopies": "보유 ×{count}",

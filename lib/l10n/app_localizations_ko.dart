@@ -268,6 +268,9 @@ class AppLocalizationsKo extends AppLocalizations {
   String get forgeConfirm => '확인';
 
   @override
+  String get forgeCardBase => '무강화';
+
+  @override
   String get ticketTitle => '행운권';
 
   @override

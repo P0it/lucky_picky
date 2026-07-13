@@ -550,6 +550,12 @@ abstract class AppLocalizations {
   /// **'OK'**
   String get forgeConfirm;
 
+  /// No description provided for @forgeCardBase.
+  ///
+  /// In en, this message translates to:
+  /// **'Base'**
+  String get forgeCardBase;
+
   /// No description provided for @ticketTitle.
   ///
   /// In en, this message translates to:

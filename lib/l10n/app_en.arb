@@ -175,6 +175,7 @@
   "forgeReforged": "A new luck came out",
   "forgeUpgraded": "Tier up!",
   "forgeConfirm": "OK",
+  "forgeCardBase": "Base",
 
   "ticketTitle": "Luck Ticket",
   "ticketOwnedCopies": "Owned ×{count}",

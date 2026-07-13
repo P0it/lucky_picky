@@ -271,6 +271,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get forgeConfirm => 'OK';
 
   @override
+  String get forgeCardBase => 'Base';
+
+  @override
   String get ticketTitle => 'Luck Ticket';
 
   @override
