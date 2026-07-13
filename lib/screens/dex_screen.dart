@@ -88,7 +88,11 @@ class DexScreen extends ConsumerWidget {
                   context,
                   emoji: TossFace.star,
                   label: l.forgeEnhanceCta,
-                  enabled: tickets.any((t) => !t.isMaxLevel),
+                  // 올릴 수 있는 카드가 있는 것만으로는 부족하다 — 그 카드를 먹일
+                  // **다른 카드**가 필요한 만큼 있어야 STEP 2 에서 막히지 않는다.
+                  enabled: tickets.any((t) =>
+                      !t.isMaxLevel &&
+                      t.materialsNeeded <= tickets.length - 1),
                   primary: true,
                   mode: ForgeMode.enhance,
                   blockedMessage: l.forgeNoEnhanceable,

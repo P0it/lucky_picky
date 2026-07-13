@@ -95,7 +95,6 @@
   "dexTitle": "Lucky Wallet",
   "dexSubtitle": "Every luck you've pulled lives here",
   "dexEmpty": "Your wallet is empty — go pull your first luck!",
-  "dexEnhanceMax": "MAX",
   "dexPlus": "+{plus}",
   "@dexPlus": {
     "placeholders": {
@@ -126,7 +125,6 @@
     }
   },
   "forgeNext": "Next",
-  "forgeBack": "Back",
   "forgeRunEnhance": "Enhance ({have}/{need})",
   "@forgeRunEnhance": {
     "placeholders": {
@@ -163,6 +161,7 @@
     }
   },
   "forgeNoMaterial": "No other card to use as material",
+  "forgeRejected": "That card can't go in right now — refreshing your wallet 🍀",
   "forgeSuccess": "Enhanced!",
   "forgeSuccessPlus": "+{plus}",
   "@forgeSuccessPlus": {

@@ -2,6 +2,8 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
+import '../theme/app_theme.dart';
+
 /// 강화 게이지 — 등급색 링이 성공 확률만큼 차오른다.
 /// 채워지는 동안 바깥으로 얇은 광채 링이 한 겹 번진다.
 class ForgeGaugePainter extends CustomPainter {
@@ -148,7 +150,7 @@ class ForgeCrackPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final grow = (t / 0.45).clamp(0.0, 1.0);
     final paint = Paint()
-      ..color = const Color(0xFF3A3A3A).withValues(alpha: 0.55)
+      ..color = AppColors.crack.withValues(alpha: 0.55)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1.8
       ..strokeCap = StrokeCap.round;
@@ -175,7 +177,7 @@ class ForgeCrackPainter extends CustomPainter {
       canvas.drawRect(
         Rect.fromCenter(center: Offset.zero, width: 7, height: 5),
         Paint()
-          ..color = const Color(0xFF9AA0A6).withValues(alpha: 0.8 * (1 - fall)),
+          ..color = AppColors.shard.withValues(alpha: 0.8 * (1 - fall)),
       );
       canvas.restore();
     }

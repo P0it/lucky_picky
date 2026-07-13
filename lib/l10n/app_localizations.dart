@@ -388,12 +388,6 @@ abstract class AppLocalizations {
   /// **'Your wallet is empty — go pull your first luck!'**
   String get dexEmpty;
 
-  /// No description provided for @dexEnhanceMax.
-  ///
-  /// In en, this message translates to:
-  /// **'MAX'**
-  String get dexEnhanceMax;
-
   /// No description provided for @dexPlus.
   ///
   /// In en, this message translates to:
@@ -448,12 +442,6 @@ abstract class AppLocalizations {
   /// **'Next'**
   String get forgeNext;
 
-  /// No description provided for @forgeBack.
-  ///
-  /// In en, this message translates to:
-  /// **'Back'**
-  String get forgeBack;
-
   /// No description provided for @forgeRunEnhance.
   ///
   /// In en, this message translates to:
@@ -507,6 +495,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No other card to use as material'**
   String get forgeNoMaterial;
+
+  /// No description provided for @forgeRejected.
+  ///
+  /// In en, this message translates to:
+  /// **'That card can\'t go in right now — refreshing your wallet 🍀'**
+  String get forgeRejected;
 
   /// No description provided for @forgeSuccess.
   ///

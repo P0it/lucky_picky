@@ -5,6 +5,7 @@ import 'package:luckypicky/data/game_backend.dart';
 import 'package:luckypicky/l10n/app_localizations.dart';
 import 'package:luckypicky/models/ticket_instance.dart';
 import 'package:luckypicky/widgets/forge_overlay.dart';
+import 'package:luckypicky/widgets/forge_painters.dart';
 
 Widget _host(Widget child) => MaterialApp(
       locale: const Locale('ko'),
@@ -18,6 +19,13 @@ Widget _host(Widget child) => MaterialApp(
       home: child,
     );
 
+const _target = TicketInstance(id: 'i1', ticketId: 'c02', pulledAt: '');
+
+List<TicketInstance> _materials(int n) => [
+      for (var i = 0; i < n; i++)
+        TicketInstance(id: 'm$i', ticketId: 'c01', pulledAt: ''),
+    ];
+
 void main() {
   testWidgets('enhance success ends on the success badge', (tester) async {
     await tester.pumpWidget(_host(ForgeOverlay(
@@ -30,9 +38,9 @@ void main() {
           rate: 80,
         ),
         ticketId: 'c02',
-        rate: 80,
       ),
-      materialCount: 2,
+      target: _target,
+      materials: _materials(2),
       accent: const Color(0xFF6FC143),
     )));
 
@@ -61,9 +69,9 @@ void main() {
           rate: 40,
         ),
         ticketId: 'c02',
-        rate: 40,
       ),
-      materialCount: 1,
+      target: _target,
+      materials: _materials(1),
       accent: const Color(0xFF6FC143),
     )));
 
@@ -71,6 +79,45 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('강화 실패…'), findsOneWidget);
+  });
+
+  testWidgets('the gauge fills to the SERVER rate, not a client prediction',
+      (tester) async {
+    // 클라이언트라면 c02(+0) 에 같은 카드 1장 → 100% 로 예측한다.
+    // 서버는 원격 설정(game_config)에 따라 35% 로 굴렸다 — 게이지는 서버 값을 따라야 한다.
+    const serverRate = 35;
+    final material =
+        [const TicketInstance(id: 'm0', ticketId: 'c02', pulledAt: '')];
+    expect(_target.successRateWith(material), isNot(serverRate));
+
+    await tester.pumpWidget(_host(ForgeOverlay(
+      result: const ForgeEnhanceResult(
+        outcome: EnhanceOutcome(
+          instanceId: 'i1',
+          ticketId: 'c02',
+          success: false,
+          level: 1,
+          rate: serverRate,
+        ),
+        ticketId: 'c02',
+      ),
+      target: _target,
+      materials: material,
+      accent: const Color(0xFF6FC143),
+    )));
+
+    // 충전 페이즈로 들어간 뒤 게이지를 읽는다.
+    await tester.pump(const Duration(milliseconds: 1400));
+
+    final painter = tester
+        .widgetList<CustomPaint>(find.byType(CustomPaint))
+        .map((w) => w.painter)
+        .whereType<ForgeGaugePainter>()
+        .single;
+    expect(painter.rate, closeTo(serverRate / 100, 1e-9));
+
+    await tester.pump(const Duration(seconds: 5));
+    await tester.pumpAndSettle();
   });
 
   testWidgets('reforge upgrade shows the tier-up line', (tester) async {
@@ -82,7 +129,7 @@ void main() {
           upgraded: true,
         ),
       ),
-      materialCount: 3,
+      materials: _materials(3),
       accent: const Color(0xFF6FC143),
     )));
 
@@ -102,7 +149,7 @@ void main() {
           upgraded: false,
         ),
       ),
-      materialCount: 3,
+      materials: _materials(3),
       accent: const Color(0xFF6FC143),
     )));
 

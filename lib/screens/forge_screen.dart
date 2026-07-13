@@ -76,7 +76,7 @@ class _ForgeScreenState extends ConsumerState<ForgeScreen> {
 
   // ---- 실행 ----
 
-  Future<void> _runEnhance(TicketInstance target, int rate) async {
+  Future<void> _runEnhance(TicketInstance target) async {
     if (_busy) return;
     setState(() => _busy = true);
     final ran = await runEnhanceFlow(
@@ -84,7 +84,6 @@ class _ForgeScreenState extends ConsumerState<ForgeScreen> {
       ref,
       targetId: target.id,
       materialIds: _picked.toList(),
-      rate: rate,
     );
     if (!mounted) return;
     if (ran) {
@@ -352,7 +351,8 @@ class _ForgeScreenState extends ConsumerState<ForgeScreen> {
 
     final pickedCards =
         tickets.where((t) => _picked.contains(t.id)).toList(growable: false);
-    // 화면에 보여주는 확률과 연출 게이지가 어긋나면 안 된다 — 같은 값을 그대로 넘긴다.
+    // 커밋 전 **예측치** — 화면 안내용이다. 연출 게이지는 서버가 실제로 굴린 확률
+    // (EnhanceOutcome.rate)로 차오른다.
     final rate = target.successRateWith(pickedCards);
     // 보여준 확률과 넘기는 재료가 같은 목록에서 나와야 한다 — 개수도 그 목록으로 센다.
     final ready = pickedCards.length == need;
@@ -411,7 +411,7 @@ class _ForgeScreenState extends ConsumerState<ForgeScreen> {
           l.forgeRunEnhance(pickedCards.length, need),
           style.color,
           ready: ready,
-          onTap: () => _runEnhance(target, rate),
+          onTap: () => _runEnhance(target),
         ),
       ],
     );

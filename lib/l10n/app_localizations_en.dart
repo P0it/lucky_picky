@@ -169,9 +169,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get dexEmpty => 'Your wallet is empty — go pull your first luck!';
 
   @override
-  String get dexEnhanceMax => 'MAX';
-
-  @override
   String dexPlus(int plus) {
     return '+$plus';
   }
@@ -205,9 +202,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get forgeNext => 'Next';
-
-  @override
-  String get forgeBack => 'Back';
 
   @override
   String forgeRunEnhance(int have, int need) {
@@ -246,6 +240,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get forgeNoMaterial => 'No other card to use as material';
+
+  @override
+  String get forgeRejected =>
+      'That card can\'t go in right now — refreshing your wallet 🍀';
 
   @override
   String get forgeSuccess => 'Enhanced!';

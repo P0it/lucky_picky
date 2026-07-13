@@ -23,6 +23,9 @@ class AppColors {
   static const emptyStem = Color(0xFFE1E5EA);
   static const dashed = Color(0xFFCDD2D9);
 
+  static const crack = Color(0xFF3A3A3A); // 강화 실패 균열선
+  static const shard = Color(0xFF9AA0A6); // 강화 실패 파편
+
   static const toast = Color(0xEC191F28); // rgba(25,31,40,.93)
   static const backdrop = Color(0x73191F28); // rgba(25,31,40,.45)
 }

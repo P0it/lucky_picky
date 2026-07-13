@@ -64,6 +64,9 @@ class _TicketScreenState extends ConsumerState<TicketScreen> {
     final owned = ref.watch(appControllerProvider.select(
         (s) => s.tickets.where((t) => t.id == widget.instanceId).firstOrNull));
     final ticket = owned == null ? null : LuckCatalog.byId(owned.ticketId);
+    // 재료로 쓸 수 있는 다른 카드 수 — 모자라면 강화 화면에 들어가 봐야 막힌다.
+    final others =
+        ref.watch(appControllerProvider.select((s) => s.tickets.length)) - 1;
 
     if (ticket == null || owned == null) {
       // 방어 — 강화 재료로 사라졌거나 알 수 없는 카드면 그냥 닫는다.
@@ -88,7 +91,7 @@ class _TicketScreenState extends ConsumerState<TicketScreen> {
               ),
             ),
             const Spacer(),
-            _enhanceButton(l, ticket, owned),
+            _enhanceButton(l, ticket, owned, others),
             const SizedBox(height: 10),
             _shareButton(l, ticket),
             const SizedBox(height: 16),
@@ -121,9 +124,11 @@ class _TicketScreenState extends ConsumerState<TicketScreen> {
   }
 
   /// 강화 버튼 — 누르면 이 카드를 대상으로 한 포지 화면(재료 고르기)이 열린다.
-  Widget _enhanceButton(
-      AppLocalizations l, LuckTicket ticket, TicketInstance owned) {
+  Widget _enhanceButton(AppLocalizations l, LuckTicket ticket,
+      TicketInstance owned, int others) {
     final style = RarityStyle.of(ticket.rarity);
+    // 재료가 모자라면 눌러도 못 끝내는 화면으로 보내지 않는다 — 이유를 토스트로 알려준다.
+    final enoughMaterials = owned.materialsNeeded <= others;
     if (owned.isMaxLevel) {
       return Container(
         margin: const EdgeInsets.symmetric(horizontal: 24),
@@ -147,34 +152,45 @@ class _TicketScreenState extends ConsumerState<TicketScreen> {
       );
     }
     return Pressable(
-      onTap: () => Navigator.of(context)
-          .push(forgeRoute(ForgeMode.enhance, targetId: owned.id)),
+      onTap: () {
+        if (!enoughMaterials) {
+          showAppToast(context, l.forgeNoMaterial);
+          return;
+        }
+        Navigator.of(context)
+            .push(forgeRoute(ForgeMode.enhance, targetId: owned.id));
+      },
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 24),
         width: double.infinity,
         height: 52,
         alignment: Alignment.center,
         decoration: BoxDecoration(
-          color: style.color,
+          color: enoughMaterials ? style.color : AppColors.card,
           borderRadius: BorderRadius.circular(AppRadius.button),
-          boxShadow: [
-            BoxShadow(
-                color: style.color.withValues(alpha: 0.28),
-                blurRadius: 16,
-                offset: const Offset(0, 6)),
-          ],
+          boxShadow: enoughMaterials
+              ? [
+                  BoxShadow(
+                      color: style.color.withValues(alpha: 0.28),
+                      blurRadius: 16,
+                      offset: const Offset(0, 6)),
+                ]
+              : null,
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.upgrade_rounded, size: 19, color: Colors.white),
+            Icon(Icons.upgrade_rounded,
+                size: 19,
+                color:
+                    enoughMaterials ? AppColors.white : AppColors.disabled),
             const SizedBox(width: 6),
             Text(
               l.forgeEnhanceCta,
               style: AppText.base(
                 size: 15,
                 weight: FontWeight.w700,
-                color: Colors.white,
+                color: enoughMaterials ? AppColors.white : AppColors.disabled,
               ),
             ),
           ],

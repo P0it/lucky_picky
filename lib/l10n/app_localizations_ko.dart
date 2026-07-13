@@ -167,9 +167,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String get dexEmpty => '지갑이 텅 비었어요 — 첫 행운을 뽑으러 가볼까요?';
 
   @override
-  String get dexEnhanceMax => 'MAX';
-
-  @override
   String dexPlus(int plus) {
     return '+$plus';
   }
@@ -203,9 +200,6 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get forgeNext => '다음';
-
-  @override
-  String get forgeBack => '뒤로';
 
   @override
   String forgeRunEnhance(int have, int need) {
@@ -243,6 +237,9 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get forgeNoMaterial => '재료로 쓸 다른 카드가 없어요';
+
+  @override
+  String get forgeRejected => '지금은 그 카드를 넣을 수 없어요 — 지갑을 새로 불러올게요 🍀';
 
   @override
   String get forgeSuccess => '강화 성공!';

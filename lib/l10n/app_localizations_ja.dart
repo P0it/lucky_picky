@@ -167,9 +167,6 @@ class AppLocalizationsJa extends AppLocalizations {
   String get dexEmpty => 'お財布はまだ空っぽ — 最初の幸運を引いてみましょう！';
 
   @override
-  String get dexEnhanceMax => 'MAX';
-
-  @override
   String dexPlus(int plus) {
     return '+$plus';
   }
@@ -203,9 +200,6 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get forgeNext => '次へ';
-
-  @override
-  String get forgeBack => '戻る';
 
   @override
   String forgeRunEnhance(int have, int need) {
@@ -243,6 +237,9 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get forgeNoMaterial => '素材にできるカードがありません';
+
+  @override
+  String get forgeRejected => '今はそのカードを入れられません — ウォレットを読み込み直します 🍀';
 
   @override
   String get forgeSuccess => '強化成功！';
