@@ -683,7 +683,7 @@ class _ForgeOverlayState extends State<ForgeOverlay>
   }
 }
 
-/// 지갑/포지와 같은 시각 어휘로 그린 카드 한 장 — 등급 그라데이션 · 등급색 테두리 ·
+/// 지갑/포지와 같은 시각 어휘로 그린 카드 한 장 — 등급 그라데이션 · 등급색 그림자 ·
 /// 클로버 마크 · 강화 단계 · 문구. [compact] 는 날아드는 재료용 축소판(문구 없음).
 class _CardFace extends StatelessWidget {
   final TicketInstance instance;
@@ -788,9 +788,13 @@ class _CardBack extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.card,
         borderRadius: BorderRadius.circular(AppRadius.card),
-        border: Border.all(
-            color: AppColors.accent.withValues(alpha: 0.35), width: 1.4),
+        // 테두리 없이 그림자만 — 중립 잉크로 띄우고, 브랜드 그린을 옅게 흘린다.
         boxShadow: [
+          const BoxShadow(
+            color: AppColors.cardShadow,
+            blurRadius: 20,
+            offset: Offset(0, 8),
+          ),
           BoxShadow(
             color: AppColors.accent.withValues(alpha: 0.18),
             blurRadius: 24,
@@ -798,7 +802,7 @@ class _CardBack extends StatelessWidget {
           ),
         ],
       ),
-      child: const TossEmoji(TossFace.recycle, size: 40),
+      child: const CloverMark(size: 40, color: AppColors.accent),
     );
   }
 }

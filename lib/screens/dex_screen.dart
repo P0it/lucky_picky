@@ -73,7 +73,6 @@ class DexScreen extends ConsumerWidget {
               Expanded(
                 child: _actionButton(
                   context,
-                  emoji: TossFace.recycle,
                   label: l.forgeReforgeCta,
                   enabled: tickets.length >= TicketInstance.reforgeMaterials,
                   primary: false,
@@ -86,7 +85,6 @@ class DexScreen extends ConsumerWidget {
               Expanded(
                 child: _actionButton(
                   context,
-                  emoji: TossFace.star,
                   label: l.forgeEnhanceCta,
                   // 올릴 수 있는 카드가 있는 것만으로는 부족하다 — 그 카드를 먹일
                   // **다른 카드**가 필요한 만큼 있어야 STEP 2 에서 막히지 않는다.
@@ -125,7 +123,6 @@ class DexScreen extends ConsumerWidget {
   /// — 눌러도 아무 반응이 없으면 고장으로 보인다.
   Widget _actionButton(
     BuildContext context, {
-    required String emoji,
     required String label,
     required bool enabled,
     required bool primary,
@@ -152,17 +149,10 @@ class DexScreen extends ConsumerWidget {
           color: bg,
           borderRadius: BorderRadius.circular(AppRadius.button),
         ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TossEmoji(emoji, size: 18),
-            const SizedBox(width: 7),
-            Text(
-              label,
-              style: AppText.base(
-                  size: 15, weight: FontWeight.w800, color: fg),
-            ),
-          ],
+        // 글자만 — 아이콘도 그 자리도 없다. 가운데 정렬이 곧 라벨 정렬.
+        child: Text(
+          label,
+          style: AppText.base(size: 15, weight: FontWeight.w800, color: fg),
         ),
       ),
     );

@@ -6,7 +6,7 @@ import '../l10n/app_localizations.dart';
 import '../models/ticket_instance.dart';
 import '../state/app_controller.dart';
 import '../theme/app_theme.dart';
-import '../theme/toss_face.dart';
+import '../widgets/clover_mark.dart';
 import '../widgets/forge_overlay.dart';
 import '../widgets/pressable.dart';
 import '../widgets/rarity_style.dart';
@@ -207,8 +207,6 @@ class _ForgeScreenState extends ConsumerState<ForgeScreen> {
             ),
           ),
           const Spacer(),
-          TossEmoji(_isEnhance ? TossFace.star : TossFace.recycle, size: 18),
-          const SizedBox(width: 6),
           Text(
             _isEnhance ? l.forgeEnhanceCta : l.forgeReforgeCta,
             style: AppText.base(
@@ -472,7 +470,11 @@ class _ForgeScreenState extends ConsumerState<ForgeScreen> {
 }
 
 /// 포지에서 고르는 카드 한 장 — 등급명 · +N · 문구 한 줄.
-/// 등급색 테두리 + 선택 시 체크. ([highlight] 는 선택 대상 고정 표시용)
+///
+/// 테두리는 없다. 고르지 않은 카드는 평평한 회색 면에 옅은 그림자만 지고,
+/// 고른 카드는 등급 그라데이션으로 칠해지고 등급색 글로우가 깔리며 체크가 채워진다
+/// — 색·깊이·아이콘 세 가지가 한꺼번에 바뀌므로 한눈에 구분된다.
+/// ([highlight] 는 선택 대상 고정 표시용 — 고를 수 없으니 체크 대신 클로버)
 class ForgePickCard extends StatelessWidget {
   final TicketInstance instance;
   final bool picked;
@@ -502,17 +504,35 @@ class ForgePickCard extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 11),
         decoration: BoxDecoration(
-          color: picked ? style.soft : AppColors.card,
+          color: picked ? null : AppColors.card,
+          gradient: picked
+              ? LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: style.panel,
+                )
+              : null,
           borderRadius: BorderRadius.circular(14),
-          border: Border.all(
-            color: picked ? style.color : Colors.transparent,
-            width: 1.4,
-          ),
+          boxShadow: picked
+              ? [
+                  BoxShadow(
+                    color: style.color.withValues(alpha: 0.28),
+                    blurRadius: 18,
+                    offset: const Offset(0, 6),
+                  ),
+                ]
+              : const [
+                  BoxShadow(
+                    color: AppColors.cardShadowSoft,
+                    blurRadius: 12,
+                    offset: Offset(0, 4),
+                  ),
+                ],
         ),
         child: Row(
           children: [
             if (highlight)
-              TossEmoji(TossFace.star, size: 18)
+              CloverMark(size: 18, color: style.color)
             else
               Icon(
                 picked

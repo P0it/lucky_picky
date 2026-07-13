@@ -28,6 +28,10 @@ class AppColors {
 
   static const toast = Color(0xEC191F28); // rgba(25,31,40,.93)
   static const backdrop = Color(0x73191F28); // rgba(25,31,40,.45)
+
+  // 카드 그림자 — 테두리 대신 "떠 있는 종이"로 면을 분리한다.
+  static const cardShadow = Color(0x14191F28); // rgba(25,31,40,.08)
+  static const cardShadowSoft = Color(0x0D191F28); // rgba(25,31,40,.05)
 }
 
 class AppRadius {
