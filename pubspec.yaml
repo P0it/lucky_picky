@@ -46,3 +46,6 @@ flutter:
           weight: 700
         - asset: assets/fonts/Pretendard-ExtraBold.otf
           weight: 800
+    - family: TossFace
+      fonts:
+        - asset: assets/fonts/TossFace.otf
