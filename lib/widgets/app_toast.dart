@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../theme/app_theme.dart';
 
-/// 폰 하단(탭바 위)에 뜨는 토스 스타일 알약 토스트. toastIn 모션 재현.
+/// 화면 상단(상태바 아래)에 내려오는 흰색 알약 토스트.
 void showAppToast(BuildContext context, String text) {
   final overlay = Overlay.of(context);
   late OverlayEntry entry;
@@ -43,28 +43,36 @@ class _ToastPillState extends State<_ToastPill> with SingleTickerProviderStateMi
 
   @override
   Widget build(BuildContext context) {
-    final bottomPad = MediaQuery.of(context).padding.bottom;
+    final topPad = MediaQuery.of(context).padding.top;
     return Positioned(
       left: 0,
       right: 0,
-      bottom: 70 + bottomPad + 20, // 탭바(70) 위
+      top: topPad + 12, // 상태바 아래
       child: IgnorePointer(
         child: Center(
           child: AnimatedBuilder(
             animation: _c,
             builder: (_, child) => Opacity(
               opacity: _c.value,
-              child: Transform.translate(offset: Offset(0, 12 * (1 - _c.value)), child: child),
+              // 위에서 내려오는 모션
+              child: Transform.translate(offset: Offset(0, -12 * (1 - _c.value)), child: child),
             ),
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
               decoration: BoxDecoration(
-                color: AppColors.toast,
+                color: AppColors.white,
                 borderRadius: BorderRadius.circular(AppRadius.chipFull),
+                boxShadow: const [
+                  BoxShadow(
+                    color: AppColors.cardShadow,
+                    blurRadius: 16,
+                    offset: Offset(0, 4),
+                  ),
+                ],
               ),
               child: Text(
                 widget.text,
-                style: AppText.base(size: 14, weight: FontWeight.w600, color: Colors.white),
+                style: AppText.base(size: 14, weight: FontWeight.w600, color: AppColors.title),
               ),
             ),
           ),
