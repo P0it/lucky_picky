@@ -36,6 +36,28 @@ Future<void> main() async {
   runApp(const ProviderScope(child: LuckyPickyApp()));
 }
 
+/// 넓은 화면(웹/데스크톱)에서 앱을 폰 폭으로 가운데 고정한다.
+/// 실제 모바일 기기처럼 좁은 화면에서는 전체 폭을 그대로 사용한다.
+class _PhoneFrame extends StatelessWidget {
+  static const _maxWidth = 430.0;
+  final Widget child;
+  const _PhoneFrame({required this.child});
+
+  @override
+  Widget build(BuildContext context) {
+    final width = MediaQuery.of(context).size.width;
+    if (width <= _maxWidth) return child;
+    return ColoredBox(
+      color: const Color(0xFF191F28), // 양옆 레터박스 배경
+      child: Center(
+        child: ClipRect(
+          child: SizedBox(width: _maxWidth, child: child),
+        ),
+      ),
+    );
+  }
+}
+
 class LuckyPickyApp extends ConsumerStatefulWidget {
   const LuckyPickyApp({super.key});
 
@@ -76,6 +98,8 @@ class _LuckyPickyAppState extends ConsumerState<LuckyPickyApp> {
       locale: ref.watch(localeProvider),
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
+      // 데스크톱/웹의 넓은 폭에서는 폰 크기로 가운데 고정, 양옆은 여백.
+      builder: (context, child) => _PhoneFrame(child: child!),
       home: const HomeShell(),
     );
   }
