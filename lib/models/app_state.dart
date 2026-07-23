@@ -13,6 +13,8 @@ class AppState {
   final int clovers; // 보유한 완성 클로버 (= 뽑기 코인)
   final bool celebrate; // 4잎 완성 축하 애니메이션 트리거
   final int bounceKey; // 잎 팝 애니메이션 재생용 키
+  final int flightKey; // 완성 클로버가 배지로 날아가는 연출 재생용 키.
+  // 서버 확정이 성공했을 때만 증가한다 — 이 값이 오르면 clovers 도 반드시 올랐다.
 
   final int statLeaves; // 총 채운 잎
   final int statClovers; // 탄생한 클로버
@@ -31,6 +33,7 @@ class AppState {
     this.clovers = 0,
     this.celebrate = false,
     this.bounceKey = 0,
+    this.flightKey = 0,
     this.statLeaves = 0,
     this.statClovers = 0,
     this.statPulls = 0,
@@ -50,6 +53,7 @@ class AppState {
     int? clovers,
     bool? celebrate,
     int? bounceKey,
+    int? flightKey,
     int? statLeaves,
     int? statClovers,
     int? statPulls,
@@ -65,6 +69,7 @@ class AppState {
       clovers: clovers ?? this.clovers,
       celebrate: celebrate ?? this.celebrate,
       bounceKey: bounceKey ?? this.bounceKey,
+      flightKey: flightKey ?? this.flightKey,
       statLeaves: statLeaves ?? this.statLeaves,
       statClovers: statClovers ?? this.statClovers,
       statPulls: statPulls ?? this.statPulls,

@@ -12,7 +12,6 @@ import '../data/supabase_game_backend.dart';
 import '../models/app_state.dart';
 import '../models/deed.dart';
 import '../models/ticket_instance.dart';
-import 'ads_controller.dart';
 
 /// 서버 도입 전 로컬 저장 키 — 최초 로그인 시 서버로 1회 이관하는 데만 쓴다.
 const _legacyPrefsKey = 'luckypicky_app_state_v1';
@@ -170,15 +169,16 @@ class AppController extends Notifier<AppState> {
     return r.cloverCompleted;
   }
 
-  /// 완성 축하 연출 → 전면광고 → 클로버 확정.
-  /// (선행 기록은 자가 신고라 클로버 생산을 광고로 게이팅한다.)
+  /// 완성 축하 연출 → 클로버 확정 → 배지로 날아가는 연출.
+  /// 클로버 생산에는 광고를 넣지 않는다 (광고는 소비 시점에만).
   void _scheduleCloverFinish() {
-    Future.delayed(const Duration(milliseconds: 1100), () {
-      AdsController.instance.showInterstitial(onDone: finishCloverCelebration);
-    });
+    Future.delayed(const Duration(milliseconds: 700), finishCloverCelebration);
   }
 
   /// 클로버 완성 연출 후 잎 4개 차감 + 보유 클로버 +1 (서버 확정).
+  ///
+  /// 확정에 성공해야만 [AppState.flightKey] 를 올린다. 덕분에 "비행을 봤다"는
+  /// 곧 "클로버가 실제로 적립됐다"와 같은 뜻이 되고, 헛되이 날아가는 일이 없다.
   Future<void> finishCloverCelebration() async {
     if (state.leaves < 4) return;
     try {
@@ -188,6 +188,7 @@ class AppController extends Notifier<AppState> {
         clovers: r.clovers,
         celebrate: false,
         statClovers: state.statClovers + 1,
+        flightKey: state.flightKey + 1,
       );
     } on GameRuleException {
       state = state.copyWith(celebrate: false);
