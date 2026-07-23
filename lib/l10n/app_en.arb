@@ -4,7 +4,7 @@
   "tabHome": "Home",
   "tabGacha": "Gacha",
   "tabFortune": "Fortune",
-  "tabDex": "Lucky Wallet",
+  "tabDex": "Collection",
   "tabArchive": "My Record",
 
   "homeStatusEmpty": "Start a new four-leaf clover.\nFour good deeds fill all its leaves.",
@@ -45,6 +45,18 @@
       "count": { "type": "int" }
     }
   },
+  "historyCoinDelta": "🪙 Coin -{count}",
+  "@historyCoinDelta": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "historyCustomMade": "[Charm made] {text}",
+  "@historyCustomMade": {
+    "placeholders": {
+      "text": { "type": "String" }
+    }
+  },
   "historyCloverDelta": "🍀 Clover -{count}",
   "@historyCloverDelta": {
     "placeholders": {
@@ -57,24 +69,22 @@
   "commonConfirm": "OK",
 
   "gachaTitle": "Lucky Gacha",
-  "gachaOwnedLabel": "Clovers owned",
-  "gachaCloverCount": "{count}",
-  "@gachaCloverCount": {
+  "gachaCoinCount": "{count}",
+  "@gachaCoinCount": {
     "placeholders": {
       "count": { "type": "int" }
     }
   },
-  "gachaPull": "Pull with a clover",
-  "gachaNotEnough": "Not enough clovers",
-  "gachaAdClover": "Watch an ad · get a clover ({left}/{total})",
-  "@gachaAdClover": {
+  "gachaPull": "Pull with a coin",
+  "gachaNotEnough": "Not enough coins",
+  "gachaAdCoin": "Watch an ad · get a coin ({left}/{total})",
+  "@gachaAdCoin": {
     "placeholders": {
       "left": { "type": "int" },
       "total": { "type": "int" }
     }
   },
-  "gachaAdCloverNone": "Ad clovers are back tomorrow",
-  "gachaAdCloverGained": "Clover +1! Give the machine a spin",
+  "gachaAdCoinNone": "Coins are back tomorrow",
   "gachaRatesButton": "Drop rates",
   "gachaTapCapsule": "Tap the capsule to open it!",
 
@@ -92,9 +102,46 @@
   "resultConfirm": "Nice",
   "resultRerollAd": "Watch an ad · pull again",
 
-  "dexTitle": "Lucky Wallet",
+  "customSectionTitle": "Lucky charms you made",
+  "customSectionEmpty": "Write your own luck — clovers from good deeds turn into a card",
+  "customCreateCta": "Make a charm",
+  "customCreateTitle": "Write your own luck",
+  "customCreateHint": "Something you'd like to come true",
+  "customCreateCounter": "{used}/{max}",
+  "@customCreateCounter": {
+    "placeholders": {
+      "used": { "type": "int" },
+      "max": { "type": "int" }
+    }
+  },
+  "customCreateConfirm": "Make it ({cost} clover)",
+  "@customCreateConfirm": {
+    "placeholders": {
+      "cost": { "type": "int" }
+    }
+  },
+  "customCreateAdNote": "You'll watch a short ad, then your card appears",
+  "customCreateNoClovers": "You need {cost} clover — record a good deed first",
+  "@customCreateNoClovers": {
+    "placeholders": {
+      "cost": { "type": "int" }
+    }
+  },
+  "customCreateFailed": "Couldn't make it just now — your clover is untouched",
+  "customCreated": "Your luck is made",
+  "customEnhance": "Enhance ({cost} clovers)",
+  "@customEnhance": {
+    "placeholders": {
+      "cost": { "type": "int" }
+    }
+  },
+  "customEnhanceMax": "Fully enhanced",
+  "customEnhanceNoClovers": "Not enough clovers",
+  "customBadge": "MADE",
+
+  "dexTitle": "Collection",
   "dexSubtitle": "Every luck you've pulled lives here",
-  "dexEmpty": "Your wallet is empty — go pull your first luck!",
+  "dexEmpty": "Your collection is empty — go pull your first luck!",
   "dexPlus": "+{plus}",
   "@dexPlus": {
     "placeholders": {
@@ -161,7 +208,7 @@
     }
   },
   "forgeNoMaterial": "No other card to use as material",
-  "forgeRejected": "That card can't go in right now — refreshing your wallet 🍀",
+  "forgeRejected": "That card can't go in right now — refreshing your collection 🍀",
   "forgeSuccess": "Enhanced!",
   "forgeSuccessPlus": "+{plus}",
   "@forgeSuccessPlus": {
@@ -264,5 +311,9 @@
   },
 
   "languageSheetTitle": "Language",
-  "languageSystem": "Follow system settings"
+  "languageSystem": "Follow system settings",
+
+  "loadingErrorTitle": "Couldn't connect",
+  "loadingErrorBody": "Please check your network connection",
+  "loadingRetry": "Try again"
 }

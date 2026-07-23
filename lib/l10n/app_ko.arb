@@ -4,7 +4,7 @@
   "tabHome": "홈",
   "tabGacha": "뽑기",
   "tabFortune": "운세",
-  "tabDex": "행운 지갑",
+  "tabDex": "보관함",
   "tabArchive": "나의 기록",
 
   "homeStatusEmpty": "새 네잎클로버를 시작해요.\n4번의 선행이면 잎이 가득 차요.",
@@ -29,6 +29,8 @@
 
   "historyPullDone": "[행운 뽑기] {text}",
   "historyLeafDelta": "🍃 잎 +{count}",
+  "historyCoinDelta": "🪙 코인 -{count}",
+  "historyCustomMade": "[행운권 제작] {text}",
   "historyCloverDelta": "🍀 클로버 -{count}",
   "historyFreePull": "🍀 무료 뽑기",
 
@@ -36,13 +38,11 @@
   "commonConfirm": "확인",
 
   "gachaTitle": "행운 뽑기",
-  "gachaOwnedLabel": "보유한 클로버",
-  "gachaCloverCount": "{count}개",
-  "gachaPull": "클로버로 뽑기",
-  "gachaNotEnough": "클로버가 부족해요",
-  "gachaAdClover": "광고 보고 클로버 받기 ({left}/{total})",
-  "gachaAdCloverNone": "광고 클로버는 내일 다시 채워져요",
-  "gachaAdCloverGained": "클로버 +1! 머신을 돌려보세요",
+  "gachaCoinCount": "{count}개",
+  "gachaPull": "코인으로 뽑기",
+  "gachaNotEnough": "코인이 부족해요",
+  "gachaAdCoin": "광고 보고 코인 받기 ({left}/{total})",
+  "gachaAdCoinNone": "코인은 내일 다시 채워져요",
   "gachaRatesButton": "확률 정보",
   "gachaTapCapsule": "캡슐을 탭해서 열어보세요!",
 
@@ -55,9 +55,25 @@
   "resultConfirm": "좋아요",
   "resultRerollAd": "광고 보고 한 번 더",
 
-  "dexTitle": "행운 지갑",
+  "customSectionTitle": "내가 만든 행운권",
+  "customSectionEmpty": "선행으로 모은 클로버가 내 문구의 행운권이 돼요",
+  "customCreateCta": "행운권 만들기",
+  "customCreateTitle": "나만의 행운을 적어보세요",
+  "customCreateHint": "이뤄졌으면 하는 한 마디",
+  "customCreateCounter": "{used}/{max}",
+  "customCreateConfirm": "만들기 (클로버 {cost}개)",
+  "customCreateAdNote": "짧은 광고를 본 뒤 카드가 나와요",
+  "customCreateNoClovers": "클로버 {cost}개가 필요해요 — 선행부터 기록해볼까요?",
+  "customCreateFailed": "지금은 만들 수 없어요 — 클로버는 그대로예요",
+  "customCreated": "나만의 행운이 만들어졌어요",
+  "customEnhance": "강화하기 (클로버 {cost}개)",
+  "customEnhanceMax": "최대 강화 완료",
+  "customEnhanceNoClovers": "클로버가 부족해요",
+  "customBadge": "직접 만듦",
+
+  "dexTitle": "보관함",
   "dexSubtitle": "뽑은 행운들이 이곳에 모여요",
-  "dexEmpty": "지갑이 텅 비었어요 — 첫 행운을 뽑으러 가볼까요?",
+  "dexEmpty": "보관함이 텅 비었어요 — 첫 행운을 뽑으러 가볼까요?",
   "dexPlus": "+{plus}",
   "dexOwnedCount": "{count}장 보유",
   "dexRarityCount": "{count}장",
@@ -77,7 +93,7 @@
   "forgeNoEnhanceable": "강화할 수 있는 카드가 없어요",
   "forgeNotEnoughCards": "카드가 {need}장 이상 있어야 해요",
   "forgeNoMaterial": "재료로 쓸 다른 카드가 없어요",
-  "forgeRejected": "지금은 그 카드를 넣을 수 없어요 — 지갑을 새로 불러올게요 🍀",
+  "forgeRejected": "지금은 그 카드를 넣을 수 없어요 — 보관함을 새로 불러올게요 🍀",
   "forgeSuccess": "강화 성공!",
   "forgeSuccessPlus": "+{plus}",
   "forgeFail": "강화 실패…",
@@ -124,5 +140,9 @@
   "fortuneShareText": "오늘 내 행운지수 {score}점 🍀\n너도 잡아봐.\n\nLuckyPicky — 선행으로 뽑는 행운",
 
   "languageSheetTitle": "언어",
-  "languageSystem": "시스템 설정 따르기"
+  "languageSystem": "시스템 설정 따르기",
+
+  "loadingErrorTitle": "연결에 실패했어요",
+  "loadingErrorBody": "네트워크 상태를 확인해 주세요",
+  "loadingRetry": "다시 시도"
 }

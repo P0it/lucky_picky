@@ -18,7 +18,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get tabFortune => '운세';
 
   @override
-  String get tabDex => '행운 지갑';
+  String get tabDex => '보관함';
 
   @override
   String get tabArchive => '나의 기록';
@@ -87,6 +87,16 @@ class AppLocalizationsKo extends AppLocalizations {
   }
 
   @override
+  String historyCoinDelta(int count) {
+    return '🪙 코인 -$count';
+  }
+
+  @override
+  String historyCustomMade(String text) {
+    return '[행운권 제작] $text';
+  }
+
+  @override
   String historyCloverDelta(int count) {
     return '🍀 클로버 -$count';
   }
@@ -104,29 +114,23 @@ class AppLocalizationsKo extends AppLocalizations {
   String get gachaTitle => '행운 뽑기';
 
   @override
-  String get gachaOwnedLabel => '보유한 클로버';
-
-  @override
-  String gachaCloverCount(int count) {
+  String gachaCoinCount(int count) {
     return '$count개';
   }
 
   @override
-  String get gachaPull => '클로버로 뽑기';
+  String get gachaPull => '코인으로 뽑기';
 
   @override
-  String get gachaNotEnough => '클로버가 부족해요';
+  String get gachaNotEnough => '코인이 부족해요';
 
   @override
-  String gachaAdClover(int left, int total) {
-    return '광고 보고 클로버 받기 ($left/$total)';
+  String gachaAdCoin(int left, int total) {
+    return '광고 보고 코인 받기 ($left/$total)';
   }
 
   @override
-  String get gachaAdCloverNone => '광고 클로버는 내일 다시 채워져요';
-
-  @override
-  String get gachaAdCloverGained => '클로버 +1! 머신을 돌려보세요';
+  String get gachaAdCoinNone => '코인은 내일 다시 채워져요';
 
   @override
   String get gachaRatesButton => '확률 정보';
@@ -158,13 +162,66 @@ class AppLocalizationsKo extends AppLocalizations {
   String get resultRerollAd => '광고 보고 한 번 더';
 
   @override
-  String get dexTitle => '행운 지갑';
+  String get customSectionTitle => '내가 만든 행운권';
+
+  @override
+  String get customSectionEmpty => '선행으로 모은 클로버가 내 문구의 행운권이 돼요';
+
+  @override
+  String get customCreateCta => '행운권 만들기';
+
+  @override
+  String get customCreateTitle => '나만의 행운을 적어보세요';
+
+  @override
+  String get customCreateHint => '이뤄졌으면 하는 한 마디';
+
+  @override
+  String customCreateCounter(int used, int max) {
+    return '$used/$max';
+  }
+
+  @override
+  String customCreateConfirm(int cost) {
+    return '만들기 (클로버 $cost개)';
+  }
+
+  @override
+  String get customCreateAdNote => '짧은 광고를 본 뒤 카드가 나와요';
+
+  @override
+  String customCreateNoClovers(int cost) {
+    return '클로버 $cost개가 필요해요 — 선행부터 기록해볼까요?';
+  }
+
+  @override
+  String get customCreateFailed => '지금은 만들 수 없어요 — 클로버는 그대로예요';
+
+  @override
+  String get customCreated => '나만의 행운이 만들어졌어요';
+
+  @override
+  String customEnhance(int cost) {
+    return '강화하기 (클로버 $cost개)';
+  }
+
+  @override
+  String get customEnhanceMax => '최대 강화 완료';
+
+  @override
+  String get customEnhanceNoClovers => '클로버가 부족해요';
+
+  @override
+  String get customBadge => '직접 만듦';
+
+  @override
+  String get dexTitle => '보관함';
 
   @override
   String get dexSubtitle => '뽑은 행운들이 이곳에 모여요';
 
   @override
-  String get dexEmpty => '지갑이 텅 비었어요 — 첫 행운을 뽑으러 가볼까요?';
+  String get dexEmpty => '보관함이 텅 비었어요 — 첫 행운을 뽑으러 가볼까요?';
 
   @override
   String dexPlus(int plus) {
@@ -239,7 +296,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get forgeNoMaterial => '재료로 쓸 다른 카드가 없어요';
 
   @override
-  String get forgeRejected => '지금은 그 카드를 넣을 수 없어요 — 지갑을 새로 불러올게요 🍀';
+  String get forgeRejected => '지금은 그 카드를 넣을 수 없어요 — 보관함을 새로 불러올게요 🍀';
 
   @override
   String get forgeSuccess => '강화 성공!';
@@ -391,4 +448,13 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get languageSystem => '시스템 설정 따르기';
+
+  @override
+  String get loadingErrorTitle => '연결에 실패했어요';
+
+  @override
+  String get loadingErrorBody => '네트워크 상태를 확인해 주세요';
+
+  @override
+  String get loadingRetry => '다시 시도';
 }

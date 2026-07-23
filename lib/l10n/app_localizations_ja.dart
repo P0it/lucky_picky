@@ -18,7 +18,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get tabFortune => '運勢';
 
   @override
-  String get tabDex => '幸運の財布';
+  String get tabDex => 'コレクション';
 
   @override
   String get tabArchive => 'わたしの記録';
@@ -87,6 +87,16 @@ class AppLocalizationsJa extends AppLocalizations {
   }
 
   @override
+  String historyCoinDelta(int count) {
+    return '🪙 コイン -$count';
+  }
+
+  @override
+  String historyCustomMade(String text) {
+    return '［チケット作成］$text';
+  }
+
+  @override
   String historyCloverDelta(int count) {
     return '🍀 クローバー -$count';
   }
@@ -104,29 +114,23 @@ class AppLocalizationsJa extends AppLocalizations {
   String get gachaTitle => '幸運ガチャ';
 
   @override
-  String get gachaOwnedLabel => '保有クローバー';
-
-  @override
-  String gachaCloverCount(int count) {
-    return '$count個';
+  String gachaCoinCount(int count) {
+    return '$count枚';
   }
 
   @override
-  String get gachaPull => 'クローバーで引く';
+  String get gachaPull => 'コインで引く';
 
   @override
-  String get gachaNotEnough => 'クローバーが足りません';
+  String get gachaNotEnough => 'コインが足りません';
 
   @override
-  String gachaAdClover(int left, int total) {
-    return '広告を見てクローバーをもらう（$left/$total）';
+  String gachaAdCoin(int left, int total) {
+    return '広告を見てコインをもらう（$left/$total）';
   }
 
   @override
-  String get gachaAdCloverNone => '広告クローバーは明日また回復します';
-
-  @override
-  String get gachaAdCloverGained => 'クローバー +1！マシンを回してみましょう';
+  String get gachaAdCoinNone => 'コインは明日また回復します';
 
   @override
   String get gachaRatesButton => '提供割合';
@@ -158,13 +162,66 @@ class AppLocalizationsJa extends AppLocalizations {
   String get resultRerollAd => '広告を見てもう1回';
 
   @override
-  String get dexTitle => '幸運の財布';
+  String get customSectionTitle => '自分で作った幸運チケット';
+
+  @override
+  String get customSectionEmpty => '善行で貯めたクローバーが、自分の言葉のチケットになります';
+
+  @override
+  String get customCreateCta => 'チケットを作る';
+
+  @override
+  String get customCreateTitle => '自分だけの幸運を書いてみよう';
+
+  @override
+  String get customCreateHint => '叶ってほしいひとこと';
+
+  @override
+  String customCreateCounter(int used, int max) {
+    return '$used/$max';
+  }
+
+  @override
+  String customCreateConfirm(int cost) {
+    return '作る（クローバー$cost個）';
+  }
+
+  @override
+  String get customCreateAdNote => '短い広告のあとにカードが出ます';
+
+  @override
+  String customCreateNoClovers(int cost) {
+    return 'クローバーが$cost個必要です — まずは善行を記録しましょう';
+  }
+
+  @override
+  String get customCreateFailed => '今は作れませんでした — クローバーはそのままです';
+
+  @override
+  String get customCreated => '自分だけの幸運ができました';
+
+  @override
+  String customEnhance(int cost) {
+    return '強化する（クローバー$cost個）';
+  }
+
+  @override
+  String get customEnhanceMax => '最大強化済み';
+
+  @override
+  String get customEnhanceNoClovers => 'クローバーが足りません';
+
+  @override
+  String get customBadge => '自作';
+
+  @override
+  String get dexTitle => 'コレクション';
 
   @override
   String get dexSubtitle => '引いた幸運がここに集まります';
 
   @override
-  String get dexEmpty => 'お財布はまだ空っぽ — 最初の幸運を引いてみましょう！';
+  String get dexEmpty => 'コレクションはまだ空っぽ — 最初の幸運を引いてみましょう！';
 
   @override
   String dexPlus(int plus) {
@@ -239,7 +296,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get forgeNoMaterial => '素材にできるカードがありません';
 
   @override
-  String get forgeRejected => '今はそのカードを入れられません — ウォレットを読み込み直します 🍀';
+  String get forgeRejected => '今はそのカードを入れられません — コレクションを読み込み直します 🍀';
 
   @override
   String get forgeSuccess => '強化成功！';
@@ -391,4 +448,13 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get languageSystem => 'システム設定に従う';
+
+  @override
+  String get loadingErrorTitle => '接続できませんでした';
+
+  @override
+  String get loadingErrorBody => 'ネットワーク状態を確認してください';
+
+  @override
+  String get loadingRetry => 'もう一度試す';
 }

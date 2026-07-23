@@ -4,7 +4,7 @@
   "tabHome": "ホーム",
   "tabGacha": "ガチャ",
   "tabFortune": "運勢",
-  "tabDex": "幸運の財布",
+  "tabDex": "コレクション",
   "tabArchive": "わたしの記録",
 
   "homeStatusEmpty": "新しい四つ葉のクローバーを始めましょう。\n4つの善い行いで葉が満ちます。",
@@ -29,6 +29,8 @@
 
   "historyPullDone": "［幸運ガチャ］{text}",
   "historyLeafDelta": "🍃 葉 +{count}",
+  "historyCoinDelta": "🪙 コイン -{count}",
+  "historyCustomMade": "［チケット作成］{text}",
   "historyCloverDelta": "🍀 クローバー -{count}",
   "historyFreePull": "🍀 無料ガチャ",
 
@@ -36,13 +38,11 @@
   "commonConfirm": "OK",
 
   "gachaTitle": "幸運ガチャ",
-  "gachaOwnedLabel": "保有クローバー",
-  "gachaCloverCount": "{count}個",
-  "gachaPull": "クローバーで引く",
-  "gachaNotEnough": "クローバーが足りません",
-  "gachaAdClover": "広告を見てクローバーをもらう（{left}/{total}）",
-  "gachaAdCloverNone": "広告クローバーは明日また回復します",
-  "gachaAdCloverGained": "クローバー +1！マシンを回してみましょう",
+  "gachaCoinCount": "{count}枚",
+  "gachaPull": "コインで引く",
+  "gachaNotEnough": "コインが足りません",
+  "gachaAdCoin": "広告を見てコインをもらう（{left}/{total}）",
+  "gachaAdCoinNone": "コインは明日また回復します",
   "gachaRatesButton": "提供割合",
   "gachaTapCapsule": "カプセルをタップして開けよう！",
 
@@ -55,9 +55,25 @@
   "resultConfirm": "いいね",
   "resultRerollAd": "広告を見てもう1回",
 
-  "dexTitle": "幸運の財布",
+  "customSectionTitle": "自分で作った幸運チケット",
+  "customSectionEmpty": "善行で貯めたクローバーが、自分の言葉のチケットになります",
+  "customCreateCta": "チケットを作る",
+  "customCreateTitle": "自分だけの幸運を書いてみよう",
+  "customCreateHint": "叶ってほしいひとこと",
+  "customCreateCounter": "{used}/{max}",
+  "customCreateConfirm": "作る（クローバー{cost}個）",
+  "customCreateAdNote": "短い広告のあとにカードが出ます",
+  "customCreateNoClovers": "クローバーが{cost}個必要です — まずは善行を記録しましょう",
+  "customCreateFailed": "今は作れませんでした — クローバーはそのままです",
+  "customCreated": "自分だけの幸運ができました",
+  "customEnhance": "強化する（クローバー{cost}個）",
+  "customEnhanceMax": "最大強化済み",
+  "customEnhanceNoClovers": "クローバーが足りません",
+  "customBadge": "自作",
+
+  "dexTitle": "コレクション",
   "dexSubtitle": "引いた幸運がここに集まります",
-  "dexEmpty": "お財布はまだ空っぽ — 最初の幸運を引いてみましょう！",
+  "dexEmpty": "コレクションはまだ空っぽ — 最初の幸運を引いてみましょう！",
   "dexPlus": "+{plus}",
   "dexOwnedCount": "{count}枚 所持",
   "dexRarityCount": "{count}枚",
@@ -77,7 +93,7 @@
   "forgeNoEnhanceable": "強化できるカードがありません",
   "forgeNotEnoughCards": "カードが{need}枚以上必要です",
   "forgeNoMaterial": "素材にできるカードがありません",
-  "forgeRejected": "今はそのカードを入れられません — ウォレットを読み込み直します 🍀",
+  "forgeRejected": "今はそのカードを入れられません — コレクションを読み込み直します 🍀",
   "forgeSuccess": "強化成功！",
   "forgeSuccessPlus": "+{plus}",
   "forgeFail": "強化失敗…",
@@ -124,5 +140,9 @@
   "fortuneShareText": "今日のわたしのラッキー指数は{score}点 🍀\nきみも掴んでみて。\n\nLuckyPicky — 善い行いで引く幸運",
 
   "languageSheetTitle": "言語",
-  "languageSystem": "システム設定に従う"
+  "languageSystem": "システム設定に従う",
+
+  "loadingErrorTitle": "接続できませんでした",
+  "loadingErrorBody": "ネットワーク状態を確認してください",
+  "loadingRetry": "もう一度試す"
 }

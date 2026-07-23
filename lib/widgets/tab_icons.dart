@@ -93,60 +93,54 @@ class _TabIconPainter extends CustomPainter {
             ..close(),
         ];
       case TabIconKind.fortune:
-        // 반짝이 별(행운지수) — 중앙 4포인트 스파클 + 작은 트윙클.
+        // 수정구 — 점괘를 보는 구슬 + 받침대, 안쪽에 작은 반짝임.
         return [
+          Path()..addOval(Rect.fromCircle(center: const Offset(12, 10), radius: 6)),
           Path()
-            ..moveTo(11, 4.6)
-            ..quadraticBezierTo(12.5, 10.5, 18.4, 12)
-            ..quadraticBezierTo(12.5, 13.5, 11, 19.4)
-            ..quadraticBezierTo(9.5, 13.5, 3.6, 12)
-            ..quadraticBezierTo(9.5, 10.5, 11, 4.6)
+            ..moveTo(8.7, 15)
+            ..lineTo(5.9, 20.3)
+            ..lineTo(18.1, 20.3)
+            ..lineTo(15.3, 15),
+          Path()
+            ..moveTo(10.2, 6.4)
+            ..quadraticBezierTo(10.9, 8.1, 12.6, 8.8)
+            ..quadraticBezierTo(10.9, 9.5, 10.2, 11.2)
+            ..quadraticBezierTo(9.5, 9.5, 7.8, 8.8)
+            ..quadraticBezierTo(9.5, 8.1, 10.2, 6.4)
             ..close(),
-          Path()
-            ..moveTo(18.7, 3.8)
-            ..lineTo(18.7, 7.4),
-          Path()
-            ..moveTo(16.9, 5.6)
-            ..lineTo(20.5, 5.6),
-          Path()
-            ..moveTo(19.6, 16.6)
-            ..lineTo(19.6, 19.4),
-          Path()
-            ..moveTo(18.2, 18)
-            ..lineTo(21, 18),
         ];
       case TabIconKind.dex:
+        // 보관함 — 뚜껑 달린 상자.
         return [
-          Path()..addRRect(RRect.fromLTRBR(4, 4, 10.5, 10.5, const Radius.circular(2))),
-          Path()..addRRect(RRect.fromLTRBR(13.5, 4, 20, 10.5, const Radius.circular(2))),
-          Path()..addRRect(RRect.fromLTRBR(4, 13.5, 10.5, 20, const Radius.circular(2))),
-          Path()..addRRect(RRect.fromLTRBR(13.5, 13.5, 20, 20, const Radius.circular(2))),
+          Path()..addRRect(RRect.fromLTRBR(3, 4.5, 21, 8.8, const Radius.circular(1.2))),
+          Path()
+            ..moveTo(4.7, 8.8)
+            ..lineTo(4.7, 19)
+            ..arcToPoint(const Offset(5.7, 20), radius: const Radius.circular(1))
+            ..lineTo(18.3, 20)
+            ..arcToPoint(const Offset(19.3, 19), radius: const Radius.circular(1))
+            ..lineTo(19.3, 8.8),
+          Path()
+            ..moveTo(9.9, 12.6)
+            ..lineTo(14.1, 12.6),
         ];
       case TabIconKind.archive:
+        // 나의 기록 — 날짜에 체크가 찍힌 달력.
         return [
+          Path()..addRRect(RRect.fromLTRBR(3.5, 5.5, 20.5, 20.5, const Radius.circular(2))),
           Path()
-            ..moveTo(11, 10.5)
-            ..cubicTo(11, 7.2, 6.6, 6.8, 6.6, 9.9)
-            ..cubicTo(6.6, 12.1, 9.2, 11.8, 11, 10.5)
-            ..close(),
+            ..moveTo(3.5, 10.2)
+            ..lineTo(20.5, 10.2),
           Path()
-            ..moveTo(13, 10.5)
-            ..cubicTo(13, 7.2, 17.4, 6.8, 17.4, 9.9)
-            ..cubicTo(17.4, 12.1, 14.8, 11.8, 13, 10.5)
-            ..close(),
+            ..moveTo(8.2, 3.6)
+            ..lineTo(8.2, 7.2),
           Path()
-            ..moveTo(11, 12.5)
-            ..cubicTo(7.7, 12.5, 7.3, 16.9, 10.4, 16.9)
-            ..cubicTo(12.6, 16.9, 12.3, 14.3, 11, 12.5)
-            ..close(),
+            ..moveTo(15.8, 3.6)
+            ..lineTo(15.8, 7.2),
           Path()
-            ..moveTo(13, 12.5)
-            ..cubicTo(16.3, 12.5, 16.7, 16.9, 13.6, 16.9)
-            ..cubicTo(11.4, 16.9, 11.7, 14.3, 13, 12.5)
-            ..close(),
-          Path()
-            ..moveTo(13, 16.5)
-            ..cubicTo(13.8, 18.1, 13.6, 19.9, 14.6, 21.1),
+            ..moveTo(8.6, 15.2)
+            ..lineTo(11.1, 17.6)
+            ..lineTo(15.5, 13.2),
         ];
     }
   }

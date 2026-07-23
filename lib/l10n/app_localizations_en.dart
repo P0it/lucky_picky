@@ -18,7 +18,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get tabFortune => 'Fortune';
 
   @override
-  String get tabDex => 'Lucky Wallet';
+  String get tabDex => 'Collection';
 
   @override
   String get tabArchive => 'My Record';
@@ -88,6 +88,16 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String historyCoinDelta(int count) {
+    return '🪙 Coin -$count';
+  }
+
+  @override
+  String historyCustomMade(String text) {
+    return '[Charm made] $text';
+  }
+
+  @override
   String historyCloverDelta(int count) {
     return '🍀 Clover -$count';
   }
@@ -105,29 +115,23 @@ class AppLocalizationsEn extends AppLocalizations {
   String get gachaTitle => 'Lucky Gacha';
 
   @override
-  String get gachaOwnedLabel => 'Clovers owned';
-
-  @override
-  String gachaCloverCount(int count) {
+  String gachaCoinCount(int count) {
     return '$count';
   }
 
   @override
-  String get gachaPull => 'Pull with a clover';
+  String get gachaPull => 'Pull with a coin';
 
   @override
-  String get gachaNotEnough => 'Not enough clovers';
+  String get gachaNotEnough => 'Not enough coins';
 
   @override
-  String gachaAdClover(int left, int total) {
-    return 'Watch an ad · get a clover ($left/$total)';
+  String gachaAdCoin(int left, int total) {
+    return 'Watch an ad · get a coin ($left/$total)';
   }
 
   @override
-  String get gachaAdCloverNone => 'Ad clovers are back tomorrow';
-
-  @override
-  String get gachaAdCloverGained => 'Clover +1! Give the machine a spin';
+  String get gachaAdCoinNone => 'Coins are back tomorrow';
 
   @override
   String get gachaRatesButton => 'Drop rates';
@@ -160,13 +164,69 @@ class AppLocalizationsEn extends AppLocalizations {
   String get resultRerollAd => 'Watch an ad · pull again';
 
   @override
-  String get dexTitle => 'Lucky Wallet';
+  String get customSectionTitle => 'Lucky charms you made';
+
+  @override
+  String get customSectionEmpty =>
+      'Write your own luck — clovers from good deeds turn into a card';
+
+  @override
+  String get customCreateCta => 'Make a charm';
+
+  @override
+  String get customCreateTitle => 'Write your own luck';
+
+  @override
+  String get customCreateHint => 'Something you\'d like to come true';
+
+  @override
+  String customCreateCounter(int used, int max) {
+    return '$used/$max';
+  }
+
+  @override
+  String customCreateConfirm(int cost) {
+    return 'Make it ($cost clover)';
+  }
+
+  @override
+  String get customCreateAdNote =>
+      'You\'ll watch a short ad, then your card appears';
+
+  @override
+  String customCreateNoClovers(int cost) {
+    return 'You need $cost clover — record a good deed first';
+  }
+
+  @override
+  String get customCreateFailed =>
+      'Couldn\'t make it just now — your clover is untouched';
+
+  @override
+  String get customCreated => 'Your luck is made';
+
+  @override
+  String customEnhance(int cost) {
+    return 'Enhance ($cost clovers)';
+  }
+
+  @override
+  String get customEnhanceMax => 'Fully enhanced';
+
+  @override
+  String get customEnhanceNoClovers => 'Not enough clovers';
+
+  @override
+  String get customBadge => 'MADE';
+
+  @override
+  String get dexTitle => 'Collection';
 
   @override
   String get dexSubtitle => 'Every luck you\'ve pulled lives here';
 
   @override
-  String get dexEmpty => 'Your wallet is empty — go pull your first luck!';
+  String get dexEmpty => 'Your collection is empty — go pull your first luck!';
 
   @override
   String dexPlus(int plus) {
@@ -243,7 +303,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get forgeRejected =>
-      'That card can\'t go in right now — refreshing your wallet 🍀';
+      'That card can\'t go in right now — refreshing your collection 🍀';
 
   @override
   String get forgeSuccess => 'Enhanced!';
@@ -396,4 +456,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get languageSystem => 'Follow system settings';
+
+  @override
+  String get loadingErrorTitle => 'Couldn\'t connect';
+
+  @override
+  String get loadingErrorBody => 'Please check your network connection';
+
+  @override
+  String get loadingRetry => 'Try again';
 }
