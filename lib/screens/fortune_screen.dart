@@ -167,31 +167,46 @@ class _FortuneScreenState extends ConsumerState<FortuneScreen>
 
     return Stack(
       children: [
-        ListView(
-          padding: EdgeInsets.zero,
-          physics: const BouncingScrollPhysics(),
-          children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(24, 36, 24, 8),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(l.fortuneTitle,
-                      style: AppText.base(
-                          size: 30, weight: FontWeight.w800, letterSpacingEm: -0.035)),
-                  const SizedBox(height: 6),
-                  Text(l.fortuneSubtitle,
-                      style: AppText.base(
-                          size: 14.5, weight: FontWeight.w500, color: AppColors.sub)),
-                ],
-              ),
-            ),
-            if (playing) _playView(l) else _resultView(l, fortune),
-          ],
-        ),
+        // 플레이 화면은 스크롤되지 않고 한 화면을 채운다 — 버튼이 탭바 바로 위에
+        // 붙어 있어야 "돌리고 → 잡는" 동작이 엄지 위치에서 끝난다.
+        if (playing)
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              _header(l),
+              Expanded(child: _playView(l)),
+            ],
+          )
+        else
+          ListView(
+            padding: EdgeInsets.zero,
+            physics: const BouncingScrollPhysics(),
+            children: [
+              _header(l),
+              _resultView(l, fortune),
+            ],
+          ),
         // 고득점 축하 — 잡은 직후 한 번만 흩날린다.
         if (!playing && _showConfetti) const Positioned.fill(child: ConfettiBurst()),
       ],
+    );
+  }
+
+  Widget _header(AppLocalizations l) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(24, 36, 24, 8),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(l.fortuneTitle,
+              style: AppText.base(
+                  size: 30, weight: FontWeight.w800, letterSpacingEm: -0.035)),
+          const SizedBox(height: 6),
+          Text(l.fortuneSubtitle,
+              style: AppText.base(
+                  size: 14.5, weight: FontWeight.w500, color: AppColors.sub)),
+        ],
+      ),
     );
   }
 
@@ -200,8 +215,8 @@ class _FortuneScreenState extends ConsumerState<FortuneScreen>
     final statLeaves =
         ref.watch(appControllerProvider.select((s) => s.statLeaves));
 
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(24, 8, 24, 30),
+    final content = Padding(
+      padding: const EdgeInsets.fromLTRB(24, 8, 24, 24),
       child: Column(
         children: [
           // 선행 응원 카피 — 보상 아님, 정체성 연출.
@@ -218,7 +233,7 @@ class _FortuneScreenState extends ConsumerState<FortuneScreen>
                     size: 12.5, weight: FontWeight.w700, color: AppColors.accent),
               ),
             ),
-          const SizedBox(height: 18),
+          const Spacer(flex: 4),
           GestureDetector(
             behavior: HitTestBehavior.opaque,
             onTap: _onGaugeAction,
@@ -235,7 +250,7 @@ class _FortuneScreenState extends ConsumerState<FortuneScreen>
             style: AppText.base(
                 size: 13.5, weight: FontWeight.w500, color: AppColors.muted),
           ),
-          const SizedBox(height: 18),
+          const Spacer(flex: 5),
           Pressable(
             onTap: _onGaugeAction,
             child: Container(
@@ -261,6 +276,17 @@ class _FortuneScreenState extends ConsumerState<FortuneScreen>
             ),
           ),
         ],
+      ),
+    );
+
+    // 한 화면을 꽉 채워 버튼을 바닥에 붙이되, 작은 기기에서는 스크롤로 흘려보낸다.
+    return LayoutBuilder(
+      builder: (context, c) => SingleChildScrollView(
+        physics: const BouncingScrollPhysics(),
+        child: ConstrainedBox(
+          constraints: BoxConstraints(minHeight: c.maxHeight),
+          child: IntrinsicHeight(child: content),
+        ),
       ),
     );
   }
