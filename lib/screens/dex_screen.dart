@@ -31,13 +31,13 @@ class DexScreen extends ConsumerWidget {
       physics: const BouncingScrollPhysics(),
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(24, 36, 24, 4),
+          padding: const EdgeInsets.fromLTRB(24, 20, 24, 4),
           child: Text(l.dexTitle,
               style: AppText.base(
                   size: 30, weight: FontWeight.w800, letterSpacingEm: -0.035)),
         ),
         Padding(
-          padding: const EdgeInsets.fromLTRB(24, 0, 24, 14),
+          padding: const EdgeInsets.fromLTRB(24, 0, 24, 10),
           child: Row(
             children: [
               Expanded(
@@ -67,7 +67,7 @@ class DexScreen extends ConsumerWidget {
         ),
         // 지갑의 두 기능 — 카드 고르기는 포지 화면이 맡는다.
         Padding(
-          padding: const EdgeInsets.fromLTRB(24, 0, 24, 6),
+          padding: const EdgeInsets.fromLTRB(24, 0, 24, 4),
           child: Row(
             children: [
               Expanded(
@@ -101,7 +101,7 @@ class DexScreen extends ConsumerWidget {
         ),
         if (tickets.isEmpty)
           Padding(
-            padding: const EdgeInsets.fromLTRB(24, 60, 24, 0),
+            padding: const EdgeInsets.fromLTRB(24, 40, 24, 0),
             child: Center(
               child: Text(
                 l.dexEmpty,
@@ -114,7 +114,7 @@ class DexScreen extends ConsumerWidget {
         else
           for (final rarity in Rarity.values)
             _raritySection(context, lang, rarity, tickets),
-        const SizedBox(height: 30),
+        const SizedBox(height: 16),
       ],
     );
   }
@@ -143,7 +143,7 @@ class DexScreen extends ConsumerWidget {
         Navigator.of(context).push(forgeRoute(mode));
       },
       child: Container(
-        height: 52,
+        height: 48,
         alignment: Alignment.center,
         decoration: BoxDecoration(
           color: bg,
@@ -173,7 +173,7 @@ class DexScreen extends ConsumerWidget {
     if (cards.isEmpty) return const SizedBox.shrink();
 
     return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 18, 20, 4),
+      padding: const EdgeInsets.fromLTRB(20, 12, 20, 2),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -205,11 +205,11 @@ class DexScreen extends ConsumerWidget {
               ],
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 6),
           // 가로형 티켓이라 한 줄에 하나 — 문구가 어색하게 꺾이지 않는다.
           for (final card in cards)
             Padding(
-              padding: const EdgeInsets.only(bottom: 10),
+              padding: const EdgeInsets.only(bottom: 8),
               child: _TicketRow(card: card, lang: lang),
             ),
         ],
@@ -234,73 +234,72 @@ class _TicketRow extends ConsumerWidget {
     // 플랫 컬렉션 카드 — 등급색이 카드 전체를 칠한다. 강화는 상세에서.
     return Pressable(
       onTap: () => Navigator.of(context).push(ticketRoute(card.id)),
-      child: SizedBox(
-        height: 96,
-        child: CollectionCard(
-          style: style,
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(16, 13, 16, 13),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    CloverMark(size: 13, color: style.color),
-                    const SizedBox(width: 5),
+      // 높이를 고정하지 않는다 — 한 줄짜리 문구면 카드가 그만큼 얇아져 지갑에
+      // 더 많은 장수가 한 화면에 들어온다. 두 줄짜리는 알아서 늘어난다.
+      child: CollectionCard(
+        style: style,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  CloverMark(size: 13, color: style.color),
+                  const SizedBox(width: 5),
+                  Text(
+                    LuckCatalog.rarityName(ticket.rarity, lang),
+                    style: AppText.base(
+                      size: 10,
+                      weight: FontWeight.w800,
+                      color: style.color,
+                    ),
+                  ),
+                  const SizedBox(width: 6),
+                  Text(
+                    'No.${card.ticketId.substring(1)}',
+                    style: AppText.base(
+                      size: 10,
+                      weight: FontWeight.w700,
+                      color: AppColors.sub,
+                      letterSpacingEm: 0,
+                    ),
+                  ),
+                  const Spacer(),
+                  // 스텁은 강화 상태만 말한다 — 기능 버튼은 지갑 상단에 있다.
+                  if (card.plus > 0)
                     Text(
-                      LuckCatalog.rarityName(ticket.rarity, lang),
+                      l.dexPlus(card.plus),
                       style: AppText.base(
-                        size: 10,
+                        size: 15,
                         weight: FontWeight.w800,
                         color: style.color,
-                      ),
-                    ),
-                    const SizedBox(width: 6),
-                    Text(
-                      'No.${card.ticketId.substring(1)}',
-                      style: AppText.base(
-                        size: 10,
-                        weight: FontWeight.w700,
-                        color: AppColors.sub,
                         letterSpacingEm: 0,
                       ),
                     ),
-                    const Spacer(),
-                    // 스텁은 강화 상태만 말한다 — 기능 버튼은 지갑 상단에 있다.
-                    if (card.plus > 0)
-                      Text(
-                        l.dexPlus(card.plus),
-                        style: AppText.base(
-                          size: 15,
-                          weight: FontWeight.w800,
-                          color: style.color,
-                          letterSpacingEm: 0,
-                        ),
-                      ),
-                    if (card.isMaxLevel) ...[
-                      const SizedBox(width: 4),
-                      const TossEmoji(TossFace.crown, size: 18),
-                    ] else if (card.plus == 0)
-                      // 빈칸 방지 — 무강화 카드는 등급색 클로버 한 장.
-                      CloverMark(size: 22, color: style.color),
-                  ],
+                  if (card.isMaxLevel) ...[
+                    const SizedBox(width: 4),
+                    const TossEmoji(TossFace.crown, size: 18),
+                  ] else if (card.plus == 0)
+                    // 빈칸 방지 — 무강화 카드는 등급색 클로버 한 장.
+                    CloverMark(size: 18, color: style.color),
+                ],
+              ),
+              const SizedBox(height: 7),
+              Text(
+                ticket.text(lang),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: AppText.base(
+                  size: 14,
+                  weight: FontWeight.w700,
+                  height: 1.32,
+                  letterSpacingEm: -0.03,
+                  color: AppColors.title,
                 ),
-                const Spacer(),
-                Text(
-                  ticket.text(lang),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: AppText.base(
-                    size: 14,
-                    weight: FontWeight.w700,
-                    height: 1.32,
-                    letterSpacingEm: -0.03,
-                    color: AppColors.title,
-                  ),
-                ),
-                const Spacer(),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),

@@ -27,7 +27,7 @@ class ArchiveScreen extends ConsumerWidget {
       physics: const BouncingScrollPhysics(),
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(24, 36, 24, 8),
+          padding: const EdgeInsets.fromLTRB(24, 20, 24, 6),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
@@ -49,8 +49,8 @@ class ArchiveScreen extends ConsumerWidget {
         ),
         // ---- 통계 대시보드 ----
         Container(
-          margin: const EdgeInsets.fromLTRB(24, 18, 24, 10),
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 22),
+          margin: const EdgeInsets.fromLTRB(24, 10, 24, 8),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
           decoration: BoxDecoration(
             color: AppColors.accentSoft,
             borderRadius: BorderRadius.circular(AppRadius.card),
@@ -69,7 +69,7 @@ class ArchiveScreen extends ConsumerWidget {
           ),
         ),
         Padding(
-          padding: const EdgeInsets.fromLTRB(24, 18, 24, 30),
+          padding: const EdgeInsets.fromLTRB(24, 12, 24, 16),
           child: Column(
             children: [
               // 세그먼트 탭
@@ -88,7 +88,7 @@ class ArchiveScreen extends ConsumerWidget {
                   ],
                 ),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 14),
               if (isCalendar)
                 DeedHeatmap(history: s.history)
               else if (s.history.isEmpty)
@@ -109,7 +109,7 @@ class ArchiveScreen extends ConsumerWidget {
           Text(value,
               style: AppText.base(
                   size: 25, weight: FontWeight.w800, color: valueColor, letterSpacingEm: -0.03)),
-          const SizedBox(height: 7),
+          const SizedBox(height: 5),
           Text(label,
               style: AppText.base(size: 12, weight: FontWeight.w600, color: AppColors.sub)),
         ],
@@ -146,7 +146,7 @@ class ArchiveScreen extends ConsumerWidget {
 
   Widget _emptyState(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 46),
+      padding: const EdgeInsets.symmetric(vertical: 32),
       child: Column(
         children: [
           Opacity(opacity: 0.5, child: const CloverMark(size: 30, withStem: true)),
@@ -239,17 +239,17 @@ class _Timeline extends StatelessWidget {
           // ---- 본문 ----
           Expanded(
             child: Padding(
-              padding: EdgeInsets.only(bottom: isLast ? 0 : 24),
+              padding: EdgeInsets.only(bottom: isLast ? 0 : 16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(h.date,
                       style: AppText.base(
                           size: 12, weight: FontWeight.w600, color: AppColors.muted, letterSpacingEm: -0.01)),
-                  const SizedBox(height: 5),
+                  const SizedBox(height: 3),
                   Text(_displayText(l, h),
-                      style: AppText.base(size: 15, weight: FontWeight.w500, height: 1.45)),
-                  const SizedBox(height: 9),
+                      style: AppText.base(size: 15, weight: FontWeight.w500, height: 1.35)),
+                  const SizedBox(height: 7),
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                     decoration: BoxDecoration(
