@@ -1,9 +1,25 @@
 import 'dart:io' show Platform;
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 import '../config/ad_config.dart';
+
+/// 보상형 광고 한 번을 재생하는 호출 — [AdsController.showRewarded] 와 같은 모양.
+typedef RewardedAdGate = void Function({
+  required VoidCallback onReward,
+  VoidCallback? onDone,
+});
+
+/// 보상형 광고 게이트.
+///
+/// 실기기에서는 [AdsController] 로 흘러가고, 테스트에서는 override 해서
+/// "광고를 끝까지 보지 않은" 경우(= onReward 없이 onDone 만)를 재현한다.
+/// 데스크톱/웹에서 [AdsController.showRewarded] 가 편의상 즉시 보상하기 때문에,
+/// 이 갈래가 없으면 광고 게이트가 걸린 흐름을 검증할 수 없다.
+final rewardedAdProvider =
+    Provider<RewardedAdGate>((ref) => AdsController.instance.showRewarded);
 
 /// 전면(인터스티셜) + 보상형(리워드) 광고 관리.
 /// 전면광고는 선행 클로버 완성 때만 — 뽑기 흐름에는 끼어들지 않는다.

@@ -62,6 +62,7 @@ class _GachaPullOverlayState extends ConsumerState<_GachaPullOverlay>
   late final AnimationController _machine; // coin/lever/drop 공용
   late final AnimationController _burst; // 개봉 버스트
   late final AnimationController _card; // 결과 카드 등장
+  late final AnimationController _shimmer; // 결과 카드 표면 광택 (반복)
 
   _Phase _phase = _Phase.coin;
   PullResult? _result;
@@ -78,6 +79,11 @@ class _GachaPullOverlayState extends ConsumerState<_GachaPullOverlay>
       ..addListener(() => setState(() {}));
     _card = AnimationController(
         vsync: this, duration: const Duration(milliseconds: 420));
+    _shimmer = AnimationController(
+        vsync: this, duration: const Duration(milliseconds: 2600))
+      ..addListener(() {
+        if (_phase == _Phase.reveal) setState(() {});
+      });
     _startSequence(widget.firstResult);
   }
 
@@ -86,6 +92,9 @@ class _GachaPullOverlayState extends ConsumerState<_GachaPullOverlay>
     _result = r;
     _card.value = 0;
     _burst.value = 0;
+    // 등급이 높을수록 개봉이 길고 화려하다 — 노멀은 담백하게 끊는다.
+    _burst.duration =
+        Duration(milliseconds: 620 + r.ticket.rarity.index * 150);
     _phase = _Phase.coin;
     HapticFeedback.selectionClick();
     _machine
@@ -136,6 +145,7 @@ class _GachaPullOverlayState extends ConsumerState<_GachaPullOverlay>
       if (!mounted) return;
       setState(() => _phase = _Phase.reveal);
       _card.forward(from: 0);
+      _shimmer.repeat();
     });
   }
 
@@ -150,6 +160,7 @@ class _GachaPullOverlayState extends ConsumerState<_GachaPullOverlay>
     _machine.dispose();
     _burst.dispose();
     _card.dispose();
+    _shimmer.dispose();
     super.dispose();
   }
 
@@ -163,22 +174,37 @@ class _GachaPullOverlayState extends ConsumerState<_GachaPullOverlay>
     final style = RarityStyle.of(result.ticket.rarity);
     final revealing = _phase == _Phase.reveal;
 
+    final tier = result.ticket.rarity.index;
+
     return Scaffold(
       backgroundColor: AppColors.white,
-      body: SafeArea(
-        child: Column(
-          children: [
-            Expanded(
-              child: Center(
-                child: revealing
-                    ? _resultCard(l, result, style)
-                    : _machineStage(l, result, style),
+      body: Stack(
+        children: [
+          // 상위 등급 개봉은 화면 전체가 등급색으로 물든다.
+          if (_phase == _Phase.open && tier >= 2)
+            Positioned.fill(
+              child: IgnorePointer(
+                child: CustomPaint(
+                  painter: _AuraFlashPainter(_burst.value, style.color, tier),
+                ),
               ),
             ),
-            if (revealing) _resultButtons(l),
-            const SizedBox(height: 24),
-          ],
-        ),
+          SafeArea(
+            child: Column(
+              children: [
+                Expanded(
+                  child: Center(
+                    child: revealing
+                        ? _resultCard(l, result, style)
+                        : _machineStage(l, result, style),
+                  ),
+                ),
+                if (revealing) _resultButtons(l),
+                const SizedBox(height: 24),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -186,6 +212,10 @@ class _GachaPullOverlayState extends ConsumerState<_GachaPullOverlay>
   // ---- 머신 연출 스테이지 ----
   Widget _machineStage(AppLocalizations l, PullResult result, RarityStyle style) {
     final t = _machine.value;
+    // 껍데기가 갈라지는 건 버스트 앞부분에서 끝난다 — 뒤는 광채만 남는다.
+    final openT =
+        _phase == _Phase.open ? (_burst.value / 0.55).clamp(0.0, 1.0) : 0.0;
+    final tier = result.ticket.rarity.index;
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: _openCapsule,
@@ -194,6 +224,8 @@ class _GachaPullOverlayState extends ConsumerState<_GachaPullOverlay>
         children: [
           Stack(
             alignment: Alignment.center,
+            // 버스트는 기계 아래쪽(캡슐 자리)에서 퍼져 스택 밖으로 넘친다 — 잘리면 안 된다.
+            clipBehavior: Clip.none,
             children: [
               SizedBox(
                 width: _machineWidth,
@@ -207,6 +239,7 @@ class _GachaPullOverlayState extends ConsumerState<_GachaPullOverlay>
                     _Phase.drop => t,
                     _ => 1,
                   },
+                  openT: openT,
                   capsuleColor: style.color,
                 ),
               ),
@@ -219,7 +252,7 @@ class _GachaPullOverlayState extends ConsumerState<_GachaPullOverlay>
                     width: 180,
                     height: 180,
                     child: CustomPaint(
-                        painter: _BurstPainter(_burst.value, style.color)),
+                        painter: _BurstPainter(_burst.value, style.color, tier)),
                   ),
                 ),
             ],
@@ -248,10 +281,10 @@ class _GachaPullOverlayState extends ConsumerState<_GachaPullOverlay>
     final text = result.ticket.text(lang);
     // 긴 문구는 한 단계 줄여서 카드 안에 자연스럽게 앉힌다.
     final textSize = text.length > 46
-        ? 17.0
+        ? 18.0
         : text.length > 30
-            ? 19.0
-            : 21.0;
+            ? 20.5
+            : 23.0;
 
     return ScaleTransition(
       scale: CurvedAnimation(parent: _card, curve: Curves.easeOutBack),
@@ -267,81 +300,100 @@ class _GachaPullOverlayState extends ConsumerState<_GachaPullOverlay>
               _chip(l.resultDup(result.copies), AppColors.sub, filled: false),
             const SizedBox(height: 16),
             SizedBox(
-              height: 250,
+              height: 244,
               width: double.infinity,
               child: CollectionCard(
                 style: style,
                 borderRadius: 24,
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(24, 22, 24, 20),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // 등급 + 번호 — 지갑 카드와 같은 머리글.
-                      Row(
+                sweepT: _shimmer.value,
+                child: Stack(
+                  children: [
+                    // 카드 우하단에 옅게 잠긴 클로버 — 날짜를 걷어낸 자리를 메우고
+                    // 문구가 허공에 뜨지 않게 무게를 잡아준다.
+                    Positioned(
+                      right: -22,
+                      bottom: -26,
+                      child: IgnorePointer(
+                        child: Opacity(
+                          opacity: 0.13,
+                          child: CloverMark(size: 132, color: style.color),
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(26, 20, 26, 20),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          CloverMark(size: 15, color: style.color),
-                          const SizedBox(width: 6),
-                          Text(
-                            rarityName,
-                            style: AppText.base(
-                                size: 12,
-                                weight: FontWeight.w800,
-                                color: style.color),
+                          // 등급 하나만 남긴다 — 번호와 획득일은 이 순간에 아무 의미가 없다.
+                          _rarityPill(rarityName, style.color),
+                          Expanded(
+                            child: Center(
+                              child: Text(
+                                text,
+                                textAlign: TextAlign.center,
+                                style: AppText.base(
+                                  size: textSize,
+                                  weight: FontWeight.w800,
+                                  height: 1.45,
+                                  letterSpacingEm: -0.035,
+                                ),
+                              ),
+                            ),
                           ),
-                          const SizedBox(width: 8),
-                          Text(
-                            'No.${result.ticket.id.substring(1)}',
-                            style: AppText.base(
-                                size: 12,
-                                weight: FontWeight.w700,
-                                color: AppColors.sub,
-                                letterSpacingEm: 0),
-                          ),
+                          // 중복이면 강화 재료로 쓸 수 있다는 안내를 카드 발치에.
+                          // 첫 획득이면 아무것도 두지 않는다 — 문구만 남는 게 가장 깨끗하다.
+                          if (!result.isNew)
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 11, vertical: 5),
+                              decoration: BoxDecoration(
+                                color: Colors.white.withValues(alpha: 0.72),
+                                borderRadius:
+                                    BorderRadius.circular(AppRadius.chipFull),
+                              ),
+                              child: Text(l.resultMaterial,
+                                  style: AppText.base(
+                                      size: 11.5,
+                                      weight: FontWeight.w800,
+                                      color: style.color)),
+                            ),
                         ],
                       ),
-                      const Spacer(),
-                      Text(
-                        text,
-                        style: AppText.base(
-                          size: textSize,
-                          weight: FontWeight.w800,
-                          height: 1.4,
-                          letterSpacingEm: -0.03,
-                        ),
-                      ),
-                      const Spacer(),
-                      // 중복이면 강화 재료로 쓸 수 있다는 안내를 카드 발치에.
-                      if (result.isNew)
-                        Text(
-                          l.ticketFirstPulled(result.instance.pulledAt),
-                          style: AppText.base(
-                              size: 11.5,
-                              weight: FontWeight.w600,
-                              color: AppColors.sub),
-                        )
-                      else
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 10, vertical: 5),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.7),
-                            borderRadius:
-                                BorderRadius.circular(AppRadius.chipFull),
-                          ),
-                          child: Text(l.resultMaterial,
-                              style: AppText.base(
-                                  size: 11.5,
-                                  weight: FontWeight.w800,
-                                  color: style.color)),
-                        ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  /// 등급 배지 — 맨살 글자 대신 반투명 흰 알약에 얹는다.
+  /// 카드 면이 등급색 그라데이션이라, 글자만 두면 배경에 묻히고 완성도가 떨어진다.
+  Widget _rarityPill(String name, Color color) {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(9, 5, 12, 5),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.72),
+        borderRadius: BorderRadius.circular(AppRadius.chipFull),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          CloverMark(size: 14, color: color),
+          const SizedBox(width: 5),
+          Text(
+            name,
+            style: AppText.base(
+                size: 12,
+                weight: FontWeight.w800,
+                color: color,
+                letterSpacingEm: 0.01),
+          ),
+        ],
       ),
     );
   }
@@ -395,17 +447,43 @@ class _GachaPullOverlayState extends ConsumerState<_GachaPullOverlay>
   }
 }
 
-/// 광채 링 + 스파클 버스트 (등급색).
+/// 광채 링 + 스파클 버스트 (등급색). [tier]가 높을수록 링·스파클이 늘고
+/// 상위 등급에는 빛줄기가 더해진다 — 노멀은 담백하게, 미스틱은 요란하게.
 class _BurstPainter extends CustomPainter {
   final double t; // 0..1
   final Color color;
-  _BurstPainter(this.t, this.color);
+  final int tier; // Rarity.index (0=노멀 ~ 4=미스틱)
+  _BurstPainter(this.t, this.color, this.tier);
 
   @override
   void paint(Canvas canvas, Size size) {
     final c = Offset(size.width / 2, size.height / 2);
+    final rings = 2 + tier ~/ 2; // 2 ~ 4
+    final sparkles = 12 + tier * 5; // 12 ~ 32
 
-    for (var r = 0; r < 2; r++) {
+    // 상위 등급 — 회전하는 빛줄기가 먼저 퍼진다.
+    if (tier >= 3) {
+      final rayT = Curves.easeOut.transform(t);
+      final rayOpacity = (0.5 * (1 - t)).clamp(0.0, 1.0);
+      canvas.save();
+      canvas.translate(c.dx, c.dy);
+      canvas.rotate(t * 0.6);
+      for (var k = 0; k < 12; k++) {
+        final ang = k * math.pi / 6;
+        final len = size.width * (0.25 + 0.5 * rayT) * (k.isEven ? 1 : 0.62);
+        canvas.drawLine(
+          Offset.fromDirection(ang, 18),
+          Offset.fromDirection(ang, len),
+          Paint()
+            ..color = color.withValues(alpha: rayOpacity)
+            ..strokeWidth = 3.5
+            ..strokeCap = StrokeCap.round,
+        );
+      }
+      canvas.restore();
+    }
+
+    for (var r = 0; r < rings; r++) {
       final lt = (t - r * 0.12).clamp(0.0, 1.0);
       if (lt <= 0) continue;
       final radius = 24 + (size.width * 0.5) * lt;
@@ -424,18 +502,55 @@ class _BurstPainter extends CustomPainter {
     final spScale =
         (t < 0.4 ? 1.4 * (t / 0.4) : 1.4 * (1 - (t - 0.4) / 0.6)).clamp(0.0, 1.4);
     final spOpacity = sp.clamp(0.0, 1.0);
-    final dist = 40 + 30 * t;
-    for (var k = 0; k < 12; k++) {
-      final ang = (k * 30) * math.pi / 180;
+    for (var k = 0; k < sparkles; k++) {
+      // 반지름을 번갈아 흩어 놓아야 한 줄로 도는 것처럼 보이지 않는다.
+      final ang = k * 2 * math.pi / sparkles;
+      final dist = (40 + 30 * t) * (k.isEven ? 1 : 1.35);
       final p = c + Offset(dist * math.cos(ang), dist * math.sin(ang));
       canvas.drawCircle(
         p,
-        3.0 * spScale,
+        (k.isEven ? 3.0 : 2.0) * spScale,
         Paint()..color = color.withValues(alpha: spOpacity),
       );
     }
   }
 
   @override
-  bool shouldRepaint(_BurstPainter old) => old.t != t || old.color != color;
+  bool shouldRepaint(_BurstPainter old) =>
+      old.t != t || old.color != color || old.tier != tier;
+}
+
+/// 유니크 이상 개봉 순간 화면 전체를 물들이는 등급색 광채.
+class _AuraFlashPainter extends CustomPainter {
+  final double t; // 0..1
+  final Color color;
+  final int tier;
+  _AuraFlashPainter(this.t, this.color, this.tier);
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    // 터질 때 확 밝았다가 서서히 가라앉는다.
+    final energy = math.sin(t.clamp(0.0, 1.0) * math.pi);
+    if (energy <= 0.01) return;
+    final peak = (0.1 + 0.06 * (tier - 2)) * energy; // 유니크 0.10 → 미스틱 0.22
+
+    final center = Offset(size.width / 2, size.height * 0.56);
+    final radius = size.width * (0.5 + 0.55 * t);
+    canvas.drawRect(
+      Offset.zero & size,
+      Paint()
+        ..shader = RadialGradient(
+          colors: [
+            color.withValues(alpha: peak),
+            color.withValues(alpha: peak * 0.35),
+            color.withValues(alpha: 0),
+          ],
+          stops: const [0, 0.55, 1],
+        ).createShader(Rect.fromCircle(center: center, radius: radius)),
+    );
+  }
+
+  @override
+  bool shouldRepaint(_AuraFlashPainter old) =>
+      old.t != t || old.color != color || old.tier != tier;
 }

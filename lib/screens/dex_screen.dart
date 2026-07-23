@@ -10,6 +10,7 @@ import '../theme/toss_face.dart';
 import '../widgets/app_toast.dart';
 import '../widgets/clover_mark.dart';
 import '../widgets/collection_card.dart';
+import '../widgets/custom_section.dart';
 import '../widgets/pressable.dart';
 import '../widgets/rarity_style.dart';
 import 'forge_screen.dart';
@@ -65,9 +66,27 @@ class DexScreen extends ConsumerWidget {
             ],
           ),
         ),
-        // 지갑의 두 기능 — 카드 고르기는 포지 화면이 맡는다.
+        // 내가 만든 행운권이 먼저 온다 — 뽑은 것보다 만든 것이 앞이다.
+        const CustomSection(),
+        const SizedBox(height: 10),
+        if (tickets.isEmpty)
+          Padding(
+            padding: const EdgeInsets.fromLTRB(24, 40, 24, 0),
+            child: Center(
+              child: Text(
+                l.dexEmpty,
+                textAlign: TextAlign.center,
+                style: AppText.base(
+                    size: 14, weight: FontWeight.w600, color: AppColors.muted),
+              ),
+            ),
+          )
+        else
+          for (final rarity in Rarity.values)
+            _raritySection(context, lang, rarity, tickets),
+        // 재조합·강화는 카드를 다 훑어본 뒤에 하는 일이라 목록 아래에 둔다.
         Padding(
-          padding: const EdgeInsets.fromLTRB(24, 0, 24, 4),
+          padding: const EdgeInsets.fromLTRB(24, 16, 24, 4),
           child: Row(
             children: [
               Expanded(
@@ -99,27 +118,12 @@ class DexScreen extends ConsumerWidget {
             ],
           ),
         ),
-        if (tickets.isEmpty)
-          Padding(
-            padding: const EdgeInsets.fromLTRB(24, 40, 24, 0),
-            child: Center(
-              child: Text(
-                l.dexEmpty,
-                textAlign: TextAlign.center,
-                style: AppText.base(
-                    size: 14, weight: FontWeight.w600, color: AppColors.muted),
-              ),
-            ),
-          )
-        else
-          for (final rarity in Rarity.values)
-            _raritySection(context, lang, rarity, tickets),
         const SizedBox(height: 16),
       ],
     );
   }
 
-  /// 지갑 상단 기능 버튼. 조건을 못 채우면 회색으로 두되 이유는 토스트로 알려준다
+  /// 보관함 하단 기능 버튼. 조건을 못 채우면 회색으로 두되 이유는 토스트로 알려준다
   /// — 눌러도 아무 반응이 없으면 고장으로 보인다.
   Widget _actionButton(
     BuildContext context, {

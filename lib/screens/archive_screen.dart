@@ -189,14 +189,21 @@ class _Timeline extends StatelessWidget {
       final text = LuckCatalog.byId(h.text)?.text(l.localeName) ?? h.text;
       return l.historyPullDone(text);
     }
+    // 커스텀은 사용자가 쓴 문구 그대로 저장돼 있다 — 번역하지 않는다.
+    if (h.kind == HistoryKind.custom) return l.historyCustomMade(h.text);
     return h.text;
   }
 
+  /// 재화가 둘로 갈렸으므로 소모 표시도 갈린다 — 뽑기는 코인, 커스텀은 클로버.
   String _displayDelta(AppLocalizations l, HistoryEntry h) {
     if (h.legacyDelta != null) return h.legacyDelta!;
-    if (h.kind == HistoryKind.deed) return l.historyLeafDelta(h.amount);
-    // 무료(광고) 뽑기는 클로버 소모 0.
-    return h.amount > 0 ? l.historyCloverDelta(h.amount) : l.historyFreePull;
+    return switch (h.kind) {
+      HistoryKind.deed => l.historyLeafDelta(h.amount),
+      HistoryKind.custom => l.historyCloverDelta(h.amount),
+      // 구버전 기록 중 amount 0 인 무료 뽑기가 남아 있을 수 있다.
+      HistoryKind.pull =>
+        h.amount > 0 ? l.historyCoinDelta(h.amount) : l.historyFreePull,
+    };
   }
 
   Widget _row(AppLocalizations l, HistoryEntry h, bool isFirst, bool isLast) {

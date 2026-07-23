@@ -1,4 +1,5 @@
 import '../models/app_state.dart';
+import '../models/custom_ticket.dart';
 import '../models/ticket_instance.dart';
 
 /// 서버가 거부한 게임 규칙 위반 — 재화 부족, 한도 초과 등.
@@ -8,16 +9,18 @@ class GameRuleException implements Exception {
   const GameRuleException(this.code);
 
   static const noClover = 'NO_CLOVERS';
-  static const noAdClovers = 'NO_AD_CLOVERS';
+  static const noCoins = 'NO_COINS';
+  static const noAdCoins = 'NO_AD_COINS';
   static const noCloverReady = 'NO_CLOVER_READY';
   static const invalidDeed = 'INVALID_DEED';
+  static const invalidText = 'INVALID_TEXT';
   static const ticketNotOwned = 'TICKET_NOT_OWNED';
   static const cannotEnhance = 'CANNOT_ENHANCE';
   static const cannotReforge = 'CANNOT_REFORGE';
   static const alreadyImported = 'ALREADY_IMPORTED';
 
   static const known = {
-    noClover, noAdClovers, noCloverReady, invalidDeed,
+    noClover, noCoins, noAdCoins, noCloverReady, invalidDeed, invalidText,
     ticketNotOwned, cannotEnhance, cannotReforge, alreadyImported,
     'AUTH_REQUIRED',
   };
@@ -69,11 +72,30 @@ class GachaOutcome {
   });
 }
 
-/// 광고 보상으로 지급된 클로버 — 뽑기는 이 클로버를 쓴다.
-class AdCloverResult {
+/// 광고 보상으로 지급된 코인 — 뽑기는 이 코인을 쓴다.
+class AdCoinResult {
+  final int coins; // 반영 후 보유 코인
+  final int usedToday; // 오늘 받은 광고 코인 수
+  const AdCoinResult({required this.coins, required this.usedToday});
+}
+
+/// 커스텀 행운권 제작 결과.
+class CustomTicketResult {
+  final CustomTicket ticket;
   final int clovers; // 반영 후 보유 클로버
-  final int usedToday; // 오늘 받은 광고 클로버 수
-  const AdCloverResult({required this.clovers, required this.usedToday});
+  const CustomTicketResult({required this.ticket, required this.clovers});
+}
+
+/// 커스텀 행운권 강화 결과 — 실패가 없으므로 성공 여부 필드가 없다.
+class CustomEnhanceResult {
+  final String id;
+  final int level; // 반영 후 레벨
+  final int clovers; // 반영 후 보유 클로버
+  const CustomEnhanceResult({
+    required this.id,
+    required this.level,
+    required this.clovers,
+  });
 }
 
 /// 강화 결과 — 판정은 서버가 한다. 실패해도 재료는 소모된다.
@@ -112,11 +134,19 @@ abstract class GameBackend {
   Future<DeedResult> recordDeed(String text);
   Future<CloverResult> finishClover();
 
-  /// 뽑기 1회 — 언제나 클로버 1개를 소모한다.
+  /// 뽑기 1회 — 언제나 코인 1개를 소모한다.
   Future<GachaOutcome> pullGacha();
 
-  /// 광고 시청 보상 — 클로버 1개 지급 (하루 한도).
-  Future<AdCloverResult> grantAdClover();
+  /// 광고 시청 보상 — 코인 1개 지급 (하루 한도).
+  Future<AdCoinResult> grantAdCoin();
+
+  /// 커스텀 행운권 제작 — 클로버를 소모해 [text] 문구의 카드를 만든다.
+  Future<CustomTicketResult> createCustomTicket(String text);
+
+  /// 커스텀 행운권 강화 — 클로버(현재 레벨 수)를 소모해 레벨을 1 올린다.
+  /// 실패하지 않는다.
+  Future<CustomEnhanceResult> enhanceCustomTicket(String id);
+
   /// 카드 [instanceId] 를 대상으로, 재료 카드 [materialIds] 를 소모해 강화한다.
   Future<EnhanceOutcome> enhanceTicket(
       String instanceId, List<String> materialIds);

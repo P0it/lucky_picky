@@ -27,7 +27,7 @@ class CloverFlight extends StatefulWidget {
     required this.onLanded,
     this.fromSize = 150,
     this.toSize = 17,
-    this.duration = const Duration(milliseconds: 520),
+    this.duration = const Duration(milliseconds: 1150),
   });
 
   @override
@@ -79,9 +79,18 @@ class _CloverFlightState extends State<CloverFlight>
       child: AnimatedBuilder(
         animation: _c,
         builder: (_, _) {
-          final t = Curves.easeInOutCubic.transform(_c.value);
+          // 앞머리 한 박자는 제자리에서 크게 숨을 쉬고 출발한다 —
+          // 바로 쏘아 보내면 "완성했다"를 알아채기도 전에 사라진다.
+          const hold = 0.18;
+          final raw = _c.value;
+          final breath = raw < hold ? Curves.easeOut.transform(raw / hold) : 1.0;
+          final t = Curves.easeInOutCubic
+              .transform(((raw - hold) / (1 - hold)).clamp(0.0, 1.0));
+
           final p = _pointAt(t);
-          final scale = 1 + (widget.toSize / widget.fromSize - 1) * t;
+          final scale =
+              (1 + 0.12 * breath * (1 - t)) * // 출발 전 부풀었다가 날면서 잦아든다
+                  (1 + (widget.toSize / widget.fromSize - 1) * t);
           // 마지막 구간에서만 살짝 지워 배지에 스미도록 한다.
           final opacity = t < 0.82 ? 1.0 : (1 - (t - 0.82) / 0.18).clamp(0.0, 1.0);
 

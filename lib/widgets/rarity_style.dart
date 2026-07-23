@@ -24,6 +24,15 @@ class RarityStyle {
 
   static RarityStyle of(Rarity r) => _styles[r]!;
 
+  /// 커스텀 행운권 전용 — 등급이 없는 카드라 등급 램프 바깥에 둔다.
+  /// 다섯 등급이 모두 색 그라데이션인 데 반해 이것만 종이(아이보리) 면에
+  /// 클로버 그린 포인트다. 한눈에 "뽑은 게 아니라 쓴 것"으로 읽힌다.
+  static const custom = RarityStyle(
+    color: Color(0xFF4A8230),
+    soft: Color(0x1A6FC143),
+    panel: [Color(0xFFFFFDF6), Color(0xFFF3F1E6)],
+  );
+
   static const _styles = <Rarity, RarityStyle>{
     // 노멀 — 클로버 그린. 시작 등급부터 브랜드색이라 투박하지 않다.
     Rarity.common: RarityStyle(

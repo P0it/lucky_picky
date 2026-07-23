@@ -16,9 +16,9 @@ import 'package:luckypicky/theme/app_theme.dart';
 import 'package:luckypicky/widgets/collection_card.dart';
 
 // 테스트는 한국어 로케일로 고정해 기존 한글 단언을 그대로 검증한다.
-// 백엔드는 서버 RPC 와 동일 규칙의 로컬 구현(시드: 잎 2 / 클로버 5)을 주입한다.
-const _defaultSeed =
-    AppState(leaves: 2, clovers: 5, statLeaves: 2, statClovers: 1);
+// 백엔드는 서버 RPC 와 동일 규칙의 로컬 구현(시드: 잎 2 · 클로버 5 · 코인 5)을 주입한다.
+const _defaultSeed = AppState(
+    leaves: 2, clovers: 5, coins: 5, statLeaves: 2, statClovers: 1);
 
 Widget _app({AppState seed = _defaultSeed}) => ProviderScope(
       overrides: [
@@ -59,8 +59,7 @@ void main() {
     await tester.tap(find.text('뽑기'));
     await tester.pump(const Duration(milliseconds: 350));
     expect(find.text('행운 뽑기'), findsOneWidget);
-    expect(find.text('보유한 클로버'), findsOneWidget);
-    expect(find.text('클로버로 뽑기'), findsOneWidget);
+    expect(find.text('코인으로 뽑기'), findsOneWidget);
 
     await tester.tap(find.text('운세'));
     await tester.pump(); // prefs 비동기 로드 반영
@@ -68,7 +67,7 @@ void main() {
     expect(find.text('오늘의 행운지수'), findsOneWidget);
     expect(find.text('행운 게이지 돌리기'), findsOneWidget); // 진입만으로는 시작 안 됨
 
-    await tester.tap(find.text('행운 지갑'));
+    await tester.tap(find.text('보관함'));
     await tester.pump(const Duration(milliseconds: 350));
     expect(find.text('뽑은 행운들이 이곳에 모여요'), findsOneWidget);
     expect(find.text('0장 보유'), findsOneWidget);
@@ -138,7 +137,7 @@ void main() {
     await tester.pump(const Duration(milliseconds: 400)); // 탭 전환 완료
 
     // 뽑기 시작 → 오버레이 진입(코인 → 레버 → 낙하 연출).
-    await tester.tap(find.text('클로버로 뽑기'));
+    await tester.tap(find.text('코인으로 뽑기'));
     await tester.pump(); // 라우트 push
     await tester.pump(const Duration(milliseconds: 300)); // 페이드 전환
     await tester.pump(const Duration(milliseconds: 600)); // 코인 투입
@@ -162,12 +161,12 @@ void main() {
     expect(find.text('4개'), findsOneWidget); // 클로버 5 → 4
 
     // 도감에 1장 등록.
-    await tester.tap(find.text('행운 지갑'));
+    await tester.tap(find.text('보관함'));
     await tester.pump(const Duration(milliseconds: 400));
     expect(find.text('1장 보유'), findsOneWidget);
   });
 
-  testWidgets('행운 지갑 — 보유 장수만 보이고, 강화 진입점은 상단 버튼 하나뿐이다',
+  testWidgets('보관함 — 보유 장수만 보이고, 강화 진입점은 상단 버튼 하나뿐이다',
       (tester) async {
     // 카드 4장(그중 한 장은 만렙)을 가진 지갑.
     const cards = [
@@ -177,9 +176,9 @@ void main() {
       TicketInstance(id: 'i4', ticketId: 'c03', level: 1, pulledAt: '2026.07.13'),
     ];
     await pumpApp(tester,
-        seed: const AppState(leaves: 2, clovers: 5, tickets: cards));
+        seed: const AppState(leaves: 2, clovers: 5, coins: 5, tickets: cards));
 
-    await tester.tap(find.text('행운 지갑'));
+    await tester.tap(find.text('보관함'));
     await tester.pump(const Duration(milliseconds: 400));
 
     // 티켓 행이 4개 그려졌는데도 강화/재조합 버튼은 각각 하나뿐이어야 한다.

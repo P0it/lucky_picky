@@ -1,8 +1,10 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../models/app_state.dart';
+import '../models/custom_ticket.dart';
 import '../models/deed.dart';
 import '../models/ticket_instance.dart';
 import 'game_backend.dart';
@@ -31,6 +33,10 @@ class SupabaseGameBackend implements GameBackend {
             .from('ticket_instances')
             .select()
             .order('created_at', ascending: false);
+        final customs = await _client
+            .from('custom_tickets')
+            .select()
+            .order('created_at', ascending: false);
         final history = await _client
             .from('history')
             .select()
@@ -42,12 +48,12 @@ class SupabaseGameBackend implements GameBackend {
           data: AppState(
             leaves: profile['leaves'] as int? ?? 0,
             clovers: profile['clovers'] as int? ?? 0,
+            coins: profile['coins'] as int? ?? 0,
             statLeaves: profile['stat_leaves'] as int? ?? 0,
             statClovers: profile['stat_clovers'] as int? ?? 0,
             statPulls: profile['stat_pulls'] as int? ?? 0,
-            adCloversToday: profile['ad_clovers_today'] as int? ?? 0,
-            lastAdCloverDate:
-                _dotDate(profile['last_ad_clover_date'] as String?),
+            adCoinsToday: profile['ad_coins_today'] as int? ?? 0,
+            lastAdCoinDate: _dotDate(profile['last_ad_coin_date'] as String?),
             tickets: [
               for (final t in tickets)
                 TicketInstance(
@@ -57,12 +63,21 @@ class SupabaseGameBackend implements GameBackend {
                   pulledAt: _dotDate(t['pulled_at'] as String?),
                 ),
             ],
+            customTickets: [
+              for (final c in customs)
+                CustomTicket(
+                  id: c['id'] as String,
+                  text: c['text'] as String? ?? '',
+                  level: c['level'] as int? ?? 1,
+                  createdAt: _dotDate(c['created_at'] as String?),
+                ),
+            ],
             history: [
               for (final h in history)
                 HistoryEntry(
                   id: h['id'] as int,
                   date: _dotDate(h['happened_on'] as String?),
-                  kind: h['kind'] == 'deed' ? HistoryKind.deed : HistoryKind.pull,
+                  kind: historyKindOf(h['kind']),
                   text: h['text'] as String? ?? '',
                   amount: h['amount'] as int? ?? 0,
                 ),
@@ -100,11 +115,37 @@ class SupabaseGameBackend implements GameBackend {
       });
 
   @override
-  Future<AdCloverResult> grantAdClover() => _guard(() async {
-        final r = await _rpc('grant_ad_clover');
-        return AdCloverResult(
+  Future<AdCoinResult> grantAdCoin() => _guard(() async {
+        final r = await _rpc('grant_ad_coin');
+        return AdCoinResult(
+          coins: r['coins'] as int,
+          usedToday: r['ad_coins_today'] as int,
+        );
+      });
+
+  @override
+  Future<CustomTicketResult> createCustomTicket(String text) =>
+      _guard(() async {
+        final r = await _rpc('create_custom_ticket', {'p_text': text});
+        return CustomTicketResult(
+          ticket: CustomTicket(
+            id: r['id'] as String,
+            text: r['text'] as String? ?? '',
+            level: r['level'] as int? ?? 1,
+            createdAt: _dotDate(r['created_at'] as String?),
+          ),
           clovers: r['clovers'] as int,
-          usedToday: r['ad_clovers_today'] as int,
+        );
+      });
+
+  @override
+  Future<CustomEnhanceResult> enhanceCustomTicket(String id) =>
+      _guard(() async {
+        final r = await _rpc('enhance_custom_ticket', {'p_id': id});
+        return CustomEnhanceResult(
+          id: r['id'] as String,
+          level: r['level'] as int,
+          clovers: r['clovers'] as int,
         );
       });
 
@@ -160,10 +201,17 @@ class SupabaseGameBackend implements GameBackend {
       if (GameRuleException.known.contains(code)) {
         throw GameRuleException(code);
       }
+      // 함수 누락·권한·스키마 불일치가 전부 "연결 실패"로 보이면 원인 추적이 불가능하다.
+      // 사용자 문구는 그대로 두고, 개발 빌드에서만 원본을 남긴다.
+      if (kDebugMode) {
+        debugPrint('[backend] PostgrestException '
+            'code=${e.code} message=${e.message} details=${e.details}');
+      }
       throw GameConnectionException(e);
     } on GameRuleException {
       rethrow;
     } catch (e) {
+      if (kDebugMode) debugPrint('[backend] ${e.runtimeType}: $e');
       throw GameConnectionException(e);
     }
   }

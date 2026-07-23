@@ -23,6 +23,10 @@ class AppColors {
   static const emptyStem = Color(0xFFE1E5EA);
   static const dashed = Color(0xFFCDD2D9);
 
+  // 뽑기 코인 — 클로버 그린과 확실히 구분되는 금색. 클로버 각인은 넣지 않는다.
+  static const coin = Color(0xFFFFD54F);
+  static const coinEdge = Color(0xFFE0A32E);
+
   static const crack = Color(0xFF3A3A3A); // 강화 실패 균열선
   static const shard = Color(0xFF9AA0A6); // 강화 실패 파편
 

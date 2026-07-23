@@ -53,7 +53,13 @@ class _SpyBackend implements GameBackend {
   @override
   Future<GachaOutcome> pullGacha() => _inner.pullGacha();
   @override
-  Future<AdCloverResult> grantAdClover() => _inner.grantAdClover();
+  Future<AdCoinResult> grantAdCoin() => _inner.grantAdCoin();
+  @override
+  Future<CustomTicketResult> createCustomTicket(String text) =>
+      _inner.createCustomTicket(text);
+  @override
+  Future<CustomEnhanceResult> enhanceCustomTicket(String id) =>
+      _inner.enhanceCustomTicket(id);
   @override
   Future<void> importLocalState(Map<String, dynamic> payload) =>
       _inner.importLocalState(payload);

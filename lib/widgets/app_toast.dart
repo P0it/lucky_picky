@@ -70,9 +70,13 @@ class _ToastPillState extends State<_ToastPill> with SingleTickerProviderStateMi
                   ),
                 ],
               ),
-              child: Text(
-                widget.text,
-                style: AppText.base(size: 14, weight: FontWeight.w600, color: AppColors.title),
+              // Overlay 바로 아래에는 Material 조상이 없어 Text에 노란 이중 밑줄이 그려진다.
+              child: Material(
+                type: MaterialType.transparency,
+                child: Text(
+                  widget.text,
+                  style: AppText.base(size: 14, weight: FontWeight.w600, color: AppColors.title),
+                ),
               ),
             ),
           ),

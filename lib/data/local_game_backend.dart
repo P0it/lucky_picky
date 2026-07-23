@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 
 import '../config/luck_tickets.dart';
 import '../models/app_state.dart';
+import '../models/custom_ticket.dart';
 import '../models/deed.dart';
 import '../models/ticket_instance.dart';
 import 'game_backend.dart';
@@ -73,8 +74,8 @@ class LocalGameBackend implements GameBackend {
 
   @override
   Future<GachaOutcome> pullGacha() async {
-    if (_data.clovers < 1) {
-      throw const GameRuleException(GameRuleException.noClover);
+    if (_data.coins < 1) {
+      throw const GameRuleException(GameRuleException.noCoins);
     }
 
     final today = _today;
@@ -91,7 +92,7 @@ class LocalGameBackend implements GameBackend {
     final copies = tickets.where((t) => t.ticketId == ticket.id).length;
 
     _data = _data.copyWith(
-      clovers: _data.clovers - 1,
+      coins: _data.coins - 1,
       statPulls: _data.statPulls + 1,
       tickets: tickets,
       history: [
@@ -108,21 +109,77 @@ class LocalGameBackend implements GameBackend {
     );
   }
 
-  /// 광고 보상 — 클로버 1개 지급. 선행으로 만든 클로버(statClovers)에는 넣지 않는다.
+  /// 광고 보상 — 코인 1개 지급. 코인은 뽑기에만 쓰이고 클로버와 섞이지 않는다.
   @override
-  Future<AdCloverResult> grantAdClover() async {
+  Future<AdCoinResult> grantAdCoin() async {
     final today = _today;
-    final used =
-        _data.lastAdCloverDate == today ? _data.adCloversToday : 0;
-    if (used >= kAdCloversPerDayRule) {
-      throw const GameRuleException(GameRuleException.noAdClovers);
+    final used = _data.lastAdCoinDate == today ? _data.adCoinsToday : 0;
+    if (used >= kAdCoinsPerDayRule) {
+      throw const GameRuleException(GameRuleException.noAdCoins);
     }
     _data = _data.copyWith(
-      clovers: _data.clovers + 1,
-      adCloversToday: used + 1,
-      lastAdCloverDate: today,
+      coins: _data.coins + 1,
+      adCoinsToday: used + 1,
+      lastAdCoinDate: today,
     );
-    return AdCloverResult(clovers: _data.clovers, usedToday: used + 1);
+    return AdCoinResult(coins: _data.coins, usedToday: used + 1);
+  }
+
+  /// 커스텀 행운권 제작 — 클로버 1개 소모. 문구는 트림 후 1~40자.
+  @override
+  Future<CustomTicketResult> createCustomTicket(String text) async {
+    final body = text.trim();
+    if (body.isEmpty || body.length > CustomTicket.maxTextLength) {
+      throw const GameRuleException(GameRuleException.invalidText);
+    }
+    if (_data.clovers < kCustomTicketCost) {
+      throw const GameRuleException(GameRuleException.noClover);
+    }
+
+    final today = _today;
+    final made = CustomTicket(
+      id: 'custom_${++_instanceSeq}',
+      text: body,
+      createdAt: today,
+    );
+    _data = _data.copyWith(
+      clovers: _data.clovers - kCustomTicketCost,
+      customTickets: [made, ..._data.customTickets],
+      history: [
+        HistoryEntryOf.custom(body, kCustomTicketCost, today),
+        ..._data.history,
+      ],
+    );
+    return CustomTicketResult(ticket: made, clovers: _data.clovers);
+  }
+
+  /// 커스텀 행운권 강화 — 클로버를 현재 레벨 수만큼 쓰고 무조건 한 단계 오른다.
+  /// 등급이 없는 카드라 확률 판정을 두지 않는다.
+  @override
+  Future<CustomEnhanceResult> enhanceCustomTicket(String id) async {
+    final cards = [..._data.customTickets];
+    final idx = cards.indexWhere((t) => t.id == id);
+    if (idx < 0) {
+      throw const GameRuleException(GameRuleException.ticketNotOwned);
+    }
+    final target = cards[idx];
+    if (target.isMaxLevel) {
+      throw const GameRuleException(GameRuleException.cannotEnhance);
+    }
+    if (_data.clovers < target.enhanceCost) {
+      throw const GameRuleException(GameRuleException.noClover);
+    }
+
+    cards[idx] = target.copyWith(level: target.level + 1);
+    _data = _data.copyWith(
+      clovers: _data.clovers - target.enhanceCost,
+      customTickets: cards,
+    );
+    return CustomEnhanceResult(
+      id: id,
+      level: target.level + 1,
+      clovers: _data.clovers,
+    );
   }
 
   /// 대상 카드 1장 + 재료 카드 N장(아무 카드나)을 소모해 강화한다.
@@ -216,8 +273,11 @@ class LocalGameBackend implements GameBackend {
     importedLocal = true;
   }
 
-  /// 하루 광고 클로버 지급 한도 — 서버 game_config 의 ad_clovers_per_day 와 동치.
-  static const int kAdCloversPerDayRule = 3;
+  /// 하루 광고 코인 지급 한도 — 서버 game_config 의 ad_coins_per_day 와 동치.
+  static const int kAdCoinsPerDayRule = 5;
+
+  /// 커스텀 행운권 제작 비용 — 서버 game_config 의 custom_ticket_cost 와 동치.
+  static const int kCustomTicketCost = CustomTicket.createCost;
 
   /// 가중치 추첨 — 등급을 가중치로 뽑고, 등급 내에서 균등 추첨.
   /// (서버 pull_gacha 의 추첨 규칙과 동일)
@@ -255,5 +315,13 @@ class HistoryEntryOf {
           date: date,
           kind: HistoryKind.pull,
           text: ticketId,
+          amount: amount);
+
+  static HistoryEntry custom(String text, int amount, String date) =>
+      HistoryEntry(
+          id: DateTime.now().millisecondsSinceEpoch,
+          date: date,
+          kind: HistoryKind.custom,
+          text: text,
           amount: amount);
 }

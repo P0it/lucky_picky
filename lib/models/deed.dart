@@ -1,7 +1,15 @@
 /// 기록 항목의 종류.
 /// - deed: 선행으로 잎을 모은 기록 (positive)
-/// - pull: 가챠 뽑기(클로버 사용) 기록
-enum HistoryKind { deed, pull }
+/// - pull: 가챠 뽑기(코인 사용) 기록
+/// - custom: 커스텀 행운권 제작(클로버 사용) 기록
+enum HistoryKind { deed, pull, custom }
+
+/// 서버 history.kind 문자열 → enum. 모르는 값은 pull 로 떨어뜨린다.
+HistoryKind historyKindOf(Object? raw) => switch (raw) {
+      'deed' => HistoryKind.deed,
+      'custom' => HistoryKind.custom,
+      _ => HistoryKind.pull,
+    };
 
 /// 기록 항목 — 표시 문자열을 미리 굳히지 않고 구조화해 저장한다.
 /// (잎/클로버 증감과 뽑기 접두어는 표시 시점에 언어별로 포맷한다.)
@@ -10,10 +18,11 @@ class HistoryEntry {
   final String date; // 'YYYY.MM.DD'
   final HistoryKind kind;
 
-  /// deed: 사용자가 입력한 선행 내용 / pull: 뽑힌 행운권의 카탈로그 ID.
+  /// deed: 사용자가 입력한 선행 내용 / pull: 뽑힌 행운권의 카탈로그 ID /
+  /// custom: 사용자가 쓴 행운권 문구.
   final String text;
 
-  /// deed: 채운 잎 수(+1) / pull: 사용한 클로버 수(무료 뽑기는 0).
+  /// deed: 채운 잎 수(+1) / pull: 사용한 코인 수 / custom: 사용한 클로버 수.
   final int amount;
 
   /// 구버전 영속 데이터 호환용 — 신규 항목은 null.
@@ -45,7 +54,7 @@ class HistoryEntry {
       return HistoryEntry(
         id: j['id'] as int,
         date: j['date'] as String,
-        kind: j['kind'] == 'deed' ? HistoryKind.deed : HistoryKind.pull,
+        kind: historyKindOf(j['kind']),
         text: j['text'] as String? ?? '',
         amount: j['amount'] as int,
       );

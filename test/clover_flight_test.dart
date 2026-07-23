@@ -33,7 +33,13 @@ class _OfflineOnFinishBackend implements GameBackend {
   @override
   Future<GachaOutcome> pullGacha() => _inner.pullGacha();
   @override
-  Future<AdCloverResult> grantAdClover() => _inner.grantAdClover();
+  Future<AdCoinResult> grantAdCoin() => _inner.grantAdCoin();
+  @override
+  Future<CustomTicketResult> createCustomTicket(String text) =>
+      _inner.createCustomTicket(text);
+  @override
+  Future<CustomEnhanceResult> enhanceCustomTicket(String id) =>
+      _inner.enhanceCustomTicket(id);
   @override
   Future<EnhanceOutcome> enhanceTicket(String id, List<String> materialIds) =>
       _inner.enhanceTicket(id, materialIds);
@@ -92,7 +98,7 @@ void main() {
     expect(find.byType(CloverFlight), findsOneWidget,
         reason: '확정에 성공했으면 비행이 떠야 한다');
 
-    await advance(tester, 600); // 비행 520ms + 여유
+    await advance(tester, 1250); // 비행 1150ms + 여유
 
     expect(find.byType(CloverFlight), findsNothing, reason: '착지 후 걷혀야 한다');
     expect(find.text('× 13'), findsOneWidget);
@@ -111,7 +117,7 @@ void main() {
     expect(find.text('× 12'), findsOneWidget);
     expect(find.text('× 13'), findsNothing);
 
-    await advance(tester, 600);
+    await advance(tester, 1250);
     expect(find.text('× 13'), findsOneWidget);
   });
 
