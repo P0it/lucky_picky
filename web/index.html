@@ -1,6 +1,4 @@
-<!DOCTYPE html>
-<html>
-<head>
+<!DOCTYPE html><html><head>
   <!--
     If you are serving your web app in a path other than the root, change the
     href value below to reflect the base path you are serving from.
@@ -27,12 +25,154 @@
   <link rel="apple-touch-icon" href="icons/Icon-192.png">
 
   <!-- Favicon -->
-  <link rel="icon" type="image/png" href="favicon.png"/>
+  <link rel="icon" type="image/png" href="favicon.png">
 
   <title>LuckyPicky</title>
   <link rel="manifest" href="manifest.json">
+  
+  
+  <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
+  
+  
+  
+  <!--
+    flutter_native_splash 가 만드는 splash-screen-style 은 스플래시를 뷰포트 전체로 깐다.
+    앱은 넓은 화면에서 430px 폰 폭으로 고정되므로(_PhoneFrame), 스플래시도 같은 폭에
+    맞춰 양옆을 레터박스 처리한다. 이 블록은 생성기가 만들지 않으므로,
+    `dart run flutter_native_splash:create` 를 다시 돌린 뒤 사라졌다면 되살려야 한다.
+
+    생성기는 이 블록을 자기 스타일 앞으로 옮긴다. 순서로는 뒤 규칙이 이기므로
+    선택자 우선순위(html body)로 눌러야 배경색이 유지된다.
+  -->
+  <style id="splash-phone-frame">
+    html body {
+      background-color: #191F28; /* 양옆 레터박스 — _PhoneFrame 과 동일 */
+    }
+
+    #splash {
+      position: fixed;
+      top: 0;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      max-width: 430px; /* _PhoneFrame._maxWidth */
+      background-color: #FFFFFF;
+      display: block;
+      overflow: hidden;
+    }
+
+    #splash img.center {
+      width: 62%;
+      max-width: 256px;
+      height: auto;
+    }
+  </style>
+  <!--
+    생성기는 removeSplashFromWeb() 을 정의만 하고 호출하지 않는다.
+    Flutter 웹이 첫 프레임에서 쏘는 flutter-first-frame 에 연결해 스플래시를 걷어낸다.
+    (첫 프레임은 Dart 로딩 화면이라 같은 그림으로 자연스럽게 이어진다.)
+    함수는 뒤쪽 splash-screen-script 에서 정의되므로 호출 시점에 찾는다.
+  -->
+  <script id="splash-phone-frame-script">
+    window.addEventListener('flutter-first-frame', function () {
+      if (typeof removeSplashFromWeb === 'function') removeSplashFromWeb();
+    });
+  </script>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <style id="splash-screen-style">
+    html {
+      height: 100%
+    }
+
+    body {
+      margin: 0;
+      min-height: 100%;
+      background-color: #FFFFFF;
+          background-size: 100% 100%;
+    }
+
+    .center {
+      margin: 0;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      -ms-transform: translate(-50%, -50%);
+      transform: translate(-50%, -50%);
+    }
+
+    .contain {
+      display:block;
+      width:100%; height:100%;
+      object-fit: contain;
+    }
+
+    .stretch {
+      display:block;
+      width:100%; height:100%;
+    }
+
+    .cover {
+      display:block;
+      width:100%; height:100%;
+      object-fit: cover;
+    }
+
+    .bottom {
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      -ms-transform: translate(-50%, 0);
+      transform: translate(-50%, 0);
+    }
+
+    .bottomLeft {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+    }
+
+    .bottomRight {
+      position: absolute;
+      bottom: 0;
+      right: 0;
+    }
+  </style>
+  <script id="splash-screen-script">
+    function removeSplashFromWeb() {
+      document.getElementById("splash")?.remove();
+      document.getElementById("splash-branding")?.remove();
+      document.body.style.background = "transparent";
+    }
+  </script>
 </head>
 <body>
+  <picture id="splash">
+      <source srcset="splash/img/light-1x.png 1x, splash/img/light-2x.png 2x, splash/img/light-3x.png 3x, splash/img/light-4x.png 4x" media="(prefers-color-scheme: light)">
+      <source srcset="splash/img/dark-1x.png 1x, splash/img/dark-2x.png 2x, splash/img/dark-3x.png 3x, splash/img/dark-4x.png 4x" media="(prefers-color-scheme: dark)">
+      <img class="center" aria-hidden="true" src="splash/img/light-1x.png" alt="">
+  </picture>
+  
+  
+  
+  
+  
+  
+  
+  
+  
   <!--
     You can customize the "flutter_bootstrap.js" script.
     This is useful to provide a custom configuration to the Flutter loader
@@ -41,6 +181,7 @@
     For more details:
     * https://docs.flutter.dev/platform-integration/web/initialization
   -->
-  <script src="flutter_bootstrap.js" async></script>
-</body>
-</html>
+  <script src="flutter_bootstrap.js" async=""></script>
+
+
+</body></html>

@@ -28,6 +28,32 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^6.0.0
+  flutter_native_splash: ^2.4.4
+  flutter_launcher_icons: ^0.14.3
+
+# 네이티브 스플래시 — 앱 실행 ~ Flutter 엔진 부팅 구간을 덮는다.
+# 이미지는 test/export_brand_assets_test.dart 가 클로버 경로에서 생성한다.
+# 재생성: dart run flutter_native_splash:create
+flutter_native_splash:
+  color: "#FFFFFF"
+  image: assets/brand/clover_splash.png
+  android_12:
+    image: assets/brand/clover_android12.png
+    icon_background_color: "#FFFFFF"
+  web: true
+
+# 앱 아이콘 — 재생성: dart run flutter_launcher_icons
+flutter_launcher_icons:
+  image_path: assets/brand/app_icon.png
+  android: true
+  ios: true
+  remove_alpha_ios: true
+  adaptive_icon_background: "#FFFFFF"
+  adaptive_icon_foreground: assets/brand/app_icon_foreground.png
+  web:
+    generate: true
+    background_color: "#FFFFFF"
+    theme_color: "#6FC143"
 
 flutter:
   uses-material-design: true
@@ -49,3 +75,10 @@ flutter:
     - family: TossFace
       fonts:
         - asset: assets/fonts/TossFace.otf
+    # 로고 워드마크용 둥근 팝 계열 (가변 폰트, OFL — 라이선스 전문 동봉).
+    - family: Fredoka
+      fonts:
+        - asset: assets/fonts/Fredoka.ttf
+    - family: Baloo2
+      fonts:
+        - asset: assets/fonts/Baloo2.ttf
