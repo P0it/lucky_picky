@@ -78,7 +78,7 @@ Future<void> _write(
 
   final cloverExtent = canvasSize * cloverRatio;
   final wordmarkSize = canvasSize * 0.145;
-  final gap = wordmark ? canvasSize * 0.11 : 0.0;
+  final gap = wordmark ? canvasSize * 0.18 : 0.0;
   final wordmarkHeight = wordmark ? wordmarkSize * 1.3 : 0.0;
 
   // 클로버 + (워드마크) 를 하나의 덩어리로 보고 세로 가운데 정렬한다.

@@ -63,11 +63,11 @@ class _AppLoadingScreenState extends State<AppLoadingScreen>
                 );
               },
               // 네이티브 스플래시 PNG 와 같은 비율 — 두 화면이 넘어갈 때 크기가 튀지 않게.
-              // (PNG: 캔버스 대비 클로버 0.52 / 간격 0.11 / 글자 0.145)
+              // (PNG: 캔버스 대비 클로버 0.52 / 간격 0.18 / 글자 0.145)
               child: const CloverMark(size: 140, withStem: true),
             ),
-            // 간격 = 클로버 140 × (0.11/0.52) ≈ 30. PNG 의 클로버-글자 간격과 맞춘다.
-            const SizedBox(height: 30),
+            // 간격 = 클로버 140 × (0.18/0.52) ≈ 48. PNG 의 클로버-글자 간격과 맞춘다.
+            const SizedBox(height: 48),
             const LogoWordmark(size: 39),
           ],
         ),
