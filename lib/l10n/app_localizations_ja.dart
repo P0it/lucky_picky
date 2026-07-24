@@ -450,6 +450,42 @@ class AppLocalizationsJa extends AppLocalizations {
   String get languageSystem => 'システム設定に従う';
 
   @override
+  String get recoveryTitle => '幸運を守る';
+
+  @override
+  String get recoverySubtitle => '機種変更やアプリ削除をしても、このコードで幸運を取り戻せます。';
+
+  @override
+  String get recoveryMyCodeLabel => 'わたしの復旧コード';
+
+  @override
+  String get recoveryShowCode => 'わたしの復旧コードを見る';
+
+  @override
+  String get recoveryCodeSaveHint => 'このコードをスクショするか、安全な場所に保存してください。';
+
+  @override
+  String get recoveryCopy => 'コピー';
+
+  @override
+  String get recoveryCopied => '復旧コードをコピーしました';
+
+  @override
+  String get recoveryRestoreLabel => 'コードで復旧する';
+
+  @override
+  String get recoveryRestoreHint => '例: めいらんなツナマヨ のどかなスパゲティ';
+
+  @override
+  String get recoveryRestoreCta => 'このコードで復旧';
+
+  @override
+  String get recoveryRestored => '幸運を取り戻しました 🍀';
+
+  @override
+  String get recoveryNotFound => 'コードが見つかりません。もう一度ご確認ください。';
+
+  @override
   String get loadingErrorTitle => '接続できませんでした';
 
   @override

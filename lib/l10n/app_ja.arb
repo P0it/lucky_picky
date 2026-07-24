@@ -142,6 +142,19 @@
   "languageSheetTitle": "言語",
   "languageSystem": "システム設定に従う",
 
+  "recoveryTitle": "幸運を守る",
+  "recoverySubtitle": "機種変更やアプリ削除をしても、このコードで幸運を取り戻せます。",
+  "recoveryMyCodeLabel": "わたしの復旧コード",
+  "recoveryShowCode": "わたしの復旧コードを見る",
+  "recoveryCodeSaveHint": "このコードをスクショするか、安全な場所に保存してください。",
+  "recoveryCopy": "コピー",
+  "recoveryCopied": "復旧コードをコピーしました",
+  "recoveryRestoreLabel": "コードで復旧する",
+  "recoveryRestoreHint": "例: めいらんなツナマヨ のどかなスパゲティ",
+  "recoveryRestoreCta": "このコードで復旧",
+  "recoveryRestored": "幸運を取り戻しました 🍀",
+  "recoveryNotFound": "コードが見つかりません。もう一度ご確認ください。",
+
   "loadingErrorTitle": "接続できませんでした",
   "loadingErrorBody": "ネットワーク状態を確認してください",
   "loadingRetry": "もう一度試す"

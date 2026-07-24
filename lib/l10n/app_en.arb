@@ -313,6 +313,19 @@
   "languageSheetTitle": "Language",
   "languageSystem": "Follow system settings",
 
+  "recoveryTitle": "Keep your luck safe",
+  "recoverySubtitle": "Switch phones or delete the app — this code brings your luck back.",
+  "recoveryMyCodeLabel": "My recovery code",
+  "recoveryShowCode": "Show my recovery code",
+  "recoveryCodeSaveHint": "Screenshot this code or keep it somewhere safe.",
+  "recoveryCopy": "Copy",
+  "recoveryCopied": "Recovery code copied",
+  "recoveryRestoreLabel": "Restore with a code",
+  "recoveryRestoreHint": "e.g. brave tunafish sleepy spaghetti",
+  "recoveryRestoreCta": "Restore with this code",
+  "recoveryRestored": "Your luck is back 🍀",
+  "recoveryNotFound": "Code not found. Please double-check it.",
+
   "loadingErrorTitle": "Couldn't connect",
   "loadingErrorBody": "Please check your network connection",
   "loadingRetry": "Try again"

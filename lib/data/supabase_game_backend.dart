@@ -185,6 +185,16 @@ class SupabaseGameBackend implements GameBackend {
   Future<void> importLocalState(Map<String, dynamic> payload) => _guard(
       () async => _rpc('import_local_state', {'p_payload': payload}));
 
+  @override
+  Future<String> issueRecoveryCode() => _guard(() async {
+        final r = await _rpc('issue_recovery_code');
+        return r['code'] as String;
+      });
+
+  @override
+  Future<void> redeemRecoveryCode(String code) => _guard(
+      () async => _rpc('redeem_recovery_code', {'p_code': code}));
+
   Future<Map<String, dynamic>> _rpc(String fn,
       [Map<String, dynamic>? params]) async {
     final r = await _client.rpc(fn, params: params);

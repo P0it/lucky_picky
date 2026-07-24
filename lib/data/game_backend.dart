@@ -18,11 +18,12 @@ class GameRuleException implements Exception {
   static const cannotEnhance = 'CANNOT_ENHANCE';
   static const cannotReforge = 'CANNOT_REFORGE';
   static const alreadyImported = 'ALREADY_IMPORTED';
+  static const recoveryNotFound = 'RECOVERY_NOT_FOUND';
 
   static const known = {
     noClover, noCoins, noAdCoins, noCloverReady, invalidDeed, invalidText,
     ticketNotOwned, cannotEnhance, cannotReforge, alreadyImported,
-    'AUTH_REQUIRED',
+    recoveryNotFound, 'AUTH_REQUIRED',
   };
 
   @override
@@ -154,4 +155,16 @@ abstract class GameBackend {
   /// 카드 [materialIds] 를 갈아 새 카드 1장을 만든다.
   Future<ReforgeOutcome> reforgeTickets(List<String> materialIds);
   Future<void> importLocalState(Map<String, dynamic> payload);
+
+  /// 이 계정의 복구 코드를 발급한다(계정당 1개, 재사용). 표시용 원문을 반환한다.
+  Future<String> issueRecoveryCode();
+
+  /// 복구 코드가 가리키는 계정의 자산을 현재 세션으로 이관한다.
+  /// 코드를 찾을 수 없으면 [GameRuleException](RECOVERY_NOT_FOUND).
+  Future<void> redeemRecoveryCode(String code);
 }
+
+/// 복구 코드 정규화 — 공백·구분자·대소문자를 지우고 글자만 남긴다.
+/// 서버 normalize_recovery_code 와 동일 규칙이라야 같은 코드로 인식된다.
+String normalizeRecoveryCode(String code) =>
+    code.replaceAll(RegExp(r'[^0-9a-zA-Z가-힣]'), '').toLowerCase();

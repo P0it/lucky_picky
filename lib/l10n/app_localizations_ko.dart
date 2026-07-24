@@ -450,6 +450,42 @@ class AppLocalizationsKo extends AppLocalizations {
   String get languageSystem => '시스템 설정 따르기';
 
   @override
+  String get recoveryTitle => '행운 지키기';
+
+  @override
+  String get recoverySubtitle => '기기를 바꾸거나 앱을 지워도 이 코드로 행운을 되찾을 수 있어요.';
+
+  @override
+  String get recoveryMyCodeLabel => '내 복구 코드';
+
+  @override
+  String get recoveryShowCode => '내 복구 코드 보기';
+
+  @override
+  String get recoveryCodeSaveHint => '이 코드를 캡처하거나 안전한 곳에 저장하세요.';
+
+  @override
+  String get recoveryCopy => '복사';
+
+  @override
+  String get recoveryCopied => '복구 코드를 복사했어요';
+
+  @override
+  String get recoveryRestoreLabel => '코드로 복구하기';
+
+  @override
+  String get recoveryRestoreHint => '명란한 참치마요 오붓한 스파게티';
+
+  @override
+  String get recoveryRestoreCta => '이 코드로 복구';
+
+  @override
+  String get recoveryRestored => '행운을 되찾았어요 🍀';
+
+  @override
+  String get recoveryNotFound => '코드를 찾을 수 없어요. 다시 확인해 주세요.';
+
+  @override
   String get loadingErrorTitle => '연결에 실패했어요';
 
   @override

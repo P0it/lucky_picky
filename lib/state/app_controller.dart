@@ -382,6 +382,28 @@ class AppController extends Notifier<AppState> {
     return ReforgeOutcome(instance: made, isNew: r.isNew, upgraded: r.upgraded);
   }
 
+  // ---- 복구 코드 ----
+  /// 이 계정의 복구 코드를 발급/조회한다(계정당 1개, 재사용).
+  /// 오프라인이면 [GameConnectionException].
+  Future<String> issueRecoveryCode() async {
+    await _ensureReady();
+    return _backend.issueRecoveryCode();
+  }
+
+  /// 복구 코드로 옛 계정의 자산을 지금 세션으로 가져온다.
+  /// 성공하면 true(자산 반영 후 재동기화), 코드를 못 찾으면 false,
+  /// 오프라인이면 [GameConnectionException].
+  Future<bool> redeemRecoveryCode(String code) async {
+    await _ensureReady();
+    try {
+      await _backend.redeemRecoveryCode(code);
+    } on GameRuleException {
+      return false;
+    }
+    await refresh();
+    return true;
+  }
+
   /// 서버 상태 강제 재동기화.
   Future<void> refresh() async {
     await _ensureReady();

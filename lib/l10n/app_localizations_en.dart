@@ -458,6 +458,44 @@ class AppLocalizationsEn extends AppLocalizations {
   String get languageSystem => 'Follow system settings';
 
   @override
+  String get recoveryTitle => 'Keep your luck safe';
+
+  @override
+  String get recoverySubtitle =>
+      'Switch phones or delete the app — this code brings your luck back.';
+
+  @override
+  String get recoveryMyCodeLabel => 'My recovery code';
+
+  @override
+  String get recoveryShowCode => 'Show my recovery code';
+
+  @override
+  String get recoveryCodeSaveHint =>
+      'Screenshot this code or keep it somewhere safe.';
+
+  @override
+  String get recoveryCopy => 'Copy';
+
+  @override
+  String get recoveryCopied => 'Recovery code copied';
+
+  @override
+  String get recoveryRestoreLabel => 'Restore with a code';
+
+  @override
+  String get recoveryRestoreHint => 'e.g. brave tunafish sleepy spaghetti';
+
+  @override
+  String get recoveryRestoreCta => 'Restore with this code';
+
+  @override
+  String get recoveryRestored => 'Your luck is back 🍀';
+
+  @override
+  String get recoveryNotFound => 'Code not found. Please double-check it.';
+
+  @override
   String get loadingErrorTitle => 'Couldn\'t connect';
 
   @override

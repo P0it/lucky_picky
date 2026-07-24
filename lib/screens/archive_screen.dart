@@ -11,6 +11,7 @@ import '../widgets/clover_mark.dart';
 import '../widgets/deed_heatmap.dart';
 import '../widgets/language_sheet.dart';
 import '../widgets/pressable.dart';
+import '../widgets/recovery_sheet.dart';
 
 class ArchiveScreen extends ConsumerWidget {
   const ArchiveScreen({super.key});
@@ -36,6 +37,15 @@ class ArchiveScreen extends ConsumerWidget {
                     style: AppText.base(
                         size: 30, weight: FontWeight.w800, letterSpacingEm: -0.035)),
               ),
+              // 복구 코드(백업/이관) 진입점.
+              Pressable(
+                onTap: () => showRecoverySheet(context),
+                child: const Padding(
+                  padding: EdgeInsets.all(4),
+                  child: Icon(Icons.shield_outlined, size: 24, color: AppColors.muted),
+                ),
+              ),
+              const SizedBox(width: 6),
               // 언어 설정 진입점 — 탭/플로팅 없이 헤더 우상단에.
               Pressable(
                 onTap: () => showLanguageSheet(context),

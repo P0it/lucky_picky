@@ -850,6 +850,78 @@ abstract class AppLocalizations {
   /// **'Follow system settings'**
   String get languageSystem;
 
+  /// No description provided for @recoveryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep your luck safe'**
+  String get recoveryTitle;
+
+  /// No description provided for @recoverySubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Switch phones or delete the app — this code brings your luck back.'**
+  String get recoverySubtitle;
+
+  /// No description provided for @recoveryMyCodeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'My recovery code'**
+  String get recoveryMyCodeLabel;
+
+  /// No description provided for @recoveryShowCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Show my recovery code'**
+  String get recoveryShowCode;
+
+  /// No description provided for @recoveryCodeSaveHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Screenshot this code or keep it somewhere safe.'**
+  String get recoveryCodeSaveHint;
+
+  /// No description provided for @recoveryCopy.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy'**
+  String get recoveryCopy;
+
+  /// No description provided for @recoveryCopied.
+  ///
+  /// In en, this message translates to:
+  /// **'Recovery code copied'**
+  String get recoveryCopied;
+
+  /// No description provided for @recoveryRestoreLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore with a code'**
+  String get recoveryRestoreLabel;
+
+  /// No description provided for @recoveryRestoreHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. brave tunafish sleepy spaghetti'**
+  String get recoveryRestoreHint;
+
+  /// No description provided for @recoveryRestoreCta.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore with this code'**
+  String get recoveryRestoreCta;
+
+  /// No description provided for @recoveryRestored.
+  ///
+  /// In en, this message translates to:
+  /// **'Your luck is back 🍀'**
+  String get recoveryRestored;
+
+  /// No description provided for @recoveryNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'Code not found. Please double-check it.'**
+  String get recoveryNotFound;
+
   /// No description provided for @loadingErrorTitle.
   ///
   /// In en, this message translates to:
