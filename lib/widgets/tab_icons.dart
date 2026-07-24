@@ -66,34 +66,7 @@ class _TabIconPainter extends CustomPainter {
             ..lineTo(14.3, 20.5),
         ];
       case TabIconKind.store:
-        return [
-          Path()
-            ..moveTo(4, 9.5)
-            ..lineTo(20, 9.5)
-            ..lineTo(20, 19)
-            ..arcToPoint(const Offset(19, 20), radius: const Radius.circular(1), clockwise: true)
-            ..lineTo(5, 20)
-            ..arcToPoint(const Offset(4, 19), radius: const Radius.circular(1), clockwise: true)
-            ..close(),
-          Path()
-            ..moveTo(2.8, 9.5)
-            ..lineTo(21.2, 9.5),
-          Path()
-            ..moveTo(12, 9.5)
-            ..lineTo(12, 20.5),
-          Path()
-            ..moveTo(12, 9.5)
-            ..cubicTo(12, 9.5, 10.6, 5, 8, 5.6)
-            ..cubicTo(6, 6, 6.4, 9.5, 9.2, 9.5)
-            ..close(),
-          Path()
-            ..moveTo(12, 9.5)
-            ..cubicTo(12, 9.5, 13.4, 5, 16, 5.6)
-            ..cubicTo(18, 6, 17.6, 9.5, 14.8, 9.5)
-            ..close(),
-        ];
-      case TabIconKind.fortune:
-        // 수정구 — 점괘를 보는 구슬 + 받침대, 안쪽에 작은 반짝임.
+        // 행운 뽑기 — 캡슐 머신처럼 보이는 구슬 + 받침대, 안쪽에 작은 반짝임.
         return [
           Path()..addOval(Rect.fromCircle(center: const Offset(12, 10), radius: 6)),
           Path()
@@ -107,6 +80,24 @@ class _TabIconPainter extends CustomPainter {
             ..quadraticBezierTo(10.9, 9.5, 10.2, 11.2)
             ..quadraticBezierTo(9.5, 9.5, 7.8, 8.8)
             ..quadraticBezierTo(9.5, 8.1, 10.2, 6.4)
+            ..close(),
+        ];
+      case TabIconKind.fortune:
+        // 운세 — 포춘쿠키: 가운데가 접힌 과자 + 비스듬히 삐져나온 쪽지.
+        return [
+          // 쿠키 몸통 — 위 가운데가 깊게 파인 만두 모양(두 잎이 접힌 느낌).
+          Path()
+            ..moveTo(4.3, 13.2)
+            ..cubicTo(4.3, 8.3, 11.2, 8.3, 12, 11.8)
+            ..cubicTo(12.8, 8.3, 19.7, 8.3, 19.7, 13.2)
+            ..cubicTo(19.7, 18, 4.3, 18, 4.3, 13.2)
+            ..close(),
+          // 쪽지 — 접힘에서 위로 비스듬히 삐져나온 종이.
+          Path()
+            ..moveTo(11.2, 11)
+            ..lineTo(12.4, 6.4)
+            ..lineTo(14.3, 6.9)
+            ..lineTo(13.1, 11.5)
             ..close(),
         ];
       case TabIconKind.dex:
