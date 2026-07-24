@@ -9,8 +9,8 @@ import '../data/game_backend.dart';
 import '../l10n/app_localizations.dart';
 import '../state/app_controller.dart';
 import '../theme/app_theme.dart';
+import '../util/text_wrap.dart';
 import 'app_toast.dart';
-import 'clover_mark.dart';
 import 'collection_card.dart';
 import 'gacha_machine.dart';
 import 'pressable.dart';
@@ -306,62 +306,49 @@ class _GachaPullOverlayState extends ConsumerState<_GachaPullOverlay>
                 style: style,
                 borderRadius: 24,
                 sweepT: _shimmer.value,
-                child: Stack(
-                  children: [
-                    // 카드 우하단에 옅게 잠긴 클로버 — 날짜를 걷어낸 자리를 메우고
-                    // 문구가 허공에 뜨지 않게 무게를 잡아준다.
-                    Positioned(
-                      right: -22,
-                      bottom: -26,
-                      child: IgnorePointer(
-                        child: Opacity(
-                          opacity: 0.13,
-                          child: CloverMark(size: 132, color: style.color),
-                        ),
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(26, 20, 26, 20),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          // 등급 하나만 남긴다 — 번호와 획득일은 이 순간에 아무 의미가 없다.
-                          _rarityPill(rarityName, style.color),
-                          Expanded(
-                            child: Center(
-                              child: Text(
-                                text,
-                                textAlign: TextAlign.center,
-                                style: AppText.base(
-                                  size: textSize,
-                                  weight: FontWeight.w800,
-                                  height: 1.45,
-                                  letterSpacingEm: -0.035,
-                                ),
-                              ),
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 18, 20, 18),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // 등급 하나만 남긴다 — 번호와 획득일은 이 순간에 아무 의미가 없다.
+                      // 좌측 상단에 등급색 솔리드 알약으로.
+                      _rarityPill(rarityName, style.color),
+                      // 남은 공간 전체에서 문구를 세로 중앙에.
+                      Expanded(
+                        child: Center(
+                          child: Text(
+                            text.keepAll,
+                            textAlign: TextAlign.center,
+                            style: AppText.base(
+                              size: textSize,
+                              weight: FontWeight.w800,
+                              height: 1.45,
+                              letterSpacingEm: -0.035,
+                              color: const Color(0xFF8F97A8),
                             ),
                           ),
-                          // 중복이면 강화 재료로 쓸 수 있다는 안내를 카드 발치에.
-                          // 첫 획득이면 아무것도 두지 않는다 — 문구만 남는 게 가장 깨끗하다.
-                          if (!result.isNew)
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 11, vertical: 5),
-                              decoration: BoxDecoration(
-                                color: Colors.white.withValues(alpha: 0.72),
-                                borderRadius:
-                                    BorderRadius.circular(AppRadius.chipFull),
-                              ),
-                              child: Text(l.resultMaterial,
-                                  style: AppText.base(
-                                      size: 11.5,
-                                      weight: FontWeight.w800,
-                                      color: style.color)),
-                            ),
-                        ],
+                        ),
                       ),
-                    ),
-                  ],
+                      // 중복이면 강화 재료로 쓸 수 있다는 안내를 카드 발치에.
+                      // 첫 획득이면 아무것도 두지 않는다 — 문구만 남는 게 가장 깨끗하다.
+                      if (!result.isNew)
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 11, vertical: 5),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withValues(alpha: 0.72),
+                            borderRadius:
+                                BorderRadius.circular(AppRadius.chipFull),
+                          ),
+                          child: Text(l.resultMaterial,
+                              style: AppText.base(
+                                  size: 11.5,
+                                  weight: FontWeight.w800,
+                                  color: style.color)),
+                        ),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -371,29 +358,29 @@ class _GachaPullOverlayState extends ConsumerState<_GachaPullOverlay>
     );
   }
 
-  /// 등급 배지 — 맨살 글자 대신 반투명 흰 알약에 얹는다.
-  /// 카드 면이 등급색 그라데이션이라, 글자만 두면 배경에 묻히고 완성도가 떨어진다.
+  /// 등급 배지 — 등급색 솔리드 알약에 흰 글자.
+  /// 카드 면이 파스텔 오로라라, 진한 등급색 알약이 색으로 곧 등급을 말한다.
   Widget _rarityPill(String name, Color color) {
     return Container(
-      padding: const EdgeInsets.fromLTRB(9, 5, 12, 5),
+      padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 6),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.72),
+        color: color,
         borderRadius: BorderRadius.circular(AppRadius.chipFull),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          CloverMark(size: 14, color: color),
-          const SizedBox(width: 5),
-          Text(
-            name,
-            style: AppText.base(
-                size: 12,
-                weight: FontWeight.w800,
-                color: color,
-                letterSpacingEm: 0.01),
+        boxShadow: [
+          BoxShadow(
+            color: color.withValues(alpha: 0.35),
+            blurRadius: 8,
+            offset: const Offset(0, 3),
           ),
         ],
+      ),
+      child: Text(
+        name,
+        style: AppText.base(
+            size: 12,
+            weight: FontWeight.w800,
+            color: Colors.white,
+            letterSpacingEm: 0.02),
       ),
     );
   }

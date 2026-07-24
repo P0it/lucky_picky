@@ -156,7 +156,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get resultMaterial => '강화 재료 +1';
 
   @override
-  String get resultConfirm => '좋아요';
+  String get resultConfirm => '행운 카드 획득';
 
   @override
   String get resultRerollAd => '광고 보고 한 번 더';

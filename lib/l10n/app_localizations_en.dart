@@ -158,7 +158,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get resultMaterial => 'Enhance material +1';
 
   @override
-  String get resultConfirm => 'Nice';
+  String get resultConfirm => 'Claim lucky card';
 
   @override
   String get resultRerollAd => 'Watch an ad · pull again';

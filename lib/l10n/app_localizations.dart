@@ -361,7 +361,7 @@ abstract class AppLocalizations {
   /// No description provided for @resultConfirm.
   ///
   /// In en, this message translates to:
-  /// **'Nice'**
+  /// **'Claim lucky card'**
   String get resultConfirm;
 
   /// No description provided for @resultRerollAd.

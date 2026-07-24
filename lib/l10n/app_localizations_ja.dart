@@ -156,7 +156,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get resultMaterial => '強化素材 +1';
 
   @override
-  String get resultConfirm => 'いいね';
+  String get resultConfirm => 'ラッキーカード獲得';
 
   @override
   String get resultRerollAd => '広告を見てもう1回';
