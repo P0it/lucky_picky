@@ -27,14 +27,13 @@ class AdConfig {
   /// 플랫폼별 테스트 광고 토글.
   /// true  : Google 공식 테스트 광고 (개발/테스트용, 수익 0)
   /// false : 실제 광고 (출시용) — 해당 플랫폼 슬롯에 실 ID + 앱 ID 필수.
-  static const bool _useTestAdsAndroid = true; // TODO: Android 실 ID 발급 후 false
+  static const bool _useTestAdsAndroid = false; // Android 실 ID 적용됨
   static const bool _useTestAdsIos = false; //     iOS 실 ID 적용됨
 
   // ── 실제 광고단위 ID (해당 플랫폼 토글이 false 일 때 사용) ──
-  // TODO(Android): AdMob 콘솔에서 발급받은 Android ID 로 교체.
-  static const String _androidInterstitial = 'ca-app-pub-0000000000000000/0000000000';
+  static const String _androidInterstitial = 'ca-app-pub-4235844602701475/9466544015';
   static const String _iosInterstitial = 'ca-app-pub-4235844602701475/4162512379';
-  static const String _androidRewarded = 'ca-app-pub-0000000000000000/0000000000';
+  static const String _androidRewarded = 'ca-app-pub-4235844602701475/4513866169';
   static const String _iosRewarded = 'ca-app-pub-4235844602701475/6676995071';
 
   // ── Google 공식 테스트 광고단위 ID (수정 금지) ──
