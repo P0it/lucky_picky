@@ -2,10 +2,10 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 	<dict>
-		<!-- AdMob App ID (Google 테스트 ID — 출시 전 실제 ID로 교체).
+		<!-- AdMob App ID (iOS 실제 앱 ID). Android 앱 ID 는 AndroidManifest.xml.
 	     광고단위 ID 토글/설정은 lib/config/ad_config.dart 참고. -->
 		<key>GADApplicationIdentifier</key>
-		<string>ca-app-pub-3940256099942544~1458002511</string>
+		<string>ca-app-pub-4235844602701475~6134069596</string>
 		<!-- App Tracking Transparency (iOS 14.5+) 권한 요청 문구 -->
 		<key>NSUserTrackingUsageDescription</key>
 		<string>맞춤형 광고를 제공하기 위해 사용자의 활동을 추적할 수 있도록 허용해 주세요.</string>
