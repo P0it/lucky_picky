@@ -18,7 +18,7 @@ class LogoWordmark extends StatelessWidget {
 
   /// 페이크 볼드가 글자를 양옆으로 [boldenRatio]/2 씩 부풀려 그만큼 자간을 먹는다.
   /// 그 몫을 되돌리고(= boldenRatio) 가독성을 위해 조금 더 벌린다.
-  static const trackingRatio = boldenRatio + 0.035;
+  static const trackingRatio = boldenRatio + 0.065;
 
   static TextStyle style(double size) => TextStyle(
         fontFamily: family,
