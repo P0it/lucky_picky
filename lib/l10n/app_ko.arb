@@ -13,9 +13,9 @@
   "homeRecordButton": "오늘의 선행 기록하기",
 
   "recordTitle": "어떤 선행을 베푸셨나요?",
-  "recordSubtitle": "작은 선행도 클로버의 잎이 됩니다.",
-  "recordHint": "예: 엘리베이터 문을 잡아주었습니다.",
-  "recordSubmit": "기록 완료하고 잎 채우기",
+  "recordSubtitle": "작은 배려로 잎을 채워봐요.",
+  "recordHint": "예: 어르신께 자리를 양보했어요.",
+  "recordSubmit": "잎 채우기",
   "toastCloverComplete": "네잎클로버가 완성됐어요 🍀",
   "toastLeafFilled": "잎을 채웠어요",
 

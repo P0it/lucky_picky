@@ -41,13 +41,13 @@ class AppLocalizationsKo extends AppLocalizations {
   String get recordTitle => '어떤 선행을 베푸셨나요?';
 
   @override
-  String get recordSubtitle => '작은 선행도 클로버의 잎이 됩니다.';
+  String get recordSubtitle => '작은 배려로 잎을 채워봐요.';
 
   @override
-  String get recordHint => '예: 엘리베이터 문을 잡아주었습니다.';
+  String get recordHint => '예: 어르신께 자리를 양보했어요.';
 
   @override
-  String get recordSubmit => '기록 완료하고 잎 채우기';
+  String get recordSubmit => '잎 채우기';
 
   @override
   String get toastCloverComplete => '네잎클로버가 완성됐어요 🍀';
