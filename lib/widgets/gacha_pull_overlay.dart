@@ -16,7 +16,7 @@ import 'gacha_machine.dart';
 import 'pressable.dart';
 import 'rarity_style.dart';
 
-/// 뽑기 전체 플로우: 코인 투입 → 레버 → 캡슐 낙하 → 탭 개봉 → 결과 카드.
+/// 뽑기 전체 플로우: 코인 투입 → 레버 → 캡슐 낙하 → 자동 개봉 → 결과 카드.
 /// 뽑기 도중에는 어떤 광고도 끼어들지 않는다 — 광고는 뽑기 화면에서 사용자가
 /// 직접 누르는 '광고 보고 클로버 받기' 하나뿐이다.
 /// 호출 전에 클로버 보유 여부를 확인해야 한다 (뽑기는 언제나 클로버 1개).
@@ -124,6 +124,9 @@ class _GachaPullOverlayState extends ConsumerState<_GachaPullOverlay>
       case _Phase.drop:
         setState(() => _phase = _Phase.waitTap);
         HapticFeedback.mediumImpact();
+        // 탭을 기다리지 않는다 — 캡슐이 배출구에 앉은 걸 눈으로 확인할
+        // 짧은 한 박자만 두고 저절로 열린다. (그 사이 탭하면 바로 개봉.)
+        Future.delayed(const Duration(milliseconds: 420), _openCapsule);
       case _Phase.waitTap:
       case _Phase.open:
       case _Phase.reveal:
@@ -132,7 +135,7 @@ class _GachaPullOverlayState extends ConsumerState<_GachaPullOverlay>
   }
 
   void _openCapsule() {
-    if (_phase != _Phase.waitTap) return;
+    if (!mounted || _phase != _Phase.waitTap) return;
     setState(() => _phase = _Phase.open);
     final rarity = _result!.ticket.rarity;
     // 등급이 높을수록 존재감 있는 햅틱.
@@ -196,7 +199,7 @@ class _GachaPullOverlayState extends ConsumerState<_GachaPullOverlay>
                   child: Center(
                     child: revealing
                         ? _resultCard(l, result, style)
-                        : _machineStage(l, result, style),
+                        : _machineStage(result, style),
                   ),
                 ),
                 if (revealing) _resultButtons(l),
@@ -210,7 +213,7 @@ class _GachaPullOverlayState extends ConsumerState<_GachaPullOverlay>
   }
 
   // ---- 머신 연출 스테이지 ----
-  Widget _machineStage(AppLocalizations l, PullResult result, RarityStyle style) {
+  Widget _machineStage(PullResult result, RarityStyle style) {
     final t = _machine.value;
     // 껍데기가 갈라지는 건 버스트 앞부분에서 끝난다 — 뒤는 광채만 남는다.
     final openT =
@@ -257,16 +260,9 @@ class _GachaPullOverlayState extends ConsumerState<_GachaPullOverlay>
                 ),
             ],
           ),
-          const SizedBox(height: 26),
-          AnimatedOpacity(
-            duration: const Duration(milliseconds: 250),
-            opacity: _phase == _Phase.waitTap ? 1 : 0,
-            child: Text(
-              l.gachaTapCapsule,
-              style: AppText.base(
-                  size: 16, weight: FontWeight.w700, color: AppColors.sub),
-            ),
-          ),
+          // 안내 문구가 있던 자리 — 자동 개봉이라 문구는 없지만,
+          // 카드 등장 전까지 기계 위치가 흔들리지 않게 높이는 남겨 둔다.
+          const SizedBox(height: 26 + 22),
         ],
       ),
     );
@@ -325,7 +321,7 @@ class _GachaPullOverlayState extends ConsumerState<_GachaPullOverlay>
                               weight: FontWeight.w800,
                               height: 1.45,
                               letterSpacingEm: -0.035,
-                              color: const Color(0xFF8F97A8),
+                              color: AppColors.title,
                             ),
                           ),
                         ),
@@ -337,7 +333,7 @@ class _GachaPullOverlayState extends ConsumerState<_GachaPullOverlay>
                           padding: const EdgeInsets.symmetric(
                               horizontal: 11, vertical: 5),
                           decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.72),
+                            color: style.color.withValues(alpha: 0.10),
                             borderRadius:
                                 BorderRadius.circular(AppRadius.chipFull),
                           ),
@@ -359,7 +355,7 @@ class _GachaPullOverlayState extends ConsumerState<_GachaPullOverlay>
   }
 
   /// 등급 배지 — 등급색 솔리드 알약에 흰 글자.
-  /// 카드 면이 파스텔 오로라라, 진한 등급색 알약이 색으로 곧 등급을 말한다.
+  /// 카드 면이 흰색이라, 진한 등급색 알약이 색으로 곧 등급을 말한다 — 테두리와 같은 색이다.
   Widget _rarityPill(String name, Color color) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 6),

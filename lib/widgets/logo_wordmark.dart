@@ -10,15 +10,13 @@ import '../theme/app_theme.dart';
 class LogoWordmark extends StatelessWidget {
   static const text = 'Lucky Picky';
   static const family = 'Fredoka';
-  static const weight = 700.0;
 
-  /// Fredoka 의 wght 축 상한이 700 이라 가변 축만으로는 더 굵어지지 않는다.
-  /// 같은 색 외곽선을 덧대 글자를 균일하게 부풀린다(페이크 볼드).
-  static const boldenRatio = 0.055;
+  /// 700(상한)은 o·u·c·y 의 속공간이 메워져 글자가 뭉쳐 보인다.
+  /// 한 단계 낮춰 속공간을 열어 두는 쪽이 로고로 더 또렷하다.
+  static const weight = 600.0;
 
-  /// 페이크 볼드가 글자를 양옆으로 [boldenRatio]/2 씩 부풀려 그만큼 자간을 먹는다.
-  /// 그 몫을 되돌리고(= boldenRatio) 가독성을 위해 조금 더 벌린다.
-  static const trackingRatio = boldenRatio + 0.065;
+  /// 둥근 서체라 자간이 좁으면 글자끼리 붙어 보인다. 살짝 벌려 숨을 준다.
+  static const trackingRatio = 0.080;
 
   static TextStyle style(double size) => TextStyle(
         fontFamily: family,
@@ -33,26 +31,10 @@ class LogoWordmark extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final base = style(size);
     return Transform.translate(
       // 자간은 마지막 글자 뒤에도 붙어 글자 덩어리가 왼쪽으로 치우친다. 절반만큼 되민다.
       offset: Offset(size * trackingRatio / 2, 0),
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          Text(
-            text,
-            style: base.copyWith(
-              foreground: Paint()
-                ..style = PaintingStyle.stroke
-                ..strokeWidth = size * boldenRatio
-                ..strokeJoin = StrokeJoin.round
-                ..color = color,
-            ),
-          ),
-          Text(text, style: base.copyWith(color: color)),
-        ],
-      ),
+      child: Text(text, style: style(size).copyWith(color: color)),
     );
   }
 }
