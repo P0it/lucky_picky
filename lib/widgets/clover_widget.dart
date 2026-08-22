@@ -133,36 +133,6 @@ class _CloverPainter extends CustomPainter {
     final s = size.width / 120.0;
     canvas.scale(s, s);
 
-    // ---- 완성 축하: 링 + 스파클 (클로버 뒤) ----
-    if (celebrateV >= 0) {
-      final t = celebrateV;
-      // burstRing: scale .45→1.75, opacity .6→0
-      final ringScale = 0.45 + (1.75 - 0.45) * t;
-      final ringOpacity = (0.6 * (1 - t)).clamp(0.0, 1.0);
-      canvas.drawCircle(
-        const Offset(60, 60),
-        37 * ringScale,
-        Paint()
-          ..color = accent.withValues(alpha: ringOpacity)
-          ..style = PaintingStyle.stroke
-          ..strokeWidth = 2.5,
-      );
-      // sparklePop: scale 0→1.5→0, opacity 0→1→0
-      final sp = t < 0.45 ? (t / 0.45) : (1 - (t - 0.45) / 0.55);
-      final spScale = (t < 0.45 ? 1.5 * (t / 0.45) : 1.5 * (1 - (t - 0.45) / 0.55)).clamp(0.0, 1.5);
-      final spOpacity = sp.clamp(0.0, 1.0);
-      for (var k = 0; k < 8; k++) {
-        final ang = (k * 45) * math.pi / 180;
-        final cx = 60 + 53 * math.cos(ang);
-        final cy = 60 + 53 * math.sin(ang);
-        canvas.drawCircle(
-          Offset(cx, cy),
-          2.6 * spScale,
-          Paint()..color = accent.withValues(alpha: spOpacity),
-        );
-      }
-    }
-
     // ---- 원근 틸트 ----
     canvas.save();
     canvas.translate(60, 61);

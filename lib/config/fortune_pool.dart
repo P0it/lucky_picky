@@ -69,16 +69,26 @@ class FortunePool {
       '초록색 펜', '클로버 스티커', '따뜻한 아메리카노', '이어폰',
       '동전 지갑', '손수건', '초콜릿', '우산',
       '에코백', '포스트잇', '립밤', '텀블러',
+      '네잎클로버 키링', '민트 사탕', '작은 손거울', '노란 양말',
+      '손목시계', '향 좋은 핸드크림', '아끼는 머그컵', '초록 마스킹테이프',
+      '주머니 속 동전 하나', '작은 노트', '좋아하는 노래 한 곡', '반질반질한 조약돌',
     ],
     'en': [
       'a green pen', 'a clover sticker', 'a warm coffee', 'earphones',
       'a coin purse', 'a handkerchief', 'chocolate', 'an umbrella',
       'a tote bag', 'sticky notes', 'lip balm', 'a tumbler',
+      'a four-leaf keyring', 'a mint candy', 'a small mirror', 'yellow socks',
+      'a wristwatch', 'nice hand cream', 'your favorite mug', 'green washi tape',
+      'one coin in your pocket', 'a tiny notebook', 'your favorite song',
+      'a smooth little pebble',
     ],
     'ja': [
       '緑のペン', 'クローバーのシール', 'あったかいコーヒー', 'イヤホン',
       '小銭入れ', 'ハンカチ', 'チョコレート', '傘',
       'エコバッグ', '付箋', 'リップクリーム', 'タンブラー',
+      '四つ葉のキーホルダー', 'ミントキャンディ', '小さな手鏡', '黄色い靴下',
+      '腕時計', '香りのいいハンドクリーム', 'お気に入りのマグ', '緑のマスキングテープ',
+      'ポケットの中の小銭', '小さなノート', 'お気に入りの一曲', 'つるつるの小石',
     ],
   };
 

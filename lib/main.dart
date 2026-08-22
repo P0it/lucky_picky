@@ -13,6 +13,7 @@ import 'screens/home_shell.dart';
 import 'state/ads_controller.dart';
 import 'state/locale_controller.dart';
 import 'theme/app_theme.dart';
+import 'widgets/app_loading_screen.dart';
 
 /// Supabase 접속 정보 — publishable key 는 RLS 전제하에 공개 가능한 값.
 /// 빌드 시 --dart-define 으로 교체할 수 있다.
@@ -25,9 +26,14 @@ const _supabaseKey = String.fromEnvironment(
   defaultValue: 'sb_publishable_cyPflSPV34SN6sg3TUAj2A_MHWJT4u7',
 );
 
+/// Supabase 초기화 — `runApp` 전에 await 하면 그동안 화면이 비어 있으므로,
+/// 앱을 먼저 띄우고 이 provider 가 끝날 때까지 로딩 화면을 보여준다.
+final bootstrapProvider = FutureProvider<void>((ref) async {
+  await Supabase.initialize(url: _supabaseUrl, publishableKey: _supabaseKey);
+});
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Supabase.initialize(url: _supabaseUrl, publishableKey: _supabaseKey);
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
     statusBarColor: Colors.transparent,
     statusBarIconBrightness: Brightness.dark, // Android: 어두운 아이콘
@@ -100,7 +106,23 @@ class _LuckyPickyAppState extends ConsumerState<LuckyPickyApp> {
       supportedLocales: AppLocalizations.supportedLocales,
       // 데스크톱/웹의 넓은 폭에서는 폰 크기로 가운데 고정, 양옆은 여백.
       builder: (context, child) => _PhoneFrame(child: child!),
-      home: const HomeShell(),
+      home: const _Bootstrap(),
     );
+  }
+}
+
+/// 초기화가 끝나면 홈으로, 그 전까지는 로딩 화면을 보여준다.
+class _Bootstrap extends ConsumerWidget {
+  const _Bootstrap();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return ref.watch(bootstrapProvider).when(
+          data: (_) => const HomeShell(),
+          loading: () => const AppLoadingScreen(),
+          error: (_, _) => AppLoadingErrorScreen(
+            onRetry: () => ref.invalidate(bootstrapProvider),
+          ),
+        );
   }
 }

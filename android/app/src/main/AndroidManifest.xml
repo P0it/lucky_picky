@@ -34,11 +34,11 @@
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
-        <!-- AdMob App ID (Google 테스트 ID — 출시 전 실제 ID로 교체).
+        <!-- AdMob App ID (Android 실제 앱 ID). iOS 앱 ID 는 ios/Runner/Info.plist.
              광고단위 ID 토글/설정은 lib/config/ad_config.dart 참고. -->
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="ca-app-pub-3940256099942544~3347511713" />
+            android:value="ca-app-pub-4235844602701475~2985162073" />
     </application>
     <!-- Required to query activities that can process text, see:
          https://developer.android.com/training/package-visibility and

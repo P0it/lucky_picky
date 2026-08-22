@@ -1,9 +1,17 @@
 // ════════════════════════════════════════════════════════════════
 //  행운권 카탈로그 — 가챠에서 나오는 모든 행운권의 원본 데이터.
 //
-//  daily_quotes.dart 와 같은 원칙으로, 단순 번역이 아니라
-//  각 언어권 밈 감성에 맞춰 "직접 각색"한 문구입니다.
-//  한국어는 짤·유행어 톤, 영어는 인터넷 밈 톤, 일본어는 넷슬랭 톤.
+//  톤 (2026-08-18 개편): 밈·유행어를 쓰지 않는다. 소비기한이 2~3개월인
+//  표현은 앱 업데이트 주기를 못 따라간다. 10년 뒤에 읽어도 통하는
+//  일상의 순간만 쓴다.
+//    · 인터넷 슬랭·신조어 금지 ("최애/드립/썰/신곡 저격/쿨거래" 류).
+//    · 특정 플랫폼·작품·인물 이름 금지.
+//    · 가챠/뽑기 용어(천장·픽업) 금지 — 이 앱은 선행앱이다.
+//    · 재미는 유행어가 아니라 "누구나 겪는 구체적 순간"에서 낸다.
+//  ※ 이전 버전은 각 언어권 밈 톤이었으나 소비기한 문제로 전면 교체했다.
+//    되돌리지 말 것. (daily_quotes.dart / fortune_copy.dart 와 같은 결)
+//
+//  단순 번역이 아니라 각 언어권 표현으로 "직접 각색"한 문구입니다.
 //
 //  ID 규칙: c=노멀(common), r=레어(rare), e=유니크(epic),
 //           l=레전드(legendary), m=미스틱(mythic) + 2자리 번호.
@@ -61,12 +69,12 @@ class LuckCatalog {
     },
     Rarity.epic: {
       'ko': '치킨 시켰는데 닭다리가 3개 들어있을 확률 (체감)',
-      'en': 'Odds of a bonus nugget in the box (vibes)',
+      'en': 'Odds of a bonus nugget in the box (roughly)',
       'ja': '唐揚げ弁当に唐揚げが1個多い確率（体感）',
     },
     Rarity.legendary: {
       'ko': '소개팅 첫 만남에 통하는 확률 (체감)',
-      'en': 'Odds of a first date actually going well (vibes)',
+      'en': 'Odds of a first date actually going well (roughly)',
       'ja': '初対面で意気投合する確率（体感）',
     },
     Rarity.mythic: {
@@ -111,9 +119,9 @@ class LuckCatalog {
       'ja': '信号が全部青のまま進める幸運',
     }),
     LuckTicket('c04', Rarity.common, {
-      'ko': '편의점에 최애 삼각김밥이 딱 하나 남아있는 행운',
+      'ko': '편의점에 좋아하는 삼각김밥이 딱 하나 남아있는 행운',
       'en': 'Luck of the last one of your favorite snack still being there',
-      'ja': 'コンビニに推しのおにぎりが1個だけ残ってる幸運',
+      'ja': 'コンビニに好きなおにぎりが1個だけ残ってる幸運',
     }),
     LuckTicket('c05', Rarity.common, {
       'ko': '알람 없이도 개운하게 눈 떠지는 행운',
@@ -131,9 +139,9 @@ class LuckCatalog {
       'ja': '電車で目の前の席がスッと空く幸運',
     }),
     LuckTicket('c08', Rarity.common, {
-      'ko': '노래 셔플이 취향 저격곡만 트는 행운',
-      'en': 'Luck of shuffle playing nothing but bangers',
-      'ja': 'シャッフルが神曲しか流さない幸運',
+      'ko': '셔플이 좋아하는 노래만 골라 트는 행운',
+      'en': 'Luck of shuffle playing one favorite after another',
+      'ja': 'シャッフルが好きな曲ばかり流す幸運',
     }),
     LuckTicket('c09', Rarity.common, {
       'ko': '카페에 콘센트 자리가 남아있는 행운',
@@ -182,13 +190,13 @@ class LuckCatalog {
     }),
     LuckTicket('c18', Rarity.common, {
       'ko': '이어폰 줄이 하나도 안 꼬여있는 행운 (유선 한정)',
-      'en': 'Luck of untangled earphones (wired gang only)',
+      'en': 'Luck of untangled earphones (wired ones only)',
       'ja': 'イヤホンが全く絡まってない幸運（有線限定）',
     }),
     LuckTicket('c19', Rarity.common, {
       'ko': '사진이 한 방에 잘 나오는 행운',
       'en': 'Luck of the first photo being the keeper',
-      'ja': '写真が一発で盛れる幸運',
+      'ja': '写真が一発でうまく撮れる幸運',
     }),
     LuckTicket('c20', Rarity.common, {
       'ko': '우산 챙긴 날에만 비가 오는 행운',
@@ -242,7 +250,7 @@ class LuckCatalog {
     }),
     LuckTicket('c30', Rarity.common, {
       'ko': '낮잠 5분 잤는데 5시간 잔 것 같은 행운',
-      'en': 'Luck of a 5-minute nap hitting like 5 hours',
+      'en': 'Luck of a 5-minute nap feeling like 5 hours',
       'ja': '5分の昼寝が5時間分に感じる幸運',
     }),
 
@@ -251,13 +259,13 @@ class LuckCatalog {
     // ────────────────────────────────────────────────────────────
     LuckTicket('r01', Rarity.rare, {
       'ko': '새로운 인연의 행운 (연인 아님)',
-      'en': 'Luck of a new connection (not romantic, calm down)',
+      'en': 'Luck of a new connection (not the romantic kind)',
       'ja': '新しい出会いの幸運（恋人ではない）',
     }),
     LuckTicket('r02', Rarity.rare, {
-      'ko': '중고거래 첫 문의가 쿨거래인 행운',
-      'en': 'Luck of the first buyer being a no-haggle legend',
-      'ja': 'フリマの最初の問い合わせが即決の幸運',
+      'ko': '내놓은 물건이 첫 연락에 바로 팔리는 행운',
+      'en': 'Luck of the first buyer taking it without haggling',
+      'ja': '出品したものが最初の連絡で決まる幸運',
     }),
     LuckTicket('r03', Rarity.rare, {
       'ko': '배달비 무료 쿠폰이 때마침 있는 행운',
@@ -285,9 +293,9 @@ class LuckCatalog {
       'ja': '美容院で注文通りの髪型になる幸運',
     }),
     LuckTicket('r08', Rarity.rare, {
-      'ko': '사진첩 정리하다 추억 대박을 발견하는 행운',
-      'en': 'Luck of finding a gem while cleaning your camera roll',
-      'ja': 'アルバム整理で神写真を発掘する幸運',
+      'ko': '사진첩 정리하다 잊고 있던 좋은 사진을 찾는 행운',
+      'en': 'Luck of finding a forgotten good photo while tidying up',
+      'ja': 'アルバム整理で忘れていた良い写真に出会う幸運',
     }),
     LuckTicket('r09', Rarity.rare, {
       'ko': '구독 해지 직전에 반값 제안을 받는 행운',
@@ -301,18 +309,18 @@ class LuckCatalog {
     }),
     LuckTicket('r11', Rarity.rare, {
       'ko': '인생 맛집을 웨이팅 없이 들어가는 행운',
-      'en': 'Luck of walking into the hyped restaurant, zero wait',
+      'en': 'Luck of walking into the busiest restaurant, zero wait',
       'ja': '人気店に並ばず入れる幸運',
     }),
     LuckTicket('r12', Rarity.rare, {
-      'ko': '단톡방에서 내 드립이 제대로 먹히는 행운',
-      'en': 'Luck of your joke actually landing in the group chat',
-      'ja': 'グルチャで自分のボケがウケる幸運',
+      'ko': '내가 한 농담에 다 같이 웃는 행운',
+      'en': 'Luck of your joke actually landing with everyone',
+      'ja': '自分の冗談にみんなが笑ってくれる幸運',
     }),
     LuckTicket('r13', Rarity.rare, {
       'ko': '좋아하는 노래 라이브가 음원보다 좋은 행운',
       'en': 'Luck of the live version being better than the studio one',
-      'ja': '推し曲のライブが音源超えしてる幸運',
+      'ja': '好きな曲のライブが音源より良い幸運',
     }),
     LuckTicket('r14', Rarity.rare, {
       'ko': '비행기 옆자리가 비어있는 행운',
@@ -347,7 +355,7 @@ class LuckCatalog {
     LuckTicket('r20', Rarity.rare, {
       'ko': '면접관이 내 이야기에 진심으로 웃어주는 행운',
       'en': 'Luck of the interviewer genuinely laughing at your story',
-      'ja': '面接官が自分の話にガチ笑いしてくれる幸運',
+      'ja': '面接官が自分の話に本気で笑ってくれる幸運',
     }),
 
     // ────────────────────────────────────────────────────────────
@@ -384,9 +392,9 @@ class LuckCatalog {
       'ja': 'ネットで買った服がモデル並みに似合う幸運',
     }),
     LuckTicket('e07', Rarity.epic, {
-      'ko': '게임에서 천장 찍기 전에 픽업이 뜨는 행운',
-      'en': 'Luck of pulling the banner unit way before pity',
-      'ja': '天井前にピックアップを引き当てる幸運',
+      'ko': '오래 품절이던 물건이 마침 재입고되는 행운',
+      'en': 'Luck of the sold-out thing being back in stock today',
+      'ja': 'ずっと売り切れだったものが再入荷している幸運',
     }),
     LuckTicket('e08', Rarity.epic, {
       'ko': '건강검진 결과가 전부 정상인 행운',
@@ -399,13 +407,13 @@ class LuckCatalog {
       'ja': '落とし物がそのままの場所で見つかる幸運',
     }),
     LuckTicket('e10', Rarity.epic, {
-      'ko': '최애가 내 댓글에 하트를 눌러주는 행운',
-      'en': 'Luck of your fave actually liking your comment',
-      'ja': '推しが自分のコメントにいいねする幸運',
+      'ko': '좋아하는 작가가 내 댓글에 답을 남겨주는 행운',
+      'en': 'Luck of the author you follow replying to your comment',
+      'ja': '好きな作家が自分のコメントに返事をくれる幸運',
     }),
     LuckTicket('e11', Rarity.epic, {
       'ko': '막차 문이 닫히기 직전에 올라타는 행운',
-      'en': 'Luck of sliding into the last train as the doors close',
+      'en': 'Luck of catching the last train as the doors close',
       'ja': '終電にドア閉まる直前で滑り込む幸運',
     }),
     LuckTicket('e12', Rarity.epic, {
@@ -418,9 +426,9 @@ class LuckCatalog {
     //  전설 (6종) — 인생의 흐름이 바뀌는 행운
     // ────────────────────────────────────────────────────────────
     LuckTicket('l01', Rarity.legendary, {
-      'ko': '평생 자랑할 썰이 생기는 행운',
+      'ko': '평생 이야기할 일이 생기는 행운',
       'en': 'Luck of gaining a story you will tell forever',
-      'ja': '一生語れる伝説エピソードが生まれる幸運',
+      'ja': '一生語れる出来事が生まれる幸運',
     }),
     LuckTicket('l02', Rarity.legendary, {
       'ko': '인생의 은인을 만나는 행운',
@@ -433,9 +441,9 @@ class LuckCatalog {
       'ja': '就活も転職もトントン拍子に進む幸運',
     }),
     LuckTicket('l04', Rarity.legendary, {
-      'ko': '소울메이트급 친구가 생기는 행운',
-      'en': 'Luck of finding a soulmate-tier friend',
-      'ja': 'ソウルメイト級の友達ができる幸運',
+      'ko': '평생 갈 친구가 생기는 행운',
+      'en': 'Luck of finding a friend for life',
+      'ja': '一生ものの友達ができる幸運',
     }),
     LuckTicket('l05', Rarity.legendary, {
       'ko': '하는 일마다 타이밍이 맞아떨어지는 행운',

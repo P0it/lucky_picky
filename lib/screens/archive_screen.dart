@@ -11,6 +11,7 @@ import '../widgets/clover_mark.dart';
 import '../widgets/deed_heatmap.dart';
 import '../widgets/language_sheet.dart';
 import '../widgets/pressable.dart';
+import '../widgets/recovery_sheet.dart';
 
 class ArchiveScreen extends ConsumerWidget {
   const ArchiveScreen({super.key});
@@ -27,7 +28,7 @@ class ArchiveScreen extends ConsumerWidget {
       physics: const BouncingScrollPhysics(),
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(24, 36, 24, 8),
+          padding: const EdgeInsets.fromLTRB(24, 20, 24, 6),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
@@ -36,6 +37,15 @@ class ArchiveScreen extends ConsumerWidget {
                     style: AppText.base(
                         size: 30, weight: FontWeight.w800, letterSpacingEm: -0.035)),
               ),
+              // 복구 코드(백업/이관) 진입점.
+              Pressable(
+                onTap: () => showRecoverySheet(context),
+                child: const Padding(
+                  padding: EdgeInsets.all(4),
+                  child: Icon(Icons.shield_outlined, size: 24, color: AppColors.muted),
+                ),
+              ),
+              const SizedBox(width: 6),
               // 언어 설정 진입점 — 탭/플로팅 없이 헤더 우상단에.
               Pressable(
                 onTap: () => showLanguageSheet(context),
@@ -49,8 +59,8 @@ class ArchiveScreen extends ConsumerWidget {
         ),
         // ---- 통계 대시보드 ----
         Container(
-          margin: const EdgeInsets.fromLTRB(24, 18, 24, 10),
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 22),
+          margin: const EdgeInsets.fromLTRB(24, 10, 24, 8),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
           decoration: BoxDecoration(
             color: AppColors.accentSoft,
             borderRadius: BorderRadius.circular(AppRadius.card),
@@ -69,7 +79,7 @@ class ArchiveScreen extends ConsumerWidget {
           ),
         ),
         Padding(
-          padding: const EdgeInsets.fromLTRB(24, 18, 24, 30),
+          padding: const EdgeInsets.fromLTRB(24, 12, 24, 16),
           child: Column(
             children: [
               // 세그먼트 탭
@@ -88,7 +98,7 @@ class ArchiveScreen extends ConsumerWidget {
                   ],
                 ),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 14),
               if (isCalendar)
                 DeedHeatmap(history: s.history)
               else if (s.history.isEmpty)
@@ -109,7 +119,7 @@ class ArchiveScreen extends ConsumerWidget {
           Text(value,
               style: AppText.base(
                   size: 25, weight: FontWeight.w800, color: valueColor, letterSpacingEm: -0.03)),
-          const SizedBox(height: 7),
+          const SizedBox(height: 5),
           Text(label,
               style: AppText.base(size: 12, weight: FontWeight.w600, color: AppColors.sub)),
         ],
@@ -146,7 +156,7 @@ class ArchiveScreen extends ConsumerWidget {
 
   Widget _emptyState(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 46),
+      padding: const EdgeInsets.symmetric(vertical: 32),
       child: Column(
         children: [
           Opacity(opacity: 0.5, child: const CloverMark(size: 30, withStem: true)),
@@ -189,14 +199,21 @@ class _Timeline extends StatelessWidget {
       final text = LuckCatalog.byId(h.text)?.text(l.localeName) ?? h.text;
       return l.historyPullDone(text);
     }
+    // 커스텀은 사용자가 쓴 문구 그대로 저장돼 있다 — 번역하지 않는다.
+    if (h.kind == HistoryKind.custom) return l.historyCustomMade(h.text);
     return h.text;
   }
 
+  /// 재화가 둘로 갈렸으므로 소모 표시도 갈린다 — 뽑기는 코인, 커스텀은 클로버.
   String _displayDelta(AppLocalizations l, HistoryEntry h) {
     if (h.legacyDelta != null) return h.legacyDelta!;
-    if (h.kind == HistoryKind.deed) return l.historyLeafDelta(h.amount);
-    // 무료(광고) 뽑기는 클로버 소모 0.
-    return h.amount > 0 ? l.historyCloverDelta(h.amount) : l.historyFreePull;
+    return switch (h.kind) {
+      HistoryKind.deed => l.historyLeafDelta(h.amount),
+      HistoryKind.custom => l.historyCloverDelta(h.amount),
+      // 구버전 기록 중 amount 0 인 무료 뽑기가 남아 있을 수 있다.
+      HistoryKind.pull =>
+        h.amount > 0 ? l.historyCoinDelta(h.amount) : l.historyFreePull,
+    };
   }
 
   Widget _row(AppLocalizations l, HistoryEntry h, bool isFirst, bool isLast) {
@@ -239,17 +256,17 @@ class _Timeline extends StatelessWidget {
           // ---- 본문 ----
           Expanded(
             child: Padding(
-              padding: EdgeInsets.only(bottom: isLast ? 0 : 24),
+              padding: EdgeInsets.only(bottom: isLast ? 0 : 16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(h.date,
                       style: AppText.base(
                           size: 12, weight: FontWeight.w600, color: AppColors.muted, letterSpacingEm: -0.01)),
-                  const SizedBox(height: 5),
+                  const SizedBox(height: 3),
                   Text(_displayText(l, h),
-                      style: AppText.base(size: 15, weight: FontWeight.w500, height: 1.45)),
-                  const SizedBox(height: 9),
+                      style: AppText.base(size: 15, weight: FontWeight.w500, height: 1.35)),
+                  const SizedBox(height: 7),
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                     decoration: BoxDecoration(

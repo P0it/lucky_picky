@@ -7,14 +7,16 @@ import '../theme/app_theme.dart';
 /// 캡슐 머신(가챠폰) 일러스트 — 플랫 스타일 CustomPaint.
 ///
 /// 애니메이션 파라미터(0~1)를 밖에서 넘겨 단계별 연출을 만든다.
-/// - [coinT]  : 클로버 코인이 투입구로 들어가는 진행도
+/// - [coinT]  : 코인이 투입구로 들어가는 진행도
 /// - [leverT] : 레버(다이얼)가 한 바퀴 도는 진행도 — 돔 속 더미가 뒤섞인다
 /// - [dropT]  : 뽑힌 캡슐이 더미 → 목 링 → 슈트 → 배출구로 내려가는 진행도
+/// - [openT]  : 기계 앞에 멈춘 캡슐이 위아래 두 쪽으로 갈라지는 진행도
 /// - [capsuleColor] : 뽑힌 캡슐 윗면 색 (등급색)
 class GachaMachine extends StatelessWidget {
   final double coinT;
   final double leverT;
   final double dropT;
+  final double openT;
   final Color capsuleColor;
 
   const GachaMachine({
@@ -22,6 +24,7 @@ class GachaMachine extends StatelessWidget {
     this.coinT = 0,
     this.leverT = 0,
     this.dropT = 0,
+    this.openT = 0,
     this.capsuleColor = AppColors.accent,
   });
 
@@ -42,6 +45,7 @@ class GachaMachine extends StatelessWidget {
           coinT: coinT,
           leverT: leverT,
           dropT: dropT,
+          openT: openT,
           capsuleColor: capsuleColor,
         ),
       ),
@@ -63,12 +67,14 @@ class _MachinePainter extends CustomPainter {
   final double coinT;
   final double leverT;
   final double dropT;
+  final double openT;
   final Color capsuleColor;
 
   _MachinePainter({
     required this.coinT,
     required this.leverT,
     required this.dropT,
+    required this.openT,
     required this.capsuleColor,
   });
 
@@ -323,17 +329,31 @@ class _MachinePainter extends CustomPainter {
   }
 
   void _drawCoin(Canvas canvas) {
-    // 클로버 코인이 위에서 투입구로 떨어지며 사라진다.
+    // 코인이 위에서 투입구로 떨어지며 사라진다. 무늬는 넣지 않는다 —
+    // 클로버를 각인하면 선행의 클로버와 광고의 코인이 다시 헷갈린다.
     final t = Curves.easeIn.transform(coinT);
     final pos = Offset.lerp(const Offset(190, 190), const Offset(190, 244), t)!;
     final opacity = (1 - t * 0.65).clamp(0.0, 1.0);
-    final paint = Paint()..color = const Color(0xFFFFD54F).withValues(alpha: opacity);
-    canvas.drawCircle(pos, 13 * (1 - t * 0.35), paint);
+    final r = 13 * (1 - t * 0.35);
+
+    // 가장자리 톱니 — 떨어지는 동안 주화의 무게감을 준다.
+    final ridge = Paint()
+      ..color = AppColors.coinEdge.withValues(alpha: opacity)
+      ..strokeWidth = 1.6
+      ..strokeCap = StrokeCap.round;
+    for (var i = 0; i < 16; i++) {
+      final a = i * math.pi / 8;
+      final d = Offset(math.cos(a), math.sin(a));
+      canvas.drawLine(pos + d * (r * 0.86), pos + d * r, ridge);
+    }
+
+    canvas.drawCircle(
+        pos, r * 0.86, Paint()..color = AppColors.coin.withValues(alpha: opacity));
     canvas.drawCircle(
       pos,
-      13 * (1 - t * 0.35),
+      r * 0.86,
       Paint()
-        ..color = const Color(0xFFE0A32E).withValues(alpha: opacity)
+        ..color = AppColors.coinEdge.withValues(alpha: opacity)
         ..style = PaintingStyle.stroke
         ..strokeWidth = 2,
     );
@@ -382,14 +402,114 @@ class _MachinePainter extends CustomPainter {
             const Color(0xFF8B95A1).withValues(alpha: 0.22 * (1 - lift * 0.6) * k),
     );
 
-    _drawCapsule(
-      canvas,
-      Offset(x, ground - hop),
+    final center = Offset(x, ground - hop);
+    final angle = from.angle + 3.6 + k * 3.4; // 굴러 나온다
+
+    if (openT > 0) {
+      _drawSplitCapsule(canvas, center, r);
+      return;
+    }
+
+    // 바닥에 닿는 순간마다 눌렸다 펴진다 — 고무공 같은 무게.
+    final contact = 1 - (hop / 34).clamp(0.0, 1.0);
+    final squash = contact * contact * (1 - k) * 0.9;
+    canvas.save();
+    canvas.translate(center.dx, center.dy + r);
+    canvas.scale(1 + squash * 0.24, 1 - squash * 0.24);
+    canvas.translate(-center.dx, -(center.dy + r));
+    _drawCapsule(canvas, center, r, capsuleColor, angle: angle, outline: true);
+    canvas.restore();
+  }
+
+  /// 캡슐이 위아래 두 쪽으로 갈라지며 열린다.
+  /// 틈에서 빛이 새어 나오고, 위쪽 뚜껑이 튀어 오르는 동안 아래쪽은 살짝 주저앉는다.
+  /// 이음매는 굴러온 각도와 무관하게 수평에 가깝다 — 뚜껑이 열린다는 게 먼저 읽혀야 한다.
+  void _drawSplitCapsule(Canvas canvas, Offset c, double r) {
+    final t = openT.clamp(0.0, 1.0);
+    // 앞부분에 몰리지 않는 감속 — 끝까지 계속 벌어지는 게 보여야 한다.
+    final ease = Curves.easeOutQuad.transform(t);
+    final fade = 1 - ((t - 0.45) / 0.55).clamp(0.0, 1.0);
+    if (fade <= 0) return;
+
+    // 틈에서 새어 나오는 빛 — 흰 배경에 묻히지 않게 등급색 후광을 깐다.
+    final flare = math.sin(t * math.pi);
+    if (flare > 0.01) {
+      canvas.drawCircle(
+        c,
+        r * (0.6 + ease * 1.2),
+        Paint()
+          ..color = capsuleColor.withValues(alpha: 0.4 * flare)
+          ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 12),
+      );
+      canvas.drawCircle(
+        c,
+        r * (0.35 + ease * 0.55),
+        Paint()
+          ..color = Colors.white.withValues(alpha: 0.9 * flare)
+          ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 8),
+      );
+    }
+
+    const seam = -0.07; // 살짝 기운 이음매 — 정면 대칭은 도장 같아 보인다
+    final gap = r * (0.02 + 0.9 * ease);
+    // 뚜껑은 옆으로 젖혀지며 살짝 떠오르고, 아래쪽은 조금만 내려앉는다.
+    // 뚜껑을 너무 높이 띄우면 기계 몸통에 겹쳐 지저분해진다.
+    _drawCapsuleHalf(canvas, c + Offset(-gap * 0.5, -gap * 0.8), r, seam - 0.85 * ease,
+        top: true, opacity: fade);
+    _drawCapsuleHalf(canvas, c + Offset(gap * 0.2, gap * 0.3), r, seam + 0.2 * ease,
+        top: false, opacity: fade);
+  }
+
+  /// 갈라진 캡슐 반쪽. 잘린 면에 흰 립을 그려 껍데기 두께가 읽히게 한다.
+  void _drawCapsuleHalf(
+    Canvas canvas,
+    Offset c,
+    double r,
+    double angle, {
+    required bool top,
+    required double opacity,
+  }) {
+    canvas.save();
+    canvas.translate(c.dx, c.dy);
+    canvas.rotate(angle);
+
+    final rect = Rect.fromCircle(center: Offset.zero, radius: r);
+    final half = Path()
+      ..addArc(rect, top ? math.pi : 0, math.pi)
+      ..close();
+
+    canvas.drawPath(half, Paint()..color = capsuleColor.withValues(alpha: opacity));
+    canvas.save();
+    canvas.clipPath(half);
+    canvas.drawCircle(
+      Offset(r * 0.3, r * 0.55),
       r,
-      capsuleColor,
-      angle: from.angle + 3.6 + k * 3.4, // 굴러 나온다
-      outline: true,
+      Paint()..color = Colors.black.withValues(alpha: 0.09 * opacity),
     );
+    if (top) {
+      canvas.drawCircle(
+        Offset(-r * 0.34, -r * 0.36),
+        r * 0.2,
+        Paint()..color = Colors.white.withValues(alpha: 0.7 * opacity),
+      );
+    }
+    canvas.restore();
+    // 잘린 면 — 안쪽이 비어 있는 껍데기라는 신호.
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(
+        Rect.fromLTRB(-r * 0.97, top ? -3 : 0, r * 0.97, top ? 0 : 3),
+        const Radius.circular(2),
+      ),
+      Paint()..color = Colors.white.withValues(alpha: 0.92 * opacity),
+    );
+    canvas.drawPath(
+      half,
+      Paint()
+        ..color = Colors.black.withValues(alpha: 0.1 * opacity)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 2,
+    );
+    canvas.restore();
   }
 
 
@@ -448,5 +568,6 @@ class _MachinePainter extends CustomPainter {
       old.coinT != coinT ||
       old.leverT != leverT ||
       old.dropT != dropT ||
+      old.openT != openT ||
       old.capsuleColor != capsuleColor;
 }

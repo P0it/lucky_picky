@@ -7,6 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:luckypicky/config/luck_tickets.dart';
 import 'package:luckypicky/data/local_game_backend.dart';
 import 'package:luckypicky/models/app_state.dart';
+import 'package:luckypicky/models/custom_ticket.dart';
 import 'package:luckypicky/models/deed.dart';
 import 'package:luckypicky/models/ticket_instance.dart';
 import 'package:luckypicky/state/app_controller.dart';
@@ -25,9 +26,9 @@ void main() {
     return (c, backend);
   }
 
-  /// 잎 2 / 클로버 5 — 기존 프로토타입 시드와 같은 출발 상태.
+  /// 잎 2 · 클로버 5(커스텀 제작용) · 코인 5(뽑기용). 두 재화는 서로 섞이지 않는다.
   AppState seeded() => const AppState(
-      leaves: 2, clovers: 5, statLeaves: 2, statClovers: 1);
+      leaves: 2, clovers: 5, coins: 5, statLeaves: 2, statClovers: 1);
 
   group('카탈로그', () {
     test('70종 — 등급별 30/20/12/6/2, ID 중복 없음', () {
@@ -111,7 +112,7 @@ void main() {
   });
 
   group('가챠 뽑기', () {
-    test('뽑기 1회 → 클로버 -1, 도감 등록, 기록 추가', () async {
+    test('뽑기 1회 → 코인 -1, 클로버 불변, 도감 등록, 기록 추가', () async {
       final (c, _) = makeContainer(seed: seeded(), rng: math.Random(1));
       final n = c.read(appControllerProvider.notifier);
       await n.ready;
@@ -119,7 +120,8 @@ void main() {
       final s = c.read(appControllerProvider);
       expect(r, isNotNull);
       expect(r!.isNew, true);
-      expect(s.clovers, 4);
+      expect(s.coins, 4);
+      expect(s.clovers, 5); // 선행으로 만든 클로버는 뽑기에 쓰이지 않는다
       expect(s.statPulls, 1);
       expect(s.tickets.length, 1);
       expect(s.tickets.first.ticketId, r.ticket.id);
@@ -128,14 +130,16 @@ void main() {
       expect(s.history.first.amount, 1);
     });
 
-    test('클로버 0이면 뽑을 수 없다', () async {
+    test('코인 0이면 클로버가 남아 있어도 뽑을 수 없다', () async {
       final (c, _) = makeContainer(seed: seeded(), rng: math.Random(1));
       final n = c.read(appControllerProvider.notifier);
       await n.ready;
       for (var i = 0; i < 5; i++) {
         expect(await n.pullGacha(), isNotNull);
       }
-      expect(c.read(appControllerProvider).clovers, 0);
+      final s = c.read(appControllerProvider);
+      expect(s.coins, 0);
+      expect(s.clovers, 5);
       expect(await n.pullGacha(), isNull);
     });
 
@@ -171,52 +175,152 @@ void main() {
     });
   });
 
-  group('광고 클로버', () {
-    test('하루 3회까지 클로버가 지급되고, 이후 false', () async {
+  group('광고 코인', () {
+    test('하루 한도까지 코인이 지급되고, 이후 false', () async {
       final (c, _) = makeContainer(seed: seeded(), rng: math.Random(3));
       final n = c.read(appControllerProvider.notifier);
       await n.ready;
-      expect(n.adCloversLeft, kAdCloversPerDay);
-      for (var i = 0; i < kAdCloversPerDay; i++) {
-        expect(await n.grantAdClover(), true);
+      expect(n.adCoinsLeft, kAdCoinsPerDay);
+      for (var i = 0; i < kAdCoinsPerDay; i++) {
+        expect(await n.grantAdCoin(), true);
       }
-      expect(c.read(appControllerProvider).clovers, 5 + kAdCloversPerDay);
-      expect(n.adCloversLeft, 0);
-      expect(await n.grantAdClover(), false); // 한도 초과
+      final s = c.read(appControllerProvider);
+      expect(s.coins, 5 + kAdCoinsPerDay);
+      expect(s.clovers, 5); // 광고는 클로버를 주지 않는다
+      expect(n.adCoinsLeft, 0);
+      expect(await n.grantAdCoin(), false); // 한도 초과
     });
 
-    test('지급받은 클로버로 뽑으면 클로버가 1개 줄어든다', () async {
+    test('지급받은 코인으로 뽑으면 코인이 1개 줄어든다', () async {
       final (c, _) = makeContainer(seed: seeded(), rng: math.Random(3));
       final n = c.read(appControllerProvider.notifier);
       await n.ready;
-      await n.grantAdClover();
-      final before = c.read(appControllerProvider).clovers;
+      await n.grantAdCoin();
+      final before = c.read(appControllerProvider).coins;
       final r = await n.pullGacha();
       expect(r, isNotNull);
       final s = c.read(appControllerProvider);
-      expect(s.clovers, before - 1);
-      expect(s.history.first.amount, 1); // 뽑기는 언제나 클로버 1개
+      expect(s.coins, before - 1);
+      expect(s.history.first.amount, 1); // 뽑기는 언제나 코인 1개
     });
 
-    test('날짜가 바뀌면 광고 클로버 한도가 리셋된다 (기준일 로직 동형 검증)', () async {
+    test('날짜가 바뀌면 광고 코인 한도가 리셋된다 (기준일 로직 동형 검증)', () async {
       final (c, _) = makeContainer(seed: seeded(), rng: math.Random(3));
       final n = c.read(appControllerProvider.notifier);
       await n.ready;
-      for (var i = 0; i < kAdCloversPerDay; i++) {
-        await n.grantAdClover();
+      for (var i = 0; i < kAdCoinsPerDay; i++) {
+        await n.grantAdCoin();
       }
-      expect(n.adCloversLeft, 0);
+      expect(n.adCoinsLeft, 0);
       final spent = c.read(appControllerProvider);
-      // lastAdCloverDate 를 과거로 되돌리면 한도가 복구되어야 한다.
+      // lastAdCoinDate 를 과거로 되돌리면 한도가 복구되어야 한다.
       final restored = AppState.fromJson(
-          spent.copyWith(lastAdCloverDate: '2000.01.01').toJson());
-      expect(restored.adCloversToday, kAdCloversPerDay);
-      expect(restored.lastAdCloverDate, '2000.01.01');
-      // adCloversLeft 는 오늘(UTC) 날짜와 비교하므로 풀 한도로 계산된다.
-      final usedToday = restored.lastAdCloverDate == _todayUtc()
-          ? restored.adCloversToday
-          : 0;
-      expect(kAdCloversPerDay - usedToday, kAdCloversPerDay);
+          spent.copyWith(lastAdCoinDate: '2000.01.01').toJson());
+      expect(restored.adCoinsToday, kAdCoinsPerDay);
+      expect(restored.lastAdCoinDate, '2000.01.01');
+      // adCoinsLeft 는 오늘(UTC) 날짜와 비교하므로 풀 한도로 계산된다.
+      final usedToday =
+          restored.lastAdCoinDate == _todayUtc() ? restored.adCoinsToday : 0;
+      expect(kAdCoinsPerDay - usedToday, kAdCoinsPerDay);
+    });
+  });
+
+  group('커스텀 행운권', () {
+    test('제작 → 클로버 -1, 카드 추가, 기록 남음', () async {
+      final (c, _) = makeContainer(seed: seeded(), rng: math.Random(4));
+      final n = c.read(appControllerProvider.notifier);
+      await n.ready;
+
+      final made = await n.createCustomTicket('  오늘은 좋은 일이 생긴다  ');
+      expect(made, isNotNull);
+      final s = c.read(appControllerProvider);
+      expect(made!.text, '오늘은 좋은 일이 생긴다'); // 앞뒤 공백은 잘린다
+      expect(made.level, 1);
+      expect(s.clovers, 4);
+      expect(s.coins, 5); // 코인은 건드리지 않는다
+      expect(s.customTickets.single.id, made.id);
+      expect(s.history.first.kind, HistoryKind.custom);
+      expect(s.history.first.text, made.text);
+      expect(s.history.first.amount, 1);
+    });
+
+    test('빈 문구/40자 초과는 거부되고 클로버가 그대로다', () async {
+      final (c, _) = makeContainer(seed: seeded(), rng: math.Random(4));
+      final n = c.read(appControllerProvider.notifier);
+      await n.ready;
+
+      expect(await n.createCustomTicket('   '), isNull);
+      expect(await n.createCustomTicket('가' * 41), isNull);
+      final s = c.read(appControllerProvider);
+      expect(s.clovers, 5);
+      expect(s.customTickets, isEmpty);
+    });
+
+    test('클로버가 없으면 제작할 수 없다', () async {
+      final (c, _) = makeContainer(
+          seed: const AppState(clovers: 0, coins: 5), rng: math.Random(4));
+      final n = c.read(appControllerProvider.notifier);
+      await n.ready;
+      expect(await n.createCustomTicket('행운'), isNull);
+      expect(c.read(appControllerProvider).customTickets, isEmpty);
+    });
+
+    test('강화 → 레벨 +1, 클로버는 이전 레벨 수만큼 줄어든다 (실패 없음)', () async {
+      final (c, _) = makeContainer(
+          seed: const AppState(clovers: 10), rng: math.Random(4));
+      final n = c.read(appControllerProvider.notifier);
+      await n.ready;
+      final made = (await n.createCustomTicket('행운'))!; // 클로버 10 → 9
+
+      // Lv.1→2 는 1개, 2→3 은 2개, 3→4 는 3개.
+      var clovers = c.read(appControllerProvider).clovers;
+      for (var level = 1; level <= 3; level++) {
+        final r = await n.enhanceCustomTicket(made.id);
+        expect(r, isNotNull);
+        expect(r!.level, level + 1);
+        clovers -= level;
+        expect(c.read(appControllerProvider).clovers, clovers);
+      }
+      expect(c.read(appControllerProvider).customTickets.single.level, 4);
+    });
+
+    test('최대 레벨이면 더 강화되지 않는다', () async {
+      final (c, _) = makeContainer(
+          seed: const AppState(clovers: 30), rng: math.Random(4));
+      final n = c.read(appControllerProvider.notifier);
+      await n.ready;
+      final made = (await n.createCustomTicket('행운'))!;
+      for (var i = 0; i < CustomTicket.maxLevel - 1; i++) {
+        expect(await n.enhanceCustomTicket(made.id), isNotNull);
+      }
+      final atMax = c.read(appControllerProvider);
+      expect(atMax.customTickets.single.level, CustomTicket.maxLevel);
+      expect(await n.enhanceCustomTicket(made.id), isNull);
+      expect(c.read(appControllerProvider).clovers, atMax.clovers);
+    });
+
+    test('클로버가 모자라면 강화되지 않는다', () async {
+      final (c, _) = makeContainer(
+          seed: const AppState(clovers: 2), rng: math.Random(4));
+      final n = c.read(appControllerProvider.notifier);
+      await n.ready;
+      final made = (await n.createCustomTicket('행운'))!; // 남은 클로버 1
+      expect(await n.enhanceCustomTicket(made.id), isNotNull); // Lv.2, 남은 0
+      expect(await n.enhanceCustomTicket(made.id), isNull); // 2개 필요
+      final s = c.read(appControllerProvider);
+      expect(s.clovers, 0);
+      expect(s.customTickets.single.level, 2);
+    });
+
+    test('커스텀 카드는 뽑기 카드 목록(강화·재조합 재료)에 섞이지 않는다', () async {
+      final (c, _) = makeContainer(seed: seeded(), rng: math.Random(4));
+      final n = c.read(appControllerProvider.notifier);
+      await n.ready;
+      await n.createCustomTicket('행운');
+      await n.pullGacha();
+      final s = c.read(appControllerProvider);
+      expect(s.tickets.length, 1); // 뽑은 카드 한 장뿐
+      expect(s.customTickets.length, 1);
     });
   });
 

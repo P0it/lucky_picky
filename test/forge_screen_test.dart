@@ -53,10 +53,22 @@ class _SpyBackend implements GameBackend {
   @override
   Future<GachaOutcome> pullGacha() => _inner.pullGacha();
   @override
-  Future<AdCloverResult> grantAdClover() => _inner.grantAdClover();
+  Future<AdCoinResult> grantAdCoin() => _inner.grantAdCoin();
+  @override
+  Future<CustomTicketResult> createCustomTicket(String text) =>
+      _inner.createCustomTicket(text);
+  @override
+  Future<CustomEnhanceResult> enhanceCustomTicket(String id) =>
+      _inner.enhanceCustomTicket(id);
   @override
   Future<void> importLocalState(Map<String, dynamic> payload) =>
       _inner.importLocalState(payload);
+
+  @override
+  Future<String> issueRecoveryCode() => _inner.issueRecoveryCode();
+
+  @override
+  Future<void> redeemRecoveryCode(String code) => _inner.redeemRecoveryCode(code);
 }
 
 /// 한국어 로케일 고정 + 서버와 같은 규칙의 로컬 백엔드 주입.

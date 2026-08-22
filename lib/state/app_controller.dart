@@ -10,16 +10,16 @@ import '../config/luck_tickets.dart';
 import '../data/game_backend.dart';
 import '../data/supabase_game_backend.dart';
 import '../models/app_state.dart';
+import '../models/custom_ticket.dart';
 import '../models/deed.dart';
 import '../models/ticket_instance.dart';
-import 'ads_controller.dart';
 
 /// 서버 도입 전 로컬 저장 키 — 최초 로그인 시 서버로 1회 이관하는 데만 쓴다.
 const _legacyPrefsKey = 'luckypicky_app_state_v1';
 
-/// 하루에 광고 시청으로 받을 수 있는 클로버 수.
-/// (서버 game_config 의 ad_clovers_per_day 와 동치 — UI 표시/사전 차단용)
-const int kAdCloversPerDay = 3;
+/// 하루에 광고 시청으로 받을 수 있는 코인 수.
+/// (서버 game_config 의 ad_coins_per_day 와 동치 — UI 표시/사전 차단용)
+const int kAdCoinsPerDay = 5;
 
 /// 게임 상태 백엔드 — 실서비스는 Supabase RPC(서버 권위).
 /// 테스트는 LocalGameBackend 로 override 한다.
@@ -94,13 +94,15 @@ class AppController extends Notifier<AppState> {
     state = state.copyWith(
       leaves: data.leaves,
       clovers: data.clovers,
+      coins: data.coins,
       statLeaves: data.statLeaves,
       statClovers: data.statClovers,
       statPulls: data.statPulls,
       tickets: data.tickets,
+      customTickets: data.customTickets,
       history: data.history,
-      adCloversToday: data.adCloversToday,
-      lastAdCloverDate: data.lastAdCloverDate,
+      adCoinsToday: data.adCoinsToday,
+      lastAdCoinDate: data.lastAdCoinDate,
     );
     // 지난 세션에서 클로버 확정(finish_clover)이 오프라인으로 끊겼다면 복구.
     if (data.leaves >= 4) {
@@ -128,7 +130,7 @@ class AppController extends Notifier<AppState> {
   /// 표시용 날짜(사용자 로컬).
   String _todayLocal() => _fmt(DateTime.now());
 
-  /// 무료 뽑기 리셋 기준일 — 서버(pull_gacha)의 current_date(UTC)와 맞춘다.
+  /// 광고 코인 리셋 기준일 — 서버(grant_ad_coin)의 current_date(UTC)와 맞춘다.
   String _todayUtc() => _fmt(DateTime.now().toUtc());
 
   // ---- navigation ----
@@ -170,15 +172,16 @@ class AppController extends Notifier<AppState> {
     return r.cloverCompleted;
   }
 
-  /// 완성 축하 연출 → 전면광고 → 클로버 확정.
-  /// (선행 기록은 자가 신고라 클로버 생산을 광고로 게이팅한다.)
+  /// 완성 축하 연출 → 클로버 확정 → 배지로 날아가는 연출.
+  /// 클로버 생산에는 광고를 넣지 않는다 (광고는 소비 시점에만).
   void _scheduleCloverFinish() {
-    Future.delayed(const Duration(milliseconds: 1100), () {
-      AdsController.instance.showInterstitial(onDone: finishCloverCelebration);
-    });
+    Future.delayed(const Duration(milliseconds: 700), finishCloverCelebration);
   }
 
   /// 클로버 완성 연출 후 잎 4개 차감 + 보유 클로버 +1 (서버 확정).
+  ///
+  /// 확정에 성공해야만 [AppState.flightKey] 를 올린다. 덕분에 "비행을 봤다"는
+  /// 곧 "클로버가 실제로 적립됐다"와 같은 뜻이 되고, 헛되이 날아가는 일이 없다.
   Future<void> finishCloverCelebration() async {
     if (state.leaves < 4) return;
     try {
@@ -188,6 +191,7 @@ class AppController extends Notifier<AppState> {
         clovers: r.clovers,
         celebrate: false,
         statClovers: state.statClovers + 1,
+        flightKey: state.flightKey + 1,
       );
     } on GameRuleException {
       state = state.copyWith(celebrate: false);
@@ -199,35 +203,34 @@ class AppController extends Notifier<AppState> {
   }
 
   // ---- 가챠 ----
-  /// 오늘 광고로 더 받을 수 있는 클로버 수 (서버 기준일=UTC 과 동일 규칙).
-  int get adCloversLeft {
-    final used =
-        state.lastAdCloverDate == _todayUtc() ? state.adCloversToday : 0;
-    return (kAdCloversPerDay - used).clamp(0, kAdCloversPerDay);
+  /// 오늘 광고로 더 받을 수 있는 코인 수 (서버 기준일=UTC 과 동일 규칙).
+  int get adCoinsLeft {
+    final used = state.lastAdCoinDate == _todayUtc() ? state.adCoinsToday : 0;
+    return (kAdCoinsPerDay - used).clamp(0, kAdCoinsPerDay);
   }
 
-  /// 광고 시청 보상으로 클로버 1개를 받는다 (하루 [kAdCloversPerDay] 회).
+  /// 광고 시청 보상으로 코인 1개를 받는다 (하루 [kAdCoinsPerDay] 회).
   /// 한도 초과면 false, 오프라인이면 [GameConnectionException].
-  Future<bool> grantAdClover() async {
+  Future<bool> grantAdCoin() async {
     await _ensureReady();
 
-    final AdCloverResult r;
+    final AdCoinResult r;
     try {
-      r = await _backend.grantAdClover();
+      r = await _backend.grantAdCoin();
     } on GameRuleException {
       return false;
     }
 
     state = state.copyWith(
-      clovers: r.clovers,
-      adCloversToday: r.usedToday,
-      lastAdCloverDate: _todayUtc(),
+      coins: r.coins,
+      adCoinsToday: r.usedToday,
+      lastAdCoinDate: _todayUtc(),
     );
     return true;
   }
 
-  /// 뽑기 1회 — 클로버 1개를 소모하고, 추첨은 서버에서 실행된다.
-  /// 뽑을 수 없으면(클로버 부족) null, 오프라인이면 [GameConnectionException].
+  /// 뽑기 1회 — 코인 1개를 소모하고, 추첨은 서버에서 실행된다.
+  /// 뽑을 수 없으면(코인 부족) null, 오프라인이면 [GameConnectionException].
   Future<PullResult?> pullGacha() async {
     await _ensureReady();
 
@@ -253,7 +256,7 @@ class AppController extends Notifier<AppState> {
     );
 
     state = state.copyWith(
-      clovers: state.clovers - 1,
+      coins: state.coins - 1,
       statPulls: state.statPulls + 1,
       tickets: [instance, ...state.tickets],
       history: [
@@ -272,6 +275,61 @@ class AppController extends Notifier<AppState> {
       copies: r.copies,
       isNew: r.isNew,
     );
+  }
+
+  // ---- 커스텀 행운권 ----
+  /// 문구 [text] 로 나만의 행운권을 만든다 (클로버 1개).
+  ///
+  /// **광고 시청이 끝난 뒤에만 호출한다.** 광고를 건너뛰거나 실패한 채 부르면
+  /// 게이트 없이 카드가 만들어진다. 규칙 위반(문구 길이/클로버 부족)이면 null,
+  /// 오프라인이면 [GameConnectionException].
+  Future<CustomTicket?> createCustomTicket(String text) async {
+    await _ensureReady();
+
+    final CustomTicketResult r;
+    try {
+      r = await _backend.createCustomTicket(text);
+    } on GameRuleException {
+      return null;
+    }
+
+    state = state.copyWith(
+      clovers: r.clovers,
+      customTickets: [r.ticket, ...state.customTickets],
+      history: [
+        HistoryEntry(
+            id: DateTime.now().millisecondsSinceEpoch,
+            date: _todayLocal(),
+            kind: HistoryKind.custom,
+            text: r.ticket.text,
+            amount: state.clovers - r.clovers),
+        ...state.history,
+      ],
+    );
+    return r.ticket;
+  }
+
+  /// 커스텀 행운권 강화 — 클로버를 현재 레벨 수만큼 쓰고 한 단계 오른다.
+  /// 실패 판정이 없으므로 성공하면 반드시 레벨이 오른다.
+  /// 규칙 위반(최고 단계/클로버 부족)이면 null, 오프라인이면 예외.
+  Future<CustomEnhanceResult?> enhanceCustomTicket(String id) async {
+    await _ensureReady();
+
+    final CustomEnhanceResult r;
+    try {
+      r = await _backend.enhanceCustomTicket(id);
+    } on GameRuleException {
+      return null;
+    }
+
+    state = state.copyWith(
+      clovers: r.clovers,
+      customTickets: [
+        for (final t in state.customTickets)
+          t.id == id ? t.copyWith(level: r.level) : t,
+      ],
+    );
+    return r;
   }
 
   /// 카드 [instanceId] 강화 — 같은 행운권 카드 [materialIds] 를 재료로 소모한다.
@@ -322,6 +380,28 @@ class AppController extends Notifier<AppState> {
         if (!consumed.contains(t.id)) t,
     ]);
     return ReforgeOutcome(instance: made, isNew: r.isNew, upgraded: r.upgraded);
+  }
+
+  // ---- 복구 코드 ----
+  /// 이 계정의 복구 코드를 발급/조회한다(계정당 1개, 재사용).
+  /// 오프라인이면 [GameConnectionException].
+  Future<String> issueRecoveryCode() async {
+    await _ensureReady();
+    return _backend.issueRecoveryCode();
+  }
+
+  /// 복구 코드로 옛 계정의 자산을 지금 세션으로 가져온다.
+  /// 성공하면 true(자산 반영 후 재동기화), 코드를 못 찾으면 false,
+  /// 오프라인이면 [GameConnectionException].
+  Future<bool> redeemRecoveryCode(String code) async {
+    await _ensureReady();
+    try {
+      await _backend.redeemRecoveryCode(code);
+    } on GameRuleException {
+      return false;
+    }
+    await refresh();
+    return true;
   }
 
   /// 서버 상태 강제 재동기화.

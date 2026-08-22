@@ -121,7 +121,7 @@ abstract class AppLocalizations {
   /// No description provided for @tabDex.
   ///
   /// In en, this message translates to:
-  /// **'Lucky Wallet'**
+  /// **'Collection'**
   String get tabDex;
 
   /// No description provided for @tabArchive.
@@ -244,6 +244,18 @@ abstract class AppLocalizations {
   /// **'🍃 Leaf +{count}'**
   String historyLeafDelta(int count);
 
+  /// No description provided for @historyCoinDelta.
+  ///
+  /// In en, this message translates to:
+  /// **'🪙 Coin -{count}'**
+  String historyCoinDelta(int count);
+
+  /// No description provided for @historyCustomMade.
+  ///
+  /// In en, this message translates to:
+  /// **'[Charm made] {text}'**
+  String historyCustomMade(String text);
+
   /// No description provided for @historyCloverDelta.
   ///
   /// In en, this message translates to:
@@ -274,47 +286,35 @@ abstract class AppLocalizations {
   /// **'Lucky Gacha'**
   String get gachaTitle;
 
-  /// No description provided for @gachaOwnedLabel.
-  ///
-  /// In en, this message translates to:
-  /// **'Clovers owned'**
-  String get gachaOwnedLabel;
-
-  /// No description provided for @gachaCloverCount.
+  /// No description provided for @gachaCoinCount.
   ///
   /// In en, this message translates to:
   /// **'{count}'**
-  String gachaCloverCount(int count);
+  String gachaCoinCount(int count);
 
   /// No description provided for @gachaPull.
   ///
   /// In en, this message translates to:
-  /// **'Pull with a clover'**
+  /// **'Pull with a coin'**
   String get gachaPull;
 
   /// No description provided for @gachaNotEnough.
   ///
   /// In en, this message translates to:
-  /// **'Not enough clovers'**
+  /// **'Not enough coins'**
   String get gachaNotEnough;
 
-  /// No description provided for @gachaAdClover.
+  /// No description provided for @gachaAdCoin.
   ///
   /// In en, this message translates to:
-  /// **'Watch an ad · get a clover ({left}/{total})'**
-  String gachaAdClover(int left, int total);
+  /// **'Watch an ad · get a coin ({left}/{total})'**
+  String gachaAdCoin(int left, int total);
 
-  /// No description provided for @gachaAdCloverNone.
+  /// No description provided for @gachaAdCoinNone.
   ///
   /// In en, this message translates to:
-  /// **'Ad clovers are back tomorrow'**
-  String get gachaAdCloverNone;
-
-  /// No description provided for @gachaAdCloverGained.
-  ///
-  /// In en, this message translates to:
-  /// **'Clover +1! Give the machine a spin'**
-  String get gachaAdCloverGained;
+  /// **'Coins are back tomorrow'**
+  String get gachaAdCoinNone;
 
   /// No description provided for @gachaRatesButton.
   ///
@@ -361,7 +361,7 @@ abstract class AppLocalizations {
   /// No description provided for @resultConfirm.
   ///
   /// In en, this message translates to:
-  /// **'Nice'**
+  /// **'Claim lucky card'**
   String get resultConfirm;
 
   /// No description provided for @resultRerollAd.
@@ -370,10 +370,100 @@ abstract class AppLocalizations {
   /// **'Watch an ad · pull again'**
   String get resultRerollAd;
 
+  /// No description provided for @customSectionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Lucky charms you made'**
+  String get customSectionTitle;
+
+  /// No description provided for @customSectionEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'Write your own luck — clovers from good deeds turn into a card'**
+  String get customSectionEmpty;
+
+  /// No description provided for @customCreateCta.
+  ///
+  /// In en, this message translates to:
+  /// **'Make a charm'**
+  String get customCreateCta;
+
+  /// No description provided for @customCreateTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Write your own luck'**
+  String get customCreateTitle;
+
+  /// No description provided for @customCreateHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Something you\'d like to come true'**
+  String get customCreateHint;
+
+  /// No description provided for @customCreateCounter.
+  ///
+  /// In en, this message translates to:
+  /// **'{used}/{max}'**
+  String customCreateCounter(int used, int max);
+
+  /// No description provided for @customCreateConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Make it ({cost} clover)'**
+  String customCreateConfirm(int cost);
+
+  /// No description provided for @customCreateAdNote.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'ll watch a short ad, then your card appears'**
+  String get customCreateAdNote;
+
+  /// No description provided for @customCreateNoClovers.
+  ///
+  /// In en, this message translates to:
+  /// **'You need {cost} clover — record a good deed first'**
+  String customCreateNoClovers(int cost);
+
+  /// No description provided for @customCreateFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t make it just now — your clover is untouched'**
+  String get customCreateFailed;
+
+  /// No description provided for @customCreated.
+  ///
+  /// In en, this message translates to:
+  /// **'Your luck is made'**
+  String get customCreated;
+
+  /// No description provided for @customEnhance.
+  ///
+  /// In en, this message translates to:
+  /// **'Enhance ({cost} clovers)'**
+  String customEnhance(int cost);
+
+  /// No description provided for @customEnhanceMax.
+  ///
+  /// In en, this message translates to:
+  /// **'Fully enhanced'**
+  String get customEnhanceMax;
+
+  /// No description provided for @customEnhanceNoClovers.
+  ///
+  /// In en, this message translates to:
+  /// **'Not enough clovers'**
+  String get customEnhanceNoClovers;
+
+  /// No description provided for @customBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'MADE'**
+  String get customBadge;
+
   /// No description provided for @dexTitle.
   ///
   /// In en, this message translates to:
-  /// **'Lucky Wallet'**
+  /// **'Collection'**
   String get dexTitle;
 
   /// No description provided for @dexSubtitle.
@@ -385,7 +475,7 @@ abstract class AppLocalizations {
   /// No description provided for @dexEmpty.
   ///
   /// In en, this message translates to:
-  /// **'Your wallet is empty — go pull your first luck!'**
+  /// **'Your collection is empty — go pull your first luck!'**
   String get dexEmpty;
 
   /// No description provided for @dexPlus.
@@ -499,7 +589,7 @@ abstract class AppLocalizations {
   /// No description provided for @forgeRejected.
   ///
   /// In en, this message translates to:
-  /// **'That card can\'t go in right now — refreshing your wallet 🍀'**
+  /// **'That card can\'t go in right now — refreshing your collection 🍀'**
   String get forgeRejected;
 
   /// No description provided for @forgeSuccess.
@@ -759,6 +849,96 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Follow system settings'**
   String get languageSystem;
+
+  /// No description provided for @recoveryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep your luck safe'**
+  String get recoveryTitle;
+
+  /// No description provided for @recoverySubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Switch phones or delete the app — this code brings your luck back.'**
+  String get recoverySubtitle;
+
+  /// No description provided for @recoveryMyCodeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'My recovery code'**
+  String get recoveryMyCodeLabel;
+
+  /// No description provided for @recoveryShowCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Show my recovery code'**
+  String get recoveryShowCode;
+
+  /// No description provided for @recoveryCodeSaveHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Screenshot this code or keep it somewhere safe.'**
+  String get recoveryCodeSaveHint;
+
+  /// No description provided for @recoveryCopy.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy'**
+  String get recoveryCopy;
+
+  /// No description provided for @recoveryCopied.
+  ///
+  /// In en, this message translates to:
+  /// **'Recovery code copied'**
+  String get recoveryCopied;
+
+  /// No description provided for @recoveryRestoreLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore with a code'**
+  String get recoveryRestoreLabel;
+
+  /// No description provided for @recoveryRestoreHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. brave tunafish sleepy spaghetti'**
+  String get recoveryRestoreHint;
+
+  /// No description provided for @recoveryRestoreCta.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore with this code'**
+  String get recoveryRestoreCta;
+
+  /// No description provided for @recoveryRestored.
+  ///
+  /// In en, this message translates to:
+  /// **'Your luck is back 🍀'**
+  String get recoveryRestored;
+
+  /// No description provided for @recoveryNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'Code not found. Please double-check it.'**
+  String get recoveryNotFound;
+
+  /// No description provided for @loadingErrorTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t connect'**
+  String get loadingErrorTitle;
+
+  /// No description provided for @loadingErrorBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Please check your network connection'**
+  String get loadingErrorBody;
+
+  /// No description provided for @loadingRetry.
+  ///
+  /// In en, this message translates to:
+  /// **'Try again'**
+  String get loadingRetry;
 }
 
 class _AppLocalizationsDelegate
