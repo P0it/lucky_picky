@@ -1,0 +1,65 @@
+# Supabase 무료 플랜은 일정 기간 활동이 없으면 프로젝트를 자동 일시정지한다.
+# 정지되면 앱이 서버에 못 붙어 데모 링크가 죽으므로, 주기적으로 가벼운 읽기
+# 쿼리를 날려 "활동 중"으로 유지한다.
+#
+# 쓰는 키는 앱에 이미 하드코딩된 publishable key 라 공개돼도 무방하다(RLS 전제).
+# 리포 시크릿 SUPABASE_URL / SUPABASE_ANON_KEY 를 넣어두면 그쪽을 우선 쓴다.
+#
+# 주의: GitHub 은 리포에 60일간 아무 활동이 없으면 schedule 워크플로를 자동으로
+# 비활성화한다. 그때는 Actions 탭에서 "Enable workflow" 를 눌러 되살려야 한다.
+name: supabase keepalive
+
+on:
+  schedule:
+    # 이틀에 한 번, 03:17 UTC (정각은 러너가 몰려 밀리므로 피함)
+    - cron: '17 3 */2 * *'
+  workflow_dispatch:
+
+# 동시에 여러 번 돌 이유가 없다.
+concurrency:
+  group: supabase-keepalive
+  cancel-in-progress: false
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Ping Supabase REST
+        env:
+          URL: ${{ secrets.SUPABASE_URL || 'https://snejndzqxmwsdmdojmag.supabase.co' }}
+          KEY: ${{ secrets.SUPABASE_ANON_KEY || 'sb_publishable_cyPflSPV34SN6sg3TUAj2A_MHWJT4u7' }}
+        run: |
+          set -euo pipefail
+
+          # RLS 로 결과는 비어도 PostgREST → Postgres 까지는 실제로 질의가 간다.
+          # 쓰기가 없으니 데이터가 더럽혀지지 않는다.
+          code=$(curl -sS -m 30 -o /tmp/body -w '%{http_code}' \
+            -H "apikey: $KEY" \
+            "$URL/rest/v1/copy_lines_active?select=surface&limit=1")
+
+          echo "REST  -> HTTP $code"
+          echo "body  -> $(head -c 200 /tmp/body)"
+
+          if [ "$code" != "200" ]; then
+            echo "::error::Supabase REST 가 200 이 아님 (HTTP $code). 프로젝트가 정지됐거나 키가 만료됐을 수 있음."
+            exit 1
+          fi
+
+      - name: Ping GoTrue health
+        env:
+          URL: ${{ secrets.SUPABASE_URL || 'https://snejndzqxmwsdmdojmag.supabase.co' }}
+          KEY: ${{ secrets.SUPABASE_ANON_KEY || 'sb_publishable_cyPflSPV34SN6sg3TUAj2A_MHWJT4u7' }}
+        run: |
+          set -euo pipefail
+
+          # 앱은 익명 로그인으로 시작하므로 Auth 도 같이 살아 있어야 한다.
+          code=$(curl -sS -m 30 -o /tmp/auth -w '%{http_code}' \
+            -H "apikey: $KEY" "$URL/auth/v1/health")
+
+          echo "Auth  -> HTTP $code  $(head -c 120 /tmp/auth)"
+
+          if [ "$code" != "200" ]; then
+            echo "::error::GoTrue health 가 200 이 아님 (HTTP $code). 익명 로그인이 꺼졌을 수 있음."
+            exit 1
+          fi

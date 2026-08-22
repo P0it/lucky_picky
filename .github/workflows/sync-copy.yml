@@ -14,7 +14,7 @@ on:
     branches: [main]
     paths:
       - 'lib/config/daily_quotes.dart'
-      - 'lib/config/fortune_pool.dart'
+      - 'lib/config/fortune_copy.dart'
       - 'tool/sync_copy.dart'
   # 문구를 안 고쳤는데 서버만 되돌리고 싶을 때 수동 실행.
   workflow_dispatch:
@@ -24,10 +24,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: dart-lang/setup-dart@v1
-      - run: dart pub get
+      # Flutter 프로젝트라 dart pub get 으로는 flutter_test SDK 를 못 풀어 실패한다.
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+      - run: flutter pub get
       - name: Sync copy to Supabase
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-        run: dart run tool/sync_copy.dart
+        run: |
+          if [ -z "${SUPABASE_SERVICE_ROLE_KEY:-}" ]; then
+            echo "::error::리포 시크릿 SUPABASE_SERVICE_ROLE_KEY 가 없습니다. Settings → Secrets and variables → Actions 에서 추가하세요."
+            exit 1
+          fi
+          dart run tool/sync_copy.dart
