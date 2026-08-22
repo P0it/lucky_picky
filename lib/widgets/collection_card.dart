@@ -3,10 +3,10 @@ import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
 import 'rarity_style.dart';
 
-/// 파스텔 오로라 글래스 카드 — 밝은 파스텔 베이스([RarityStyle.panel]) 위에
-/// 오로라 색 덩어리([RarityStyle.blobs])를 겹쳐 이리데센스를 낸다.
-/// 흰 테두리(림)와 그림자로 유리처럼 떠 보이게 하고, 대각선 광택 한 줄이
-/// 표면에 정지해 있다. 등급이 오를수록 오로라가 화려해진다.
+/// 컬렉션 카드 — 면은 앱 전체와 같은 흰 톤으로 두고, 등급은 **테두리**로만 말한다.
+/// 등급색 1.4px 라인에 같은 색 글로우를 깔아 테두리만 은은하게 빛난다.
+/// (예전에는 카드 면 전체가 등급별 파스텔 오로라였는데, 앱의 담백한 톤과
+///  부딪혀서 면을 비우고 색을 가장자리로 몰았다.)
 class CollectionCard extends StatelessWidget {
   final RarityStyle style;
   final Widget child;
@@ -26,41 +26,40 @@ class CollectionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final radius = BorderRadius.circular(borderRadius);
     return Container(
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(borderRadius),
-        // 테두리 대신 그림자 두 겹 — 중립 잉크로 면을 띄우고, 등급색을 옅게 흘려
-        // 파스텔 면이 흰 배경에서 붕 뜨지 않게 잡아준다.
+        borderRadius: radius,
+        color: Colors.white,
         boxShadow: [
           const BoxShadow(
             color: AppColors.cardShadow,
             blurRadius: 20,
             offset: Offset(0, 8),
           ),
+          // 등급색 글로우 — 테두리 바깥으로 번져 카드가 그 색으로 빛나 보인다.
           BoxShadow(
-            color: style.color.withValues(alpha: 0.14),
-            blurRadius: 18,
-            offset: const Offset(0, 6),
+            color: style.color.withValues(alpha: 0.22),
+            blurRadius: 16,
+            spreadRadius: -2,
+            offset: const Offset(0, 4),
           ),
         ],
       ),
-      // 밝은 유리 림 — 파스텔 면 위에 얹혀 카드를 유리처럼 마감한다.
+      // 등급색 테두리 — 카드에서 등급을 말하는 건 이 선 하나뿐이다.
       foregroundDecoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(borderRadius),
-        border: Border.all(color: const Color(0xE6FFFFFF), width: 1),
+        borderRadius: radius,
+        border: Border.all(
+            color: style.color.withValues(alpha: 0.85), width: 1.4),
       ),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(borderRadius),
+        borderRadius: radius,
         child: Stack(
           children: [
             Positioned.fill(
               child: IgnorePointer(
                 child: CustomPaint(
-                  painter: _AuroraFacePainter(
-                    base: style.panel,
-                    blobs: style.blobs,
-                    sweepT: sweepT,
-                  ),
+                  painter: _CardFacePainter(tint: style.color, sweepT: sweepT),
                 ),
               ),
             ),
@@ -72,65 +71,35 @@ class CollectionCard extends StatelessWidget {
   }
 }
 
-/// 카드 표면 — 파스텔 베이스 + 오로라 덩어리 + 정지 광택 + 지나가는 광택.
-class _AuroraFacePainter extends CustomPainter {
-  final List<Color> base;
-  final List<AuroraBlob> blobs;
+/// 카드 표면 — 흰 면에 등급색을 아주 옅게 안쪽 가장자리로만 흘리고,
+/// 지나가는 광택 한 줄(뽑기 결과)만 추가로 얹는다.
+class _CardFacePainter extends CustomPainter {
+  final Color tint;
   final double? sweepT; // null 이면 지나가는 광택 없음
 
-  const _AuroraFacePainter({
-    required this.base,
-    required this.blobs,
-    required this.sweepT,
-  });
+  const _CardFacePainter({required this.tint, required this.sweepT});
 
   @override
   void paint(Canvas canvas, Size size) {
     final rect = Offset.zero & size;
 
-    // 1) 파스텔 베이스 그라데이션.
+    // 1) 테두리 안쪽으로만 스며드는 등급색 — 면 한가운데는 흰색 그대로다.
     canvas.drawRect(
       rect,
       Paint()
-        ..shader = LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: base,
-        ).createShader(rect),
-    );
-
-    // 2) 오로라 덩어리 — 여러 방사형 색을 겹쳐 이음새 없는 이리데센스.
-    final short = size.shortestSide;
-    for (final b in blobs) {
-      canvas.drawRect(
-        rect,
-        Paint()
-          ..shader = RadialGradient(
-            center: b.center,
-            radius: b.radius * size.longestSide / short,
-            colors: [b.color, b.color.withValues(alpha: 0)],
-            stops: const [0, 0.72],
-          ).createShader(rect),
-      );
-    }
-
-    // 3) 정지 광택 — 유리에 비친 창처럼 대각선 한 줄.
-    canvas.drawRect(
-      rect,
-      Paint()
-        ..shader = const LinearGradient(
-          begin: Alignment(-0.9, -1),
-          end: Alignment(0.9, 1),
+        ..shader = RadialGradient(
+          center: Alignment.center,
+          radius: 0.98,
           colors: [
-            Color(0x00FFFFFF),
-            Color(0x66FFFFFF),
-            Color(0x00FFFFFF),
+            tint.withValues(alpha: 0),
+            tint.withValues(alpha: 0),
+            tint.withValues(alpha: 0.055),
           ],
-          stops: [0.34, 0.47, 0.60],
+          stops: const [0, 0.78, 1],
         ).createShader(rect),
     );
 
-    // 4) 지나가는 광택 — 앞 60% 동안만 띠가 지나가고 나머지는 쉰다.
+    // 2) 지나가는 광택 — 앞 60% 동안만 띠가 지나가고 나머지는 쉰다.
     final t = sweepT;
     if (t == null) return;
     final p = t / 0.6;
@@ -151,10 +120,10 @@ class _AuroraFacePainter extends CustomPainter {
         ..shader = LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: const [
-            Color(0x00FFFFFF),
-            Color(0x8CFFFFFF),
-            Color(0x00FFFFFF),
+          colors: [
+            tint.withValues(alpha: 0),
+            tint.withValues(alpha: 0.16),
+            tint.withValues(alpha: 0),
           ],
           stops: [s0, s1, s2],
         ).createShader(rect),
@@ -162,6 +131,6 @@ class _AuroraFacePainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(_AuroraFacePainter old) =>
-      old.sweepT != sweepT || old.base != base || old.blobs != blobs;
+  bool shouldRepaint(_CardFacePainter old) =>
+      old.sweepT != sweepT || old.tint != tint;
 }

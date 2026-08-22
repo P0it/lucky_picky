@@ -143,13 +143,12 @@ void main() {
     await tester.pump(const Duration(milliseconds: 600)); // 코인 투입
     await tester.pump(const Duration(milliseconds: 900)); // 레버 회전
     await tester.pump(const Duration(milliseconds: 800)); // 캡슐 낙하
-    await tester.pump(const Duration(milliseconds: 300)); // waitTap 힌트 표시
-    expect(find.text('캡슐을 탭해서 열어보세요!'), findsOneWidget);
+    await tester.pump(const Duration(milliseconds: 300)); // 낙하 마무리
 
-    // 캡슐 탭 → 버스트 → 결과 카드.
-    await tester.tap(find.text('캡슐을 탭해서 열어보세요!'));
+    // 탭 없이 자동 개봉 → 버스트 → 결과 카드.
+    await tester.pump(const Duration(milliseconds: 500)); // 자동 개봉 대기(420ms)
     await tester.pump();
-    await tester.pump(const Duration(milliseconds: 700)); // 버스트
+    await tester.pump(const Duration(milliseconds: 1400)); // 버스트(등급별 최대 1220ms)
     await tester.pump(const Duration(milliseconds: 500)); // 카드 등장
     expect(find.text('NEW!'), findsOneWidget);
     expect(find.text('행운 카드 획득'), findsOneWidget);

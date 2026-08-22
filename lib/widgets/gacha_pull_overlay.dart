@@ -321,7 +321,7 @@ class _GachaPullOverlayState extends ConsumerState<_GachaPullOverlay>
                               weight: FontWeight.w800,
                               height: 1.45,
                               letterSpacingEm: -0.035,
-                              color: const Color(0xFF8F97A8),
+                              color: AppColors.title,
                             ),
                           ),
                         ),
@@ -333,7 +333,7 @@ class _GachaPullOverlayState extends ConsumerState<_GachaPullOverlay>
                           padding: const EdgeInsets.symmetric(
                               horizontal: 11, vertical: 5),
                           decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.72),
+                            color: style.color.withValues(alpha: 0.10),
                             borderRadius:
                                 BorderRadius.circular(AppRadius.chipFull),
                           ),
@@ -355,7 +355,7 @@ class _GachaPullOverlayState extends ConsumerState<_GachaPullOverlay>
   }
 
   /// 등급 배지 — 등급색 솔리드 알약에 흰 글자.
-  /// 카드 면이 파스텔 오로라라, 진한 등급색 알약이 색으로 곧 등급을 말한다.
+  /// 카드 면이 흰색이라, 진한 등급색 알약이 색으로 곧 등급을 말한다 — 테두리와 같은 색이다.
   Widget _rarityPill(String name, Color color) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 6),

@@ -235,7 +235,7 @@ class _TicketRow extends ConsumerWidget {
     if (ticket == null) return const SizedBox.shrink();
     final style = RarityStyle.of(ticket.rarity);
 
-    // 플랫 컬렉션 카드 — 등급색이 카드 전체를 칠한다. 강화는 상세에서.
+    // 플랫 컬렉션 카드 — 흰 면에 등급색 테두리만. 강화는 상세에서.
     return Pressable(
       onTap: () => Navigator.of(context).push(ticketRoute(card.id)),
       // 높이를 고정하지 않는다 — 한 줄짜리 문구면 카드가 그만큼 얇아져 지갑에
