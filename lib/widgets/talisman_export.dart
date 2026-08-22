@@ -1,12 +1,11 @@
-import 'dart:io';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:gal/gal.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:share_plus/share_plus.dart';
+
+import 'talisman_export_io.dart'
+    if (dart.library.js_interop) 'talisman_export_web.dart' as impl;
 
 /// RepaintBoundary 영역을 PNG 바이트로 캡처한다.
 /// [pixelRatio] 3 → 360 논리폭 기준 1080px 결과물.
@@ -26,21 +25,10 @@ Future<Uint8List> captureBoundaryPng(GlobalKey key, {double pixelRatio = 3.0}) a
   }
 }
 
-/// 사진 앨범에 저장. 권한이 없으면 요청한다.
-Future<void> saveTalismanToGallery(Uint8List bytes, String name) async {
-  final hasAccess = await Gal.hasAccess(toAlbum: true);
-  if (!hasAccess) {
-    await Gal.requestAccess(toAlbum: true);
-  }
-  await Gal.putImageBytes(bytes, name: name);
-}
+/// 사진 앨범에 저장 (웹에서는 브라우저 다운로드).
+Future<void> saveTalismanToGallery(Uint8List bytes, String name) =>
+    impl.savePng(bytes, name);
 
-/// 임시 파일로 써서 시스템 공유 시트를 연다 (친구·지인에게 선물).
-Future<void> shareTalisman(Uint8List bytes, String name, {required String text}) async {
-  final dir = await getTemporaryDirectory();
-  final file = File('${dir.path}/$name.png');
-  await file.writeAsBytes(bytes);
-  await SharePlus.instance.share(
-    ShareParams(files: [XFile(file.path, mimeType: 'image/png')], text: text),
-  );
-}
+/// 시스템 공유 시트를 연다 (친구·지인에게 선물).
+Future<void> shareTalisman(Uint8List bytes, String name, {required String text}) =>
+    impl.sharePng(bytes, name, text);

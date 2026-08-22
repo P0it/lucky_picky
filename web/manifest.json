@@ -3,9 +3,9 @@
     "short_name": "LuckyPicky",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "background_color": "#F4F7F5",
+    "theme_color": "#F4F7F5",
+    "description": "선행을 기록하면 클로버가 자라는 하루 운세 앱 — LuckyPicky",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [
