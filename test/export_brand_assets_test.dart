@@ -114,7 +114,7 @@ Future<void> _write(
   expect(File(path).lengthSync(), greaterThan(0));
 }
 
-/// `LogoWordmark` 와 동일한 사양(단색 + 페이크 볼드)으로 워드마크를 그린다.
+/// `LogoWordmark` 와 동일한 사양(단색)으로 워드마크를 그린다.
 void _paintWordmark(Canvas canvas,
     {required double fontSize, required Offset center}) {
   final base = LogoWordmark.style(fontSize);
@@ -133,13 +133,6 @@ void _paintWordmark(Canvas canvas,
     );
   }
 
-  draw(base.copyWith(
-    foreground: Paint()
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = fontSize * LogoWordmark.boldenRatio
-      ..strokeJoin = StrokeJoin.round
-      ..color = AppColors.accent,
-  ));
   draw(base.copyWith(color: AppColors.accent));
 }
 
