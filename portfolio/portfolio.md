@@ -26,7 +26,7 @@ capture: false
 
 ### 클로버 완성
 
-**파일** ./screens/03-clover.png
+**파일** ./screens/03-clover.mp4
 **설명** 네 장째를 채우면 클로버가 상단 배지로 날아간다
 
 ### 행운 뽑기
@@ -56,8 +56,8 @@ capture: false
 
 ### 강화 연출
 
-**파일** ./screens/09-forge-result.png
-**설명** 게이지가 한 바퀴 차고 성패가 갈린다
+**파일** ./screens/09-forge.mp4
+**설명** 재료가 빨려 들어가고 게이지가 한 바퀴 돌면 성패가 갈린다
 
 ### 나의 기록
 
