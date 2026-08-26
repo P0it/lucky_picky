@@ -152,10 +152,10 @@ void main() {
     await tester.pump(const Duration(milliseconds: 700)); // 버스트
     await tester.pump(const Duration(milliseconds: 500)); // 카드 등장
     expect(find.text('NEW!'), findsOneWidget);
-    expect(find.text('좋아요'), findsOneWidget);
+    expect(find.text('행운 카드 획득'), findsOneWidget);
 
     // 확인 → 오버레이 닫힘 (1회차라 전면광고 차례 아님).
-    await tester.tap(find.text('좋아요'));
+    await tester.tap(find.text('행운 카드 획득'));
     await tester.pumpAndSettle();
     expect(find.text('행운 뽑기'), findsOneWidget); // 가챠 화면 복귀
     expect(find.text('4개'), findsOneWidget); // 클로버 5 → 4

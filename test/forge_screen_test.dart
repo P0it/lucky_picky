@@ -63,6 +63,11 @@ class _SpyBackend implements GameBackend {
   @override
   Future<void> importLocalState(Map<String, dynamic> payload) =>
       _inner.importLocalState(payload);
+  @override
+  Future<String> issueRecoveryCode() => _inner.issueRecoveryCode();
+  @override
+  Future<void> redeemRecoveryCode(String code) =>
+      _inner.redeemRecoveryCode(code);
 }
 
 /// 한국어 로케일 고정 + 서버와 같은 규칙의 로컬 백엔드 주입.

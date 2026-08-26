@@ -49,6 +49,11 @@ class _OfflineOnFinishBackend implements GameBackend {
   @override
   Future<void> importLocalState(Map<String, dynamic> payload) =>
       _inner.importLocalState(payload);
+  @override
+  Future<String> issueRecoveryCode() => _inner.issueRecoveryCode();
+  @override
+  Future<void> redeemRecoveryCode(String code) =>
+      _inner.redeemRecoveryCode(code);
 }
 
 Widget _host(GameBackend backend) => ProviderScope(
