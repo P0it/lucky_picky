@@ -15,12 +15,32 @@
   아무도 광고를 안 보고 매일 한도만큼 재화를 가져간다. 두 정적 파일을 `web/`
   에서 `site/` 로 옮긴 이유가 이것이다.
 
-  배포 후:
-  - 그 **루트 도메인**을 두 스토어의 "개발자 웹사이트" 로 등록 (서브도메인 불가 —
-    AdMob 크롤러는 루트만 본다)
-  - `https://<도메인>/privacy.html` 을 두 스토어의 개인정보처리방침 URL 로 등록
-  - `curl -i https://<도메인>/app-ads.txt` 로 200 + `text/plain` 확인.
-    블로그 호스트가 없는 경로를 200 짜리 404 페이지로 돌려주면 크롤링이 실패한다.
+  **배포처: `hynu.app`** (개인 블로그, Vercel). 없는 경로에 정상 404 를 주는 것을
+  확인했으므로 그대로 쓴다. 별도 Vercel 프로젝트를 파지 말 것 — app-ads.txt 는
+  루트에 있어야 하는데 루트는 블로그가 쓰고 있다. 블로그 리포에 파일을 얹는다.
+
+  블로그 리포의 정적 디렉터리(Next.js 면 `public/`)에 이렇게 넣는다:
+
+  | 이 리포 | 블로그 리포 | 공개 URL |
+  |---|---|---|
+  | `site/app-ads.txt` | `public/app-ads.txt` | `https://hynu.app/app-ads.txt` |
+  | `site/index.html` | `public/luckypicky/index.html` | `https://hynu.app/luckypicky/index.html` |
+  | `site/privacy.html` | `public/luckypicky/privacy.html` | `https://hynu.app/luckypicky/privacy.html` |
+  | `site/favicon.png` | `public/luckypicky/favicon.png` | — |
+
+  `app-ads.txt` 만 루트다. 나머지는 `luckypicky/` 아래 같은 폴더에 모여 있어야
+  페이지 안의 상대 링크(`privacy.html`, `favicon.png`)가 그대로 동작한다.
+
+  이 리포의 `site/` 가 원본이다. 방침 내용을 고치면 블로그 리포로 복사해야 한다
+  (정적 파일 4개라 자동화할 만큼은 아니다).
+
+  배포 후 스토어 등록:
+  - 두 스토어의 **개발자 웹사이트** = `https://hynu.app` — 루트여야 한다.
+    AdMob 크롤러는 이 URL 의 루트 도메인에서만 app-ads.txt 를 찾는다.
+  - 두 스토어의 **개인정보처리방침 URL** = `https://hynu.app/luckypicky/privacy.html`
+  - 확인: `curl -i https://hynu.app/app-ads.txt` → 200 + `text/plain`, 본문이
+    실제 텍스트인지 볼 것.
+  - AdMob → 앱 → app-ads.txt 상태가 "확인됨" 으로 바뀌기까지 최대 24시간.
 
 - [ ] **Supabase 마이그레이션 적용** (SQL 에디터에서 순서대로)
   1. `supabase/migrations/20260827000010_recovery_rate_limit.sql`
