@@ -5,11 +5,22 @@
 
 ## 반드시 먼저 (이거 없으면 심사에서 막힌다)
 
-- [ ] **도메인 확보 + web/ 배포**
-  `web/privacy.html`, `web/app-ads.txt` 는 내용이 다 채워졌지만 올릴 곳이 없다.
-  배포 도메인 = 스토어 등록정보의 "개발자 웹사이트" 로 맞추면 app-ads.txt 는
-  자동 충족된다. 배포 후 `https://<도메인>/privacy.html` 을 두 스토어 등록정보의
-  개인정보처리방침 URL 에 넣는다.
+- [ ] **도메인 확보 + `site/` 배포**
+  `site/` 가 배포 대상이다 — 랜딩(`index.html`), 개인정보처리방침(`privacy.html`),
+  `app-ads.txt`. 정적 파일뿐이라 빌드 과정이 없다. Cloudflare Pages·Vercel 등
+  아무 정적 호스트에 폴더째 올리면 된다.
+
+  **`web/` 은 배포하지 않는다.** Flutter 웹 빌드는 광고 SDK 가 없어
+  `AdsController.showRewarded` 가 광고 없이 즉시 보상을 지급한다 — 공개하면
+  아무도 광고를 안 보고 매일 한도만큼 재화를 가져간다. 두 정적 파일을 `web/`
+  에서 `site/` 로 옮긴 이유가 이것이다.
+
+  배포 후:
+  - 그 **루트 도메인**을 두 스토어의 "개발자 웹사이트" 로 등록 (서브도메인 불가 —
+    AdMob 크롤러는 루트만 본다)
+  - `https://<도메인>/privacy.html` 을 두 스토어의 개인정보처리방침 URL 로 등록
+  - `curl -i https://<도메인>/app-ads.txt` 로 200 + `text/plain` 확인.
+    블로그 호스트가 없는 경로를 200 짜리 404 페이지로 돌려주면 크롤링이 실패한다.
 
 - [ ] **Supabase 마이그레이션 적용** (SQL 에디터에서 순서대로)
   1. `supabase/migrations/20260827000010_recovery_rate_limit.sql`
