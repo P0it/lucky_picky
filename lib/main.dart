@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io' show Platform;
 
 import 'package:app_tracking_transparency/app_tracking_transparency.dart';
@@ -14,6 +15,7 @@ import 'state/ads_controller.dart';
 import 'state/consent_controller.dart';
 import 'state/locale_controller.dart';
 import 'theme/app_theme.dart';
+import 'util/error_reporter.dart';
 import 'widgets/app_loading_screen.dart';
 
 /// Supabase 접속 정보 — publishable key 는 RLS 전제하에 공개 가능한 값.
@@ -34,13 +36,22 @@ final bootstrapProvider = FutureProvider<void>((ref) async {
 });
 
 Future<void> main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
-    statusBarColor: Colors.transparent,
-    statusBarIconBrightness: Brightness.dark, // Android: 어두운 아이콘
-    statusBarBrightness: Brightness.light, // iOS: 밝은 배경 → 어두운 아이콘
-  ));
-  runApp(const ProviderScope(child: LuckyPickyApp()));
+  // runZonedGuarded 안에서 바인딩을 초기화해야 프레임워크가 같은 존을 쓴다 —
+  // 존이 갈리면 비동기 예외가 이 핸들러로 안 올라온다.
+  runZonedGuarded(() async {
+    WidgetsFlutterBinding.ensureInitialized();
+    installErrorHandlers();
+    SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+      statusBarIconBrightness: Brightness.dark, // Android: 어두운 아이콘
+      statusBarBrightness: Brightness.light, // iOS: 밝은 배경 → 어두운 아이콘
+    ));
+    // 세로 고정 — 레이아웃이 폰 폭(_PhoneFrame) 기준이라 가로에서는 깨진다.
+    await SystemChrome.setPreferredOrientations(const [
+      DeviceOrientation.portraitUp,
+    ]);
+    runApp(const ProviderScope(child: LuckyPickyApp()));
+  }, (error, stack) => reportError(error, stack, context: 'zone'));
 }
 
 /// 넓은 화면(웹/데스크톱)에서 앱을 폰 폭으로 가운데 고정한다.
