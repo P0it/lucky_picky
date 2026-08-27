@@ -907,7 +907,7 @@ abstract class AppLocalizations {
   /// No description provided for @recoveryRestoreHint.
   ///
   /// In en, this message translates to:
-  /// **'e.g. brave tunafish sleepy spaghetti'**
+  /// **'e.g. brave tunafish sleepy spaghetti odd fishbread'**
   String get recoveryRestoreHint;
 
   /// No description provided for @recoveryRestoreCta.
@@ -927,6 +927,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Code not found. Please double-check it.'**
   String get recoveryNotFound;
+
+  /// No description provided for @recoveryTooManyTries.
+  ///
+  /// In en, this message translates to:
+  /// **'Too many attempts. Please try again later.'**
+  String get recoveryTooManyTries;
 
   /// No description provided for @loadingErrorTitle.
   ///

@@ -151,10 +151,11 @@
   "recoveryCopy": "コピー",
   "recoveryCopied": "復旧コードをコピーしました",
   "recoveryRestoreLabel": "コードで復旧する",
-  "recoveryRestoreHint": "例: めいらんなツナマヨ のどかなスパゲティ",
+  "recoveryRestoreHint": "例: めいらんなツナマヨ のどかなスパゲティ あやしいたい焼き",
   "recoveryRestoreCta": "このコードで復旧",
   "recoveryRestored": "幸運を取り戻しました 🍀",
   "recoveryNotFound": "コードが見つかりません。もう一度ご確認ください。",
+  "recoveryTooManyTries": "試行が多すぎます。しばらくしてからお試しください。",
 
   "loadingErrorTitle": "接続できませんでした",
   "loadingErrorBody": "ネットワーク状態を確認してください",

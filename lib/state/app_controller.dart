@@ -391,17 +391,20 @@ class AppController extends Notifier<AppState> {
   }
 
   /// 복구 코드로 옛 계정의 자산을 지금 세션으로 가져온다.
-  /// 성공하면 true(자산 반영 후 재동기화), 코드를 못 찾으면 false,
   /// 오프라인이면 [GameConnectionException].
-  Future<bool> redeemRecoveryCode(String code) async {
+  Future<RecoveryOutcome> redeemRecoveryCode(String code) async {
     await _ensureReady();
     try {
       await _backend.redeemRecoveryCode(code);
-    } on GameRuleException {
-      return false;
+    } on GameRuleException catch (e) {
+      // 시도 제한과 코드 오류는 사용자에게 다르게 안내해야 한다 —
+      // 전자는 기다리면 풀리고, 후자는 코드를 다시 확인해야 한다.
+      return e.code == GameRuleException.recoveryRateLimited
+          ? RecoveryOutcome.rateLimited
+          : RecoveryOutcome.notFound;
     }
     await refresh();
-    return true;
+    return RecoveryOutcome.restored;
   }
 
   /// 서버 상태 강제 재동기화.
@@ -411,3 +414,6 @@ class AppController extends Notifier<AppState> {
     _applySnapshot(snap.data);
   }
 }
+
+/// 복구 코드 사용 결과 — UI 는 이 셋을 각각 다른 문구로 안내한다.
+enum RecoveryOutcome { restored, notFound, rateLimited }

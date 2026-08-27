@@ -477,7 +477,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get recoveryRestoreLabel => '코드로 복구하기';
 
   @override
-  String get recoveryRestoreHint => '명란한 참치마요 오붓한 스파게티';
+  String get recoveryRestoreHint => '명란한 참치마요 오붓한 스파게티 수상한 붕어빵';
 
   @override
   String get recoveryRestoreCta => '이 코드로 복구';
@@ -487,6 +487,9 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get recoveryNotFound => '코드를 찾을 수 없어요. 다시 확인해 주세요.';
+
+  @override
+  String get recoveryTooManyTries => '시도가 너무 많아요. 잠시 후 다시 해주세요.';
 
   @override
   String get loadingErrorTitle => '연결에 실패했어요';

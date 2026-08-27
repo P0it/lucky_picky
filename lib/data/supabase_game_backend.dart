@@ -192,8 +192,13 @@ class SupabaseGameBackend implements GameBackend {
       });
 
   @override
-  Future<void> redeemRecoveryCode(String code) => _guard(
-      () async => _rpc('redeem_recovery_code', {'p_code': code}));
+  Future<void> redeemRecoveryCode(String code) => _guard(() async {
+        // 서버는 실패를 예외가 아니라 error 필드로 돌려준다 — 예외로 던지면
+        // 트랜잭션이 롤백돼 대입 시도 카운터가 남지 않기 때문이다.
+        final r = await _rpc('redeem_recovery_code', {'p_code': code});
+        final err = r['error'] as String?;
+        if (err != null) throw GameRuleException(err);
+      });
 
   Future<Map<String, dynamic>> _rpc(String fn,
       [Map<String, dynamic>? params]) async {

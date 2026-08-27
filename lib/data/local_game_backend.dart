@@ -390,9 +390,11 @@ const _recoveryNouns = [
   '실내화', '빗자루', '프라이팬', '자물쇠', '컵라면', '나침반',
 ];
 
-/// "형용사 + 뜬금없는 개념" 두 쌍 조합. 서버 issue_recovery_code 와 같은 형식.
+/// "형용사 + 뜬금없는 개념" 세 쌍 조합. 서버 issue_recovery_code 와 같은 형식.
+/// 두 쌍(44^4 ≈ 375만)은 대입으로 뚫려서 세 쌍(44^6 ≈ 72.6억)으로 늘렸다.
 String _genRecoveryCode(math.Random rng) {
   String pick(List<String> xs) => xs[rng.nextInt(xs.length)];
   return '${pick(_recoveryAdjectives)} ${pick(_recoveryNouns)} '
+      '${pick(_recoveryAdjectives)} ${pick(_recoveryNouns)} '
       '${pick(_recoveryAdjectives)} ${pick(_recoveryNouns)}';
 }

@@ -72,14 +72,17 @@ class _RecoverySheetState extends ConsumerState<_RecoverySheet> {
     setState(() => _restoring = true);
     final l = AppLocalizations.of(context);
     try {
-      final ok =
+      final outcome =
           await ref.read(appControllerProvider.notifier).redeemRecoveryCode(code);
       if (!mounted) return;
-      if (ok) {
-        Navigator.of(context).pop();
-        showAppToast(context, l.recoveryRestored);
-      } else {
-        showAppToast(context, l.recoveryNotFound);
+      switch (outcome) {
+        case RecoveryOutcome.restored:
+          Navigator.of(context).pop();
+          showAppToast(context, l.recoveryRestored);
+        case RecoveryOutcome.notFound:
+          showAppToast(context, l.recoveryNotFound);
+        case RecoveryOutcome.rateLimited:
+          showAppToast(context, l.recoveryTooManyTries);
       }
     } on GameConnectionException {
       if (mounted) showAppToast(context, l.errorNeedConnection);

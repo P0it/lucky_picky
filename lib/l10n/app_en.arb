@@ -322,10 +322,11 @@
   "recoveryCopy": "Copy",
   "recoveryCopied": "Recovery code copied",
   "recoveryRestoreLabel": "Restore with a code",
-  "recoveryRestoreHint": "e.g. brave tunafish sleepy spaghetti",
+  "recoveryRestoreHint": "e.g. brave tunafish sleepy spaghetti odd fishbread",
   "recoveryRestoreCta": "Restore with this code",
   "recoveryRestored": "Your luck is back 🍀",
   "recoveryNotFound": "Code not found. Please double-check it.",
+  "recoveryTooManyTries": "Too many attempts. Please try again later.",
 
   "loadingErrorTitle": "Couldn't connect",
   "loadingErrorBody": "Please check your network connection",

@@ -151,10 +151,11 @@
   "recoveryCopy": "복사",
   "recoveryCopied": "복구 코드를 복사했어요",
   "recoveryRestoreLabel": "코드로 복구하기",
-  "recoveryRestoreHint": "명란한 참치마요 오붓한 스파게티",
+  "recoveryRestoreHint": "명란한 참치마요 오붓한 스파게티 수상한 붕어빵",
   "recoveryRestoreCta": "이 코드로 복구",
   "recoveryRestored": "행운을 되찾았어요 🍀",
   "recoveryNotFound": "코드를 찾을 수 없어요. 다시 확인해 주세요.",
+  "recoveryTooManyTries": "시도가 너무 많아요. 잠시 후 다시 해주세요.",
 
   "loadingErrorTitle": "연결에 실패했어요",
   "loadingErrorBody": "네트워크 상태를 확인해 주세요",

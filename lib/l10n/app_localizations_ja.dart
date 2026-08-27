@@ -477,7 +477,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get recoveryRestoreLabel => 'コードで復旧する';
 
   @override
-  String get recoveryRestoreHint => '例: めいらんなツナマヨ のどかなスパゲティ';
+  String get recoveryRestoreHint => '例: めいらんなツナマヨ のどかなスパゲティ あやしいたい焼き';
 
   @override
   String get recoveryRestoreCta => 'このコードで復旧';
@@ -487,6 +487,9 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get recoveryNotFound => 'コードが見つかりません。もう一度ご確認ください。';
+
+  @override
+  String get recoveryTooManyTries => '試行が多すぎます。しばらくしてからお試しください。';
 
   @override
   String get loadingErrorTitle => '接続できませんでした';

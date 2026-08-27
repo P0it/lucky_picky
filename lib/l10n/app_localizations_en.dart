@@ -487,7 +487,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get recoveryRestoreLabel => 'Restore with a code';
 
   @override
-  String get recoveryRestoreHint => 'e.g. brave tunafish sleepy spaghetti';
+  String get recoveryRestoreHint =>
+      'e.g. brave tunafish sleepy spaghetti odd fishbread';
 
   @override
   String get recoveryRestoreCta => 'Restore with this code';
@@ -497,6 +498,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get recoveryNotFound => 'Code not found. Please double-check it.';
+
+  @override
+  String get recoveryTooManyTries =>
+      'Too many attempts. Please try again later.';
 
   @override
   String get loadingErrorTitle => 'Couldn\'t connect';

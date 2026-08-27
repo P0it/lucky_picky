@@ -19,11 +19,12 @@ class GameRuleException implements Exception {
   static const cannotReforge = 'CANNOT_REFORGE';
   static const alreadyImported = 'ALREADY_IMPORTED';
   static const recoveryNotFound = 'RECOVERY_NOT_FOUND';
+  static const recoveryRateLimited = 'RECOVERY_RATE_LIMITED';
 
   static const known = {
     noClover, noCoins, noAdCoins, noCloverReady, invalidDeed, invalidText,
     ticketNotOwned, cannotEnhance, cannotReforge, alreadyImported,
-    recoveryNotFound, 'AUTH_REQUIRED',
+    recoveryNotFound, recoveryRateLimited, 'AUTH_REQUIRED',
   };
 
   @override
