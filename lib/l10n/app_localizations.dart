@@ -934,6 +934,42 @@ abstract class AppLocalizations {
   /// **'Too many attempts. Please try again later.'**
   String get recoveryTooManyTries;
 
+  /// No description provided for @heatmapMonthTotal.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} good deeds this month'**
+  String heatmapMonthTotal(int count);
+
+  /// No description provided for @heatmapLegendLow.
+  ///
+  /// In en, this message translates to:
+  /// **'Less'**
+  String get heatmapLegendLow;
+
+  /// No description provided for @heatmapLegendHigh.
+  ///
+  /// In en, this message translates to:
+  /// **'More'**
+  String get heatmapLegendHigh;
+
+  /// No description provided for @heatmapTapHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap a colored date to see that day\'s deeds.'**
+  String get heatmapTapHint;
+
+  /// No description provided for @heatmapDayTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Good deeds on {date}'**
+  String heatmapDayTitle(DateTime date);
+
+  /// No description provided for @heatmapDayCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} good deeds on this day.'**
+  String heatmapDayCount(int count);
+
   /// No description provided for @loadingErrorTitle.
   ///
   /// In en, this message translates to:

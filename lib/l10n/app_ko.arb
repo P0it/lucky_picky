@@ -157,6 +157,13 @@
   "recoveryNotFound": "코드를 찾을 수 없어요. 다시 확인해 주세요.",
   "recoveryTooManyTries": "시도가 너무 많아요. 잠시 후 다시 해주세요.",
 
+  "heatmapMonthTotal": "이번 달 {count}번의 선행",
+  "heatmapLegendLow": "적음",
+  "heatmapLegendHigh": "많음",
+  "heatmapTapHint": "색이 칠해진 날짜를 누르면 그날의 선행을 볼 수 있어요.",
+  "heatmapDayTitle": "{date}의 선행",
+  "heatmapDayCount": "이날 {count}번의 선행을 베푸셨어요.",
+
   "loadingErrorTitle": "연결에 실패했어요",
   "loadingErrorBody": "네트워크 상태를 확인해 주세요",
   "loadingRetry": "다시 시도"

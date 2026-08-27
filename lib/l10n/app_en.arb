@@ -328,6 +328,28 @@
   "recoveryNotFound": "Code not found. Please double-check it.",
   "recoveryTooManyTries": "Too many attempts. Please try again later.",
 
+  "heatmapMonthTotal": "{count} good deeds this month",
+  "@heatmapMonthTotal": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "heatmapLegendLow": "Less",
+  "heatmapLegendHigh": "More",
+  "heatmapTapHint": "Tap a colored date to see that day's deeds.",
+  "heatmapDayTitle": "Good deeds on {date}",
+  "@heatmapDayTitle": {
+    "placeholders": {
+      "date": { "type": "DateTime", "format": "MMMMd" }
+    }
+  },
+  "heatmapDayCount": "{count} good deeds on this day.",
+  "@heatmapDayCount": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+
   "loadingErrorTitle": "Couldn't connect",
   "loadingErrorBody": "Please check your network connection",
   "loadingRetry": "Try again"

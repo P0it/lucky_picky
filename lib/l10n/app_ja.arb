@@ -157,6 +157,13 @@
   "recoveryNotFound": "コードが見つかりません。もう一度ご確認ください。",
   "recoveryTooManyTries": "試行が多すぎます。しばらくしてからお試しください。",
 
+  "heatmapMonthTotal": "今月 {count}回の善行",
+  "heatmapLegendLow": "少ない",
+  "heatmapLegendHigh": "多い",
+  "heatmapTapHint": "色のついた日付をタップすると、その日の善行を見られます。",
+  "heatmapDayTitle": "{date}の善行",
+  "heatmapDayCount": "この日は{count}回の善行をされました。",
+
   "loadingErrorTitle": "接続できませんでした",
   "loadingErrorBody": "ネットワーク状態を確認してください",
   "loadingRetry": "もう一度試す"

@@ -492,6 +492,33 @@ class AppLocalizationsKo extends AppLocalizations {
   String get recoveryTooManyTries => '시도가 너무 많아요. 잠시 후 다시 해주세요.';
 
   @override
+  String heatmapMonthTotal(int count) {
+    return '이번 달 $count번의 선행';
+  }
+
+  @override
+  String get heatmapLegendLow => '적음';
+
+  @override
+  String get heatmapLegendHigh => '많음';
+
+  @override
+  String get heatmapTapHint => '색이 칠해진 날짜를 누르면 그날의 선행을 볼 수 있어요.';
+
+  @override
+  String heatmapDayTitle(DateTime date) {
+    final intl.DateFormat dateDateFormat = intl.DateFormat.MMMMd(localeName);
+    final String dateString = dateDateFormat.format(date);
+
+    return '$dateString의 선행';
+  }
+
+  @override
+  String heatmapDayCount(int count) {
+    return '이날 $count번의 선행을 베푸셨어요.';
+  }
+
+  @override
   String get loadingErrorTitle => '연결에 실패했어요';
 
   @override

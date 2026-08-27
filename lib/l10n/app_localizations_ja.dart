@@ -492,6 +492,33 @@ class AppLocalizationsJa extends AppLocalizations {
   String get recoveryTooManyTries => '試行が多すぎます。しばらくしてからお試しください。';
 
   @override
+  String heatmapMonthTotal(int count) {
+    return '今月 $count回の善行';
+  }
+
+  @override
+  String get heatmapLegendLow => '少ない';
+
+  @override
+  String get heatmapLegendHigh => '多い';
+
+  @override
+  String get heatmapTapHint => '色のついた日付をタップすると、その日の善行を見られます。';
+
+  @override
+  String heatmapDayTitle(DateTime date) {
+    final intl.DateFormat dateDateFormat = intl.DateFormat.MMMMd(localeName);
+    final String dateString = dateDateFormat.format(date);
+
+    return '$dateStringの善行';
+  }
+
+  @override
+  String heatmapDayCount(int count) {
+    return 'この日は$count回の善行をされました。';
+  }
+
+  @override
   String get loadingErrorTitle => '接続できませんでした';
 
   @override

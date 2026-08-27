@@ -504,6 +504,33 @@ class AppLocalizationsEn extends AppLocalizations {
       'Too many attempts. Please try again later.';
 
   @override
+  String heatmapMonthTotal(int count) {
+    return '$count good deeds this month';
+  }
+
+  @override
+  String get heatmapLegendLow => 'Less';
+
+  @override
+  String get heatmapLegendHigh => 'More';
+
+  @override
+  String get heatmapTapHint => 'Tap a colored date to see that day\'s deeds.';
+
+  @override
+  String heatmapDayTitle(DateTime date) {
+    final intl.DateFormat dateDateFormat = intl.DateFormat.MMMMd(localeName);
+    final String dateString = dateDateFormat.format(date);
+
+    return 'Good deeds on $dateString';
+  }
+
+  @override
+  String heatmapDayCount(int count) {
+    return '$count good deeds on this day.';
+  }
+
+  @override
   String get loadingErrorTitle => 'Couldn\'t connect';
 
   @override
