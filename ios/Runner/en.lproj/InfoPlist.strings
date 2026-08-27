@@ -1,0 +1,4 @@
+/* App Tracking Transparency — shown before the iOS tracking prompt. */
+"NSUserTrackingUsageDescription" = "Allow tracking so we can show you more relevant ads.";
+/* Photo library — saving a finished luck charm image. */
+"NSPhotoLibraryAddUsageDescription" = "Used to save your finished luck charm to your photo library.";

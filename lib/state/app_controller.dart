@@ -384,10 +384,11 @@ class AppController extends Notifier<AppState> {
 
   // ---- 복구 코드 ----
   /// 이 계정의 복구 코드를 발급/조회한다(계정당 1개, 재사용).
+  /// [lang] 은 코드 단어를 만들 언어 — 읽을 수 없는 코드는 복구에 쓸모가 없다.
   /// 오프라인이면 [GameConnectionException].
-  Future<String> issueRecoveryCode() async {
+  Future<String> issueRecoveryCode(String lang) async {
     await _ensureReady();
-    return _backend.issueRecoveryCode();
+    return _backend.issueRecoveryCode(lang);
   }
 
   /// 복구 코드로 옛 계정의 자산을 지금 세션으로 가져온다.

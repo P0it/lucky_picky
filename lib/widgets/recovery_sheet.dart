@@ -48,8 +48,10 @@ class _RecoverySheetState extends ConsumerState<_RecoverySheet> {
     if (_issuing) return;
     setState(() => _issuing = true);
     final l = AppLocalizations.of(context);
+    final lang = Localizations.localeOf(context).languageCode;
     try {
-      final code = await ref.read(appControllerProvider.notifier).issueRecoveryCode();
+      final code =
+          await ref.read(appControllerProvider.notifier).issueRecoveryCode(lang);
       if (!mounted) return;
       setState(() => _myCode = code);
     } on GameConnectionException {

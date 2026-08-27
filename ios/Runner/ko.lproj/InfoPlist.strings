@@ -1,0 +1,4 @@
+/* App Tracking Transparency — iOS 추적 허용 팝업에 뜨는 문구. */
+"NSUserTrackingUsageDescription" = "맞춤형 광고를 제공하기 위해 사용자의 활동을 추적할 수 있도록 허용해 주세요.";
+/* 사진 앨범 — 완성한 행운 부적 이미지 저장. */
+"NSPhotoLibraryAddUsageDescription" = "완성한 소원의 행운 부적 이미지를 사진 앨범에 저장하기 위해 사용해요.";

@@ -50,7 +50,8 @@ class _OfflineOnFinishBackend implements GameBackend {
   Future<void> importLocalState(Map<String, dynamic> payload) =>
       _inner.importLocalState(payload);
   @override
-  Future<String> issueRecoveryCode() => _inner.issueRecoveryCode();
+  Future<String> issueRecoveryCode([String lang = 'en']) =>
+      _inner.issueRecoveryCode(lang);
   @override
   Future<void> redeemRecoveryCode(String code) =>
       _inner.redeemRecoveryCode(code);

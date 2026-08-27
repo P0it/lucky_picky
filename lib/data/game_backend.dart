@@ -158,14 +158,21 @@ abstract class GameBackend {
   Future<void> importLocalState(Map<String, dynamic> payload);
 
   /// 이 계정의 복구 코드를 발급한다(계정당 1개, 재사용). 표시용 원문을 반환한다.
-  Future<String> issueRecoveryCode();
+  /// [lang] 은 코드 단어를 만들 언어 — 읽고 입력할 수 있어야 코드가 쓸모 있다.
+  /// 한 번 발급되면 언어를 바꿔도 코드는 그대로다(적어둔 코드가 바뀌면 안 된다).
+  Future<String> issueRecoveryCode([String lang = 'en']);
 
   /// 복구 코드가 가리키는 계정의 자산을 현재 세션으로 이관한다.
   /// 코드를 찾을 수 없으면 [GameRuleException](RECOVERY_NOT_FOUND).
   Future<void> redeemRecoveryCode(String code);
 }
 
-/// 복구 코드 정규화 — 공백·구분자·대소문자를 지우고 글자만 남긴다.
+/// 복구 코드 정규화 — 공백·구두점을 지우고 소문자로 내린다.
 /// 서버 normalize_recovery_code 와 동일 규칙이라야 같은 코드로 인식된다.
-String normalizeRecoveryCode(String code) =>
-    code.replaceAll(RegExp(r'[^0-9a-zA-Z가-힣]'), '').toLowerCase();
+///
+/// 허용 목록(`[^0-9a-zA-Z가-힣]`)이 아니라 제거 목록인 이유: 허용 방식은 새 문자
+/// 체계를 넣을 때마다 규칙을 고쳐야 하고, 빠뜨리면 그 언어 코드가 통째로 빈
+/// 문자열이 된다(일본어가 그랬다).
+String normalizeRecoveryCode(String code) => code
+    .replaceAll(RegExp(r'[\s\p{P}]', unicode: true), '')
+    .toLowerCase();

@@ -88,5 +88,35 @@ void main() {
       await b.redeemRecoveryCode(messy);
       expect((await stateOf(b)).clovers, 3);
     });
+
+    test('발급 언어 — 각 언어의 글자로 코드가 나온다', () async {
+      final store = LocalRecoveryStore();
+      final ko = await LocalGameBackend(recovery: store).issueRecoveryCode('ko');
+      final en = await LocalGameBackend(recovery: store).issueRecoveryCode('en');
+      final ja = await LocalGameBackend(recovery: store).issueRecoveryCode('ja');
+
+      expect(ko, matches(RegExp(r'[가-힣]')));
+      expect(en, matches(RegExp(r'^[a-z ]+$')));
+      expect(ja, matches(RegExp(r'[ぁ-んァ-ン]')));
+      // 모르는 언어는 영어로 떨어진다 — 읽을 수 없는 코드보다는 낫다.
+      final other =
+          await LocalGameBackend(recovery: store).issueRecoveryCode('de');
+      expect(other, matches(RegExp(r'^[a-z ]+$')));
+    });
+
+    test('정규화가 어떤 문자 체계든 지우지 않는다', () async {
+      // 허용 목록 방식이던 시절 일본어 코드는 정규화하면 빈 문자열이 됐다.
+      for (final lang in ['ko', 'en', 'ja']) {
+        final store = LocalRecoveryStore();
+        final a = LocalGameBackend(
+            seed: const AppState(clovers: 4), recovery: store);
+        final b = LocalGameBackend(recovery: store);
+        final code = await a.issueRecoveryCode(lang);
+
+        expect(normalizeRecoveryCode(code), isNotEmpty, reason: lang);
+        await b.redeemRecoveryCode(code);
+        expect((await stateOf(b)).clovers, 4, reason: lang);
+      }
+    });
   });
 }

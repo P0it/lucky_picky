@@ -286,11 +286,11 @@ class LocalGameBackend implements GameBackend {
   }
 
   @override
-  Future<String> issueRecoveryCode() async {
+  Future<String> issueRecoveryCode([String lang = 'en']) async {
     if (_recoveryCode != null) return _recoveryCode!;
     String words;
     do {
-      words = _genRecoveryCode(rng);
+      words = _genRecoveryCode(rng, lang);
     } while (_recovery.byNorm.containsKey(normalizeRecoveryCode(words)));
     _recoveryCode = words;
     _recovery.byNorm[normalizeRecoveryCode(words)] = this;
@@ -378,23 +378,31 @@ class LocalRecoveryStore {
   final Map<String, LocalGameBackend> byNorm = {};
 }
 
-const _recoveryAdjectives = [
-  '느긋한', '억울한', '수줍은', '엉뚱한', '새침한', '나른한', '얼큰한', '담백한',
-  '바삭한', '몽글한', '뾰족한', '폭신한', '매콤한', '화끈한', '깜찍한', '태연한',
-  '명란한', '오붓한', '시큰둥한', '수상한', '멀쩡한', '괴상한',
-];
+// 서버는 recovery_words 테이블에 언어별 44+44 단어를 들고 있다. 로컬 구현은
+// 테스트·개발용 거울이라 언어별로 몇 개씩만 둔다 — 형식(3쌍)과 언어 분기가
+// 서버와 같은지 확인하는 것이 목적이지, 대입 공간을 재현하는 게 아니다.
+const _recoveryAdjectives = <String, List<String>>{
+  'ko': ['느긋한', '억울한', '수줍은', '엉뚱한', '새침한', '나른한', '얼큰한', '담백한'],
+  'en': ['brave', 'sleepy', 'jolly', 'crispy', 'fluffy', 'grumpy', 'shiny', 'mellow'],
+  'ja': ['のんきな', 'しずかな', 'はでな', 'すなおな', 'へんな', 'げんきな', 'ゆかいな', 'まじめな'],
+};
 
-const _recoveryNouns = [
-  '참치마요', '스파게티', '형광등', '소화전', '고등어', '세탁기', '코뿔소', '우체통',
-  '볼링공', '다시마', '붕어빵', '계산기', '청국장', '콘센트', '고무장갑', '해파리',
-  '실내화', '빗자루', '프라이팬', '자물쇠', '컵라면', '나침반',
-];
+const _recoveryNouns = <String, List<String>>{
+  'ko': ['참치마요', '스파게티', '형광등', '소화전', '고등어', '세탁기', '코뿔소', '우체통'],
+  'en': ['tunafish', 'spaghetti', 'lightbulb', 'hydrant', 'mackerel', 'washer', 'rhino', 'mailbox'],
+  'ja': ['ツナマヨ', 'スパゲティ', 'けいこうとう', 'しょうかせん', 'さば', 'せんたくき', 'サイ', 'ポスト'],
+};
 
 /// "형용사 + 뜬금없는 개념" 세 쌍 조합. 서버 issue_recovery_code 와 같은 형식.
 /// 두 쌍(44^4 ≈ 375만)은 대입으로 뚫려서 세 쌍(44^6 ≈ 72.6억)으로 늘렸다.
-String _genRecoveryCode(math.Random rng) {
-  String pick(List<String> xs) => xs[rng.nextInt(xs.length)];
-  return '${pick(_recoveryAdjectives)} ${pick(_recoveryNouns)} '
-      '${pick(_recoveryAdjectives)} ${pick(_recoveryNouns)} '
-      '${pick(_recoveryAdjectives)} ${pick(_recoveryNouns)}';
+/// 모르는 언어는 영어로 — 읽고 입력할 수 있는 범위가 가장 넓다.
+String _genRecoveryCode(math.Random rng, String lang) {
+  final code = _recoveryAdjectives.containsKey(lang) ? lang : 'en';
+  final adj = _recoveryAdjectives[code]!;
+  final noun = _recoveryNouns[code]!;
+  // 일본어는 형용사와 명사를 붙여 쓴다.
+  final glue = code == 'ja' ? '' : ' ';
+  String pair() =>
+      '${adj[rng.nextInt(adj.length)]}$glue${noun[rng.nextInt(noun.length)]}';
+  return '${pair()} ${pair()} ${pair()}';
 }

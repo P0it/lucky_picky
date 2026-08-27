@@ -186,8 +186,8 @@ class SupabaseGameBackend implements GameBackend {
       () async => _rpc('import_local_state', {'p_payload': payload}));
 
   @override
-  Future<String> issueRecoveryCode() => _guard(() async {
-        final r = await _rpc('issue_recovery_code');
+  Future<String> issueRecoveryCode([String lang = 'en']) => _guard(() async {
+        final r = await _rpc('issue_recovery_code', {'p_lang': lang});
         return r['code'] as String;
       });
 
