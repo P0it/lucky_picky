@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../l10n/app_localizations.dart';
+import '../state/consent_controller.dart';
 import '../state/locale_controller.dart';
 import '../theme/app_theme.dart';
 import 'pressable.dart';
@@ -78,7 +79,44 @@ class _LanguageSheet extends ConsumerWidget {
               opt,
               selected: current?.languageCode == opt.locale?.languageCode,
             ),
+          // 광고 동의를 받은 지역(EEA·영국 등)에서만 나온다 — UMP 는 받은 동의를
+          // 언제든 다시 열 수 있는 진입점을 요구한다. 그 외 지역에서는 숨는다.
+          FutureBuilder<bool>(
+            future: ConsentGate.instance.privacyOptionsRequired(),
+            builder: (context, snap) => snap.data == true
+                ? _adPrivacyRow(context, l.adPrivacySettings)
+                : const SizedBox.shrink(),
+          ),
         ],
+      ),
+    );
+  }
+
+  /// 광고 개인정보 설정 진입점 — 언어 행과 같은 면을 쓰되 체크 대신 화살표.
+  Widget _adPrivacyRow(BuildContext context, String label) {
+    return Pressable(
+      onTap: () {
+        Navigator.of(context).pop();
+        ConsentGate.instance.showPrivacyOptions();
+      },
+      child: Container(
+        margin: const EdgeInsets.only(top: 6),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        decoration: BoxDecoration(
+          color: AppColors.card,
+          borderRadius: BorderRadius.circular(AppRadius.button),
+        ),
+        child: Row(
+          children: [
+            Expanded(
+              child: Text(label,
+                  style: AppText.base(
+                      size: 16, weight: FontWeight.w600, color: AppColors.title)),
+            ),
+            const Icon(Icons.chevron_right_rounded,
+                size: 20, color: AppColors.muted),
+          ],
+        ),
       ),
     );
   }

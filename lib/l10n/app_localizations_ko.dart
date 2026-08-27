@@ -450,6 +450,9 @@ class AppLocalizationsKo extends AppLocalizations {
   String get languageSystem => '시스템 설정 따르기';
 
   @override
+  String get adPrivacySettings => '광고 개인정보 설정';
+
+  @override
   String get recoveryTitle => '행운 지키기';
 
   @override

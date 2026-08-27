@@ -458,6 +458,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get languageSystem => 'Follow system settings';
 
   @override
+  String get adPrivacySettings => 'Ad privacy settings';
+
+  @override
   String get recoveryTitle => 'Keep your luck safe';
 
   @override

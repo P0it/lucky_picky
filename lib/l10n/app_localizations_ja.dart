@@ -450,6 +450,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String get languageSystem => 'システム設定に従う';
 
   @override
+  String get adPrivacySettings => '広告のプライバシー設定';
+
+  @override
   String get recoveryTitle => '幸運を守る';
 
   @override

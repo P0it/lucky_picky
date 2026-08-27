@@ -850,6 +850,12 @@ abstract class AppLocalizations {
   /// **'Follow system settings'**
   String get languageSystem;
 
+  /// No description provided for @adPrivacySettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Ad privacy settings'**
+  String get adPrivacySettings;
+
   /// No description provided for @recoveryTitle.
   ///
   /// In en, this message translates to:
