@@ -187,9 +187,6 @@ class AppLocalizationsJa extends AppLocalizations {
   }
 
   @override
-  String get customCreateAdNote => '短い広告のあとにカードが出ます';
-
-  @override
   String customCreateNoClovers(int cost) {
     return 'クローバーが$cost個必要です — まずは善行を記録しましょう';
   }

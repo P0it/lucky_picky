@@ -62,7 +62,6 @@
   "customCreateHint": "이뤄졌으면 하는 한 마디",
   "customCreateCounter": "{used}/{max}",
   "customCreateConfirm": "만들기 (클로버 {cost}개)",
-  "customCreateAdNote": "짧은 광고를 본 뒤 카드가 나와요",
   "customCreateNoClovers": "클로버 {cost}개가 필요해요 — 선행부터 기록해볼까요?",
   "customCreateFailed": "지금은 만들 수 없어요 — 클로버는 그대로예요",
   "customCreated": "나만의 행운이 만들어졌어요",

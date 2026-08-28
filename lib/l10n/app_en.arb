@@ -120,7 +120,6 @@
       "cost": { "type": "int" }
     }
   },
-  "customCreateAdNote": "You'll watch a short ad, then your card appears",
   "customCreateNoClovers": "You need {cost} clover — record a good deed first",
   "@customCreateNoClovers": {
     "placeholders": {

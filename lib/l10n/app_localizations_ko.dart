@@ -187,9 +187,6 @@ class AppLocalizationsKo extends AppLocalizations {
   }
 
   @override
-  String get customCreateAdNote => '짧은 광고를 본 뒤 카드가 나와요';
-
-  @override
   String customCreateNoClovers(int cost) {
     return '클로버 $cost개가 필요해요 — 선행부터 기록해볼까요?';
   }

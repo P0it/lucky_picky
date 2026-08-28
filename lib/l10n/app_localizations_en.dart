@@ -190,10 +190,6 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get customCreateAdNote =>
-      'You\'ll watch a short ad, then your card appears';
-
-  @override
   String customCreateNoClovers(int cost) {
     return 'You need $cost clover — record a good deed first';
   }

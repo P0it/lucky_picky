@@ -62,7 +62,6 @@
   "customCreateHint": "叶ってほしいひとこと",
   "customCreateCounter": "{used}/{max}",
   "customCreateConfirm": "作る（クローバー{cost}個）",
-  "customCreateAdNote": "短い広告のあとにカードが出ます",
   "customCreateNoClovers": "クローバーが{cost}個必要です — まずは善行を記録しましょう",
   "customCreateFailed": "今は作れませんでした — クローバーはそのままです",
   "customCreated": "自分だけの幸運ができました",

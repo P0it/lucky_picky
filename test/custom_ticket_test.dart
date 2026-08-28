@@ -12,19 +12,23 @@ import 'package:luckypicky/state/app_controller.dart';
 import 'package:luckypicky/theme/app_theme.dart';
 import 'package:luckypicky/widgets/custom_ticket_card.dart';
 
-/// 광고를 끝까지 본 경우 — 보상 콜백이 온다.
-void _adWatched({required VoidCallback onReward, VoidCallback? onDone}) {
+/// 광고 게이트가 불렸는지 세는 스파이.
+///
+/// 소원 만들기에는 광고가 없다 — 클로버 한 개는 이미 선행 네 건으로 치른
+/// 값이라, 그 위에 광고를 또 얹으면 내 손으로 얻은 것이 아니게 된다.
+/// 이 카운터가 0 이 아니면 그 규칙이 깨진 것이다.
+int _adCalls = 0;
+void _adSpy({required VoidCallback onReward, VoidCallback? onDone}) {
+  _adCalls++;
   onReward();
   onDone?.call();
 }
 
-/// 광고를 건너뛰거나 로드되지 않은 경우 — 보상 없이 종료된다.
-void _adSkipped({required VoidCallback onReward, VoidCallback? onDone}) {
-  onDone?.call();
-}
-
 void main() {
-  setUp(() => SharedPreferences.setMockInitialValues({}));
+  setUp(() {
+    SharedPreferences.setMockInitialValues({});
+    _adCalls = 0;
+  });
 
   Widget host(RewardedAdGate gate, {int clovers = 3}) {
     final backend = LocalGameBackend(seed: AppState(clovers: clovers));
@@ -60,8 +64,8 @@ void main() {
     return c;
   }
 
-  testWidgets('광고를 끝까지 보면 카드가 만들어지고 클로버가 1개 줄어든다', (tester) async {
-    await tester.pumpWidget(host(_adWatched));
+  testWidgets('소원을 만들면 카드가 생기고 클로버가 1개 줄어든다', (tester) async {
+    await tester.pumpWidget(host(_adSpy));
     final c = await write(tester, '오늘은 좋은 일이 생긴다');
 
     final s = c.read(appControllerProvider);
@@ -73,19 +77,19 @@ void main() {
     await tester.pump(const Duration(milliseconds: 2200)); // 토스트 타이머 flush
   });
 
-  testWidgets('광고를 완료하지 않으면 클로버가 차감되지 않고 카드도 생기지 않는다', (tester) async {
-    await tester.pumpWidget(host(_adSkipped));
+  testWidgets('소원 만들기 경로에는 광고가 없다', (tester) async {
+    await tester.pumpWidget(host(_adSpy));
     final c = await write(tester, '오늘은 좋은 일이 생긴다');
 
-    final s = c.read(appControllerProvider);
-    expect(s.clovers, 3); // 그대로
-    expect(s.customTickets, isEmpty);
-    expect(find.byType(CustomTicketCard), findsNothing);
+    expect(_adCalls, 0,
+        reason: '클로버는 이미 선행 네 건으로 치른 값이다 — 광고는 뽑기 쪽에만 둔다');
+    // 그래도 카드는 정상적으로 만들어진다.
+    expect(c.read(appControllerProvider).customTickets, hasLength(1));
     await tester.pump(const Duration(milliseconds: 2200));
   });
 
   testWidgets('클로버가 없으면 시트가 아예 열리지 않는다', (tester) async {
-    await tester.pumpWidget(host(_adWatched, clovers: 0));
+    await tester.pumpWidget(host(_adSpy, clovers: 0));
     final c = await write(tester, '행운');
 
     expect(find.byType(TextField), findsNothing); // 입력 시트 없음

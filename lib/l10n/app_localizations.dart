@@ -412,12 +412,6 @@ abstract class AppLocalizations {
   /// **'Make it ({cost} clover)'**
   String customCreateConfirm(int cost);
 
-  /// No description provided for @customCreateAdNote.
-  ///
-  /// In en, this message translates to:
-  /// **'You\'ll watch a short ad, then your card appears'**
-  String get customCreateAdNote;
-
   /// No description provided for @customCreateNoClovers.
   ///
   /// In en, this message translates to:
