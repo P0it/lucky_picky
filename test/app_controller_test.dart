@@ -539,7 +539,40 @@ void main() {
       expect(s.tickets.length, 2);
       expect(s.tickets.every((t) => t.ticketId == 'c01'), true);
       expect(s.tickets.map((t) => t.level).toList()..sort(), [1, 2]);
-      expect(s.history.single.text, '이관 테스트');
+
+      // 기록은 부트스트랩에 안 실린다 — '나의 기록' 탭에서 받는다.
+      expect(s.history, isEmpty);
+      await n.ensureHistoryLoaded();
+      expect(c.read(appControllerProvider).history.single.text, '이관 테스트');
+    });
+  });
+
+  group('기록 지연 로딩', () {
+    test('부트스트랩은 기록을 받지 않고, 탭 진입 시에 받는다', () async {
+      final (c, _) = makeContainer(seed: seeded());
+      final n = c.read(appControllerProvider.notifier);
+      await n.ready;
+      await n.recordDeed('먼저 인사했다');
+
+      // 낙관적으로 끼워 넣은 이번 세션 항목만 있고, 아직 '받은' 상태는 아니다.
+      expect(c.read(appControllerProvider).historyLoaded, false);
+
+      await n.ensureHistoryLoaded();
+      final s = c.read(appControllerProvider);
+      expect(s.historyLoaded, true);
+      expect(s.history.first.text, '먼저 인사했다');
+    });
+
+    test('이미 받았으면 다시 받지 않는다', () async {
+      final (c, backend) = makeContainer(seed: seeded());
+      final n = c.read(appControllerProvider.notifier);
+      await n.ready;
+      await n.ensureHistoryLoaded();
+
+      // 받은 뒤 백엔드에만 항목이 늘어도, 다시 받지 않으므로 화면은 그대로다.
+      await backend.recordDeed('두 번째');
+      await n.ensureHistoryLoaded();
+      expect(c.read(appControllerProvider).history, isEmpty);
     });
   });
 

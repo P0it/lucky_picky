@@ -46,6 +46,7 @@ class PullResult {
 
 class AppController extends Notifier<AppState> {
   Future<void>? _bootstrap;
+  Future<void>? _historyLoad;
 
   GameBackend get _backend => ref.read(gameBackendProvider);
 
@@ -100,7 +101,10 @@ class AppController extends Notifier<AppState> {
       statPulls: data.statPulls,
       tickets: data.tickets,
       customTickets: data.customTickets,
-      history: data.history,
+      // 기록은 스냅샷에 없다 — 여기서 비우면 복구 코드로 계정이 바뀐 뒤에도
+      // 옛 계정 타임라인이 남지 않고, 다음에 탭을 열 때 다시 받는다.
+      history: const [],
+      historyLoaded: false,
       adCoinsToday: data.adCoinsToday,
       lastAdCoinDate: data.lastAdCoinDate,
     );
@@ -406,6 +410,34 @@ class AppController extends Notifier<AppState> {
     }
     await refresh();
     return RecoveryOutcome.restored;
+  }
+
+  /// 타임라인 기록을 (아직 안 받았으면) 받아온다. '나의 기록' 탭 진입 시 호출.
+  ///
+  /// 콜드 스타트 스냅샷에서 기록 300건이 가장 큰 덩어리인데, 대부분의 세션은
+  /// 그 탭을 열지도 않는다. 그래서 볼 때 받는다.
+  /// 실패(오프라인 등)는 삼킨다 — 화면이 비어 보일 뿐 앱은 계속 돈다.
+  Future<void> ensureHistoryLoaded() async {
+    if (state.historyLoaded) return;
+    final running = _historyLoad;
+    if (running != null) return running;
+    final run = _loadHistory();
+    _historyLoad = run;
+    try {
+      await run;
+    } catch (_) {
+      // 다음 진입에서 다시 시도한다.
+    } finally {
+      _historyLoad = null;
+    }
+  }
+
+  Future<void> _loadHistory() async {
+    await _ensureReady();
+    final rows = await _backend.fetchHistory();
+    // 서버 목록이 권위다 — 로딩 중에 낙관적으로 끼워 넣은 항목이 있어도
+    // 그건 이미 서버에 쓰인 것이라 다음 목록에 포함된다.
+    state = state.copyWith(history: rows, historyLoaded: true);
   }
 
   /// 서버 상태 강제 재동기화.

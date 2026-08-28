@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:luckypicky/data/game_backend.dart';
 import 'package:luckypicky/data/local_game_backend.dart';
+import 'package:luckypicky/models/deed.dart';
 import 'package:luckypicky/l10n/app_localizations.dart';
 import 'package:luckypicky/models/app_state.dart';
 import 'package:luckypicky/models/ticket_instance.dart';
@@ -46,6 +47,10 @@ class _SpyBackend implements GameBackend {
   Future<void> ensureSignedIn() => _inner.ensureSignedIn();
   @override
   Future<BackendSnapshot> fetchState() => _inner.fetchState();
+
+  @override
+  Future<List<HistoryEntry>> fetchHistory({int limit = 300}) =>
+      _inner.fetchHistory(limit: limit);
   @override
   Future<DeedResult> recordDeed(String text) => _inner.recordDeed(text);
   @override

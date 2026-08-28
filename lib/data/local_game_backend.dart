@@ -51,7 +51,13 @@ class LocalGameBackend implements GameBackend {
 
   @override
   Future<BackendSnapshot> fetchState() async =>
-      BackendSnapshot(data: _data, importedLocal: importedLocal);
+      // 서버와 같은 모양으로 — 기록은 스냅샷에 싣지 않는다 (fetchHistory 참고).
+      BackendSnapshot(
+          data: _data.copyWith(history: const []), importedLocal: importedLocal);
+
+  @override
+  Future<List<HistoryEntry>> fetchHistory({int limit = 300}) async =>
+      _data.history.take(limit).toList(growable: false);
 
   @override
   Future<DeedResult> recordDeed(String text) async {

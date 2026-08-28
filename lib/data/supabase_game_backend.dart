@@ -45,11 +45,6 @@ class SupabaseGameBackend implements GameBackend {
             .from('custom_tickets')
             .select('id,text,level,created_at')
             .order('created_at', ascending: false);
-        final history = await _client
-            .from('history')
-            .select('id,kind,text,amount,happened_on')
-            .order('created_at', ascending: false)
-            .limit(300);
 
         return BackendSnapshot(
           importedLocal: profile['imported_local'] as bool? ?? false,
@@ -80,16 +75,7 @@ class SupabaseGameBackend implements GameBackend {
                   createdAt: _dotDate(c['created_at'] as String?),
                 ),
             ],
-            history: [
-              for (final h in history)
-                HistoryEntry(
-                  id: h['id'] as int,
-                  date: _dotDate(h['happened_on'] as String?),
-                  kind: historyKindOf(h['kind']),
-                  text: h['text'] as String? ?? '',
-                  amount: h['amount'] as int? ?? 0,
-                ),
-            ],
+            // history 는 여기서 받지 않는다 — fetchHistory 참고.
           ),
         );
       });
@@ -192,6 +178,26 @@ class SupabaseGameBackend implements GameBackend {
   @override
   Future<void> importLocalState(Map<String, dynamic> payload) => _guard(
       () async => _rpc('import_local_state', {'p_payload': payload}));
+
+  @override
+  Future<List<HistoryEntry>> fetchHistory({int limit = 300}) =>
+      _guard(() async {
+        final rows = await _client
+            .from('history')
+            .select('id,kind,text,amount,happened_on')
+            .order('created_at', ascending: false)
+            .limit(limit);
+        return [
+          for (final h in rows)
+            HistoryEntry(
+              id: h['id'] as int,
+              date: _dotDate(h['happened_on'] as String?),
+              kind: historyKindOf(h['kind']),
+              text: h['text'] as String? ?? '',
+              amount: h['amount'] as int? ?? 0,
+            ),
+        ];
+      });
 
   @override
   Future<String> issueRecoveryCode([String lang = 'en']) => _guard(() async {

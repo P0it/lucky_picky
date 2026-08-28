@@ -1,5 +1,6 @@
 import '../models/app_state.dart';
 import '../models/custom_ticket.dart';
+import '../models/deed.dart';
 import '../models/ticket_instance.dart';
 
 /// 서버가 거부한 게임 규칙 위반 — 재화 부족, 한도 초과 등.
@@ -156,6 +157,13 @@ abstract class GameBackend {
   /// 카드 [materialIds] 를 갈아 새 카드 1장을 만든다.
   Future<ReforgeOutcome> reforgeTickets(List<String> materialIds);
   Future<void> importLocalState(Map<String, dynamic> payload);
+
+  /// 타임라인 기록을 최신순으로 받아온다.
+  ///
+  /// [fetchState] 는 이걸 포함하지 않는다 — 기록은 '나의 기록' 탭에서만 쓰는데
+  /// 콜드 스타트 스냅샷에서 가장 큰 덩어리(300건)라, 대부분의 세션이 쓰지도
+  /// 않는 데이터를 매번 내려받게 된다.
+  Future<List<HistoryEntry>> fetchHistory({int limit = 300});
 
   /// 이 계정의 복구 코드를 발급한다(계정당 1개, 재사용). 표시용 원문을 반환한다.
   /// [lang] 은 코드 단어를 만들 언어 — 읽고 입력할 수 있어야 코드가 쓸모 있다.
