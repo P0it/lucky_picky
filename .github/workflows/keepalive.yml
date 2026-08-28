@@ -1,0 +1,28 @@
+# Supabase 무료 플랜은 7일간 요청이 없으면 프로젝트를 일시정지(pause)한다.
+# 사흘에 한 번 REST 를 한 번 두드려 "활동 있음" 으로 유지한다.
+#
+# 시크릿을 안 넣어도 동작한다 — 앱에 이미 박혀 있는 공개 값(publishable key)을 폴백으로 쓴다.
+# 프로젝트를 옮기면 리포 시크릿 SUPABASE_URL / SUPABASE_ANON_KEY 만 채우면 된다.
+name: supabase keepalive
+
+on:
+  schedule:
+    # 3일마다 00:17 UTC. 정각은 GitHub 스케줄러가 밀리므로 피한다.
+    - cron: '17 0 */3 * *'
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Supabase REST
+        env:
+          URL: ${{ secrets.SUPABASE_URL || 'https://snejndzqxmwsdmdojmag.supabase.co' }}
+          KEY: ${{ secrets.SUPABASE_ANON_KEY || 'sb_publishable_cyPflSPV34SN6sg3TUAj2A_MHWJT4u7' }}
+        run: |
+          code=$(curl -s -o /tmp/body -w '%{http_code}' \
+            -H "apikey: $KEY" -H "Authorization: Bearer $KEY" \
+            "$URL/rest/v1/copy_lines?select=id&limit=1")
+          echo "HTTP $code"; cat /tmp/body; echo
+          # 2xx 가 아니면 프로젝트가 이미 멈췄거나 키가 만료된 것이므로 실패로 알린다.
+          [ "$code" -ge 200 ] && [ "$code" -lt 300 ]
