@@ -28,18 +28,26 @@ class SupabaseGameBackend implements GameBackend {
 
   @override
   Future<BackendSnapshot> fetchState() => _guard(() async {
-        final profile = await _client.from('profiles').select().single();
+        // 컬럼을 명시한다 — select() 는 user_id·created_at·updated_at 까지 전부
+        // 실어 보낸다. 보유 카드는 유저마다 수백 장이 되고 콜드 스타트마다
+        // 통째로 내려오므로, 안 쓰는 컬럼 하나가 곧 대역폭 요금이다.
+        // (정렬 기준 created_at 은 선택하지 않아도 order 에 쓸 수 있다.)
+        final profile = await _client
+            .from('profiles')
+            .select('leaves,clovers,coins,stat_leaves,stat_clovers,stat_pulls,'
+                'ad_coins_today,last_ad_coin_date,imported_local')
+            .single();
         final tickets = await _client
             .from('ticket_instances')
-            .select()
+            .select('id,ticket_id,level,pulled_at')
             .order('created_at', ascending: false);
         final customs = await _client
             .from('custom_tickets')
-            .select()
+            .select('id,text,level,created_at')
             .order('created_at', ascending: false);
         final history = await _client
             .from('history')
-            .select()
+            .select('id,kind,text,amount,happened_on')
             .order('created_at', ascending: false)
             .limit(300);
 
