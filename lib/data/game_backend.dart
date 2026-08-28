@@ -76,6 +76,13 @@ class GachaOutcome {
 }
 
 /// 광고 보상으로 지급된 코인 — 뽑기는 이 코인을 쓴다.
+/// 하루 무료 코인 수령 결과.
+class DailyCoinResult {
+  final bool claimed; // 오늘 몫을 방금 받았는지 (이미 받았으면 false)
+  final int coins; // 반영 후 보유 코인
+  const DailyCoinResult({required this.claimed, required this.coins});
+}
+
 class AdCoinResult {
   final int coins; // 반영 후 보유 코인
   final int usedToday; // 오늘 받은 광고 코인 수
@@ -142,6 +149,11 @@ abstract class GameBackend {
 
   /// 광고 시청 보상 — 코인 1개 지급 (하루 한도).
   Future<AdCoinResult> grantAdCoin();
+
+  /// 하루 한 번 주는 무료 코인을 받는다. 이미 받은 날이면 claimed=false 로
+  /// 조용히 돌아온다 — 예외가 아니다. 앱 시작마다 불리는 곁가지라, 던지면
+  /// 이미 받은 날에는 매번 부트스트랩이 실패한다.
+  Future<DailyCoinResult> claimDailyCoin();
 
   /// 커스텀 행운권 제작 — 클로버를 소모해 [text] 문구의 카드를 만든다.
   Future<CustomTicketResult> createCustomTicket(String text);

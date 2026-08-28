@@ -51,6 +51,9 @@ class _SpyBackend implements GameBackend {
   @override
   Future<List<HistoryEntry>> fetchHistory({int limit = 300}) =>
       _inner.fetchHistory(limit: limit);
+
+  @override
+  Future<DailyCoinResult> claimDailyCoin() => _inner.claimDailyCoin();
   @override
   Future<DeedResult> recordDeed(String text) => _inner.recordDeed(text);
   @override

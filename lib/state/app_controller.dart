@@ -138,6 +138,14 @@ class AppController extends Notifier<AppState> {
 
   Future<void> _runBootstrap() async {
     await _backend.ensureSignedIn();
+
+    // 오늘 몫의 무료 코인. 스냅샷보다 먼저 받아야 방금 받은 코인이 첫 화면에
+    // 반영된다. 실패해도 부트스트랩을 세우지 않는다 — 곁가지 하나 때문에
+    // 앱 전체가 못 뜨면 안 된다.
+    try {
+      await _backend.claimDailyCoin();
+    } catch (_) {}
+
     var snap = await _backend.fetchState();
     if (!snap.importedLocal) {
       final legacy = await _readLegacyBlob();

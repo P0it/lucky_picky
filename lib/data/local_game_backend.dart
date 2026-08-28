@@ -29,6 +29,8 @@ class LocalGameBackend implements GameBackend {
 
   /// 이 계정이 발급받은 복구 코드(표시용 원문). 없으면 아직 미발급.
   String? _recoveryCode;
+  /// 마지막으로 무료 코인을 받은 날 'YYYY.MM.DD' (서버 profiles.last_free_coin_date).
+  String? _lastFreeCoinDate;
 
   LocalGameBackend(
       {AppState? seed,
@@ -141,6 +143,19 @@ class LocalGameBackend implements GameBackend {
       lastAdCoinDate: today,
     );
     return AdCoinResult(coins: _data.coins, usedToday: used + 1);
+  }
+
+  /// 하루 무료 코인 — 날짜가 바뀌면 다시 받을 수 있다.
+  /// 서버 claim_daily_coin 과 같은 규칙(UTC 기준일).
+  @override
+  Future<DailyCoinResult> claimDailyCoin() async {
+    final today = _today;
+    if (_lastFreeCoinDate == today) {
+      return DailyCoinResult(claimed: false, coins: _data.coins);
+    }
+    _lastFreeCoinDate = today;
+    _data = _data.copyWith(coins: _data.coins + kFreeCoinsPerDayRule);
+    return DailyCoinResult(claimed: true, coins: _data.coins);
   }
 
   /// 커스텀 행운권 제작 — 클로버 1개 소모. 문구는 트림 후 1~40자.
@@ -327,6 +342,9 @@ class LocalGameBackend implements GameBackend {
 
   /// 하루 광고 코인 지급 한도 — 서버 game_config 의 ad_coins_per_day 와 동치.
   static const int kAdCoinsPerDayRule = 5;
+
+  /// 하루 무료 코인 — 서버 game_config 의 free_coins_per_day 와 동치.
+  static const int kFreeCoinsPerDayRule = 1;
 
   /// 커스텀 행운권 제작 비용 — 서버 game_config 의 custom_ticket_cost 와 동치.
   static const int kCustomTicketCost = CustomTicket.createCost;

@@ -118,6 +118,15 @@ class SupabaseGameBackend implements GameBackend {
       });
 
   @override
+  Future<DailyCoinResult> claimDailyCoin() => _guard(() async {
+        final r = await _rpc('claim_daily_coin');
+        return DailyCoinResult(
+          claimed: r['claimed'] as bool? ?? false,
+          coins: r['coins'] as int,
+        );
+      });
+
+  @override
   Future<CustomTicketResult> createCustomTicket(String text) =>
       _guard(() async {
         final r = await _rpc('create_custom_ticket', {'p_text': text});

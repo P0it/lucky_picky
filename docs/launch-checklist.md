@@ -45,9 +45,14 @@
 - [ ] **Supabase 마이그레이션 적용** (SQL 에디터에서 순서대로)
   1. `supabase/migrations/20260827000010_recovery_rate_limit.sql`
   2. `supabase/migrations/20260827000011_recovery_words_i18n.sql`
-  두 파일은 기존 `recovery_codes` 행의 해시를 원문에서 다시 계산한다 — 이미
+  3. `supabase/migrations/20260828000012_daily_free_coin.sql`
+  10·11 은 기존 `recovery_codes` 행의 해시를 원문에서 다시 계산한다 — 이미
   발급된 코드는 그대로 쓸 수 있다. 적용 전 앱을 올리면 `p_lang` 인자가 없는
   구버전 함수라 복구 코드 발급이 실패한다. **마이그레이션이 먼저다.**
+
+  12 는 안 올려도 앱은 정상 동작한다(무료 코인만 안 나온다) — `claim_daily_coin`
+  실패는 부트스트랩에서 삼킨다. 그래도 이걸 빼면 신규 이용자가 첫 뽑기 전에
+  광고부터 봐야 하므로, 출시 전에 반드시 올린다.
 
 - [ ] **AdMob 콘솔에서 GDPR 동의 메시지 생성**
   앱에 UMP 코드는 들어갔지만, AdMob 콘솔 → 개인정보 보호 및 메시지에서
