@@ -519,6 +519,12 @@ class AppLocalizationsJa extends AppLocalizations {
   }
 
   @override
+  String get offlineBanner => 'オフラインです。接続すると続けられます';
+
+  @override
+  String get offlineRetry => '再試行';
+
+  @override
   String get loadingErrorTitle => '接続できませんでした';
 
   @override

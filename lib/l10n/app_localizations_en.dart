@@ -531,6 +531,12 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get offlineBanner => 'You\'re offline. Reconnect to keep going';
+
+  @override
+  String get offlineRetry => 'Retry';
+
+  @override
   String get loadingErrorTitle => 'Couldn\'t connect';
 
   @override

@@ -164,6 +164,9 @@
   "heatmapDayTitle": "{date}의 선행",
   "heatmapDayCount": "이날 {count}번의 선행을 베푸셨어요.",
 
+  "offlineBanner": "오프라인이에요. 연결되면 이어서 할 수 있어요",
+  "offlineRetry": "다시 시도",
+
   "loadingErrorTitle": "연결에 실패했어요",
   "loadingErrorBody": "네트워크 상태를 확인해 주세요",
   "loadingRetry": "다시 시도"

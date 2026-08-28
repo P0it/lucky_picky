@@ -519,6 +519,12 @@ class AppLocalizationsKo extends AppLocalizations {
   }
 
   @override
+  String get offlineBanner => '오프라인이에요. 연결되면 이어서 할 수 있어요';
+
+  @override
+  String get offlineRetry => '다시 시도';
+
+  @override
   String get loadingErrorTitle => '연결에 실패했어요';
 
   @override

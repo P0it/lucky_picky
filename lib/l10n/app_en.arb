@@ -350,6 +350,9 @@
     }
   },
 
+  "offlineBanner": "You're offline. Reconnect to keep going",
+  "offlineRetry": "Retry",
+
   "loadingErrorTitle": "Couldn't connect",
   "loadingErrorBody": "Please check your network connection",
   "loadingRetry": "Try again"

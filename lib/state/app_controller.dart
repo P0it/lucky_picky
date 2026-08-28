@@ -8,6 +8,7 @@ import 'package:supabase_flutter/supabase_flutter.dart' show Supabase;
 
 import '../config/luck_tickets.dart';
 import '../data/game_backend.dart';
+import '../data/state_cache.dart';
 import '../data/supabase_game_backend.dart';
 import '../models/app_state.dart';
 import '../models/custom_ticket.dart';
@@ -48,14 +49,72 @@ class AppController extends Notifier<AppState> {
   Future<void>? _bootstrap;
   Future<void>? _historyLoad;
 
+  /// 서버 스냅샷을 한 번이라도 반영했는지 — 늦게 도착한 로컬 사본이
+  /// 최신 서버 상태를 덮어쓰지 않게 막는다.
+  bool _serverApplied = false;
+
+  final _cache = const StateCache();
+
   GameBackend get _backend => ref.read(gameBackendProvider);
 
   @override
   AppState build() {
-    // 시작 시 백그라운드로 로그인+서버 상태 로드. 실패(오프라인)해도
-    // 앱은 뜨고, 이후 mutation 시점에 재시도된다.
+    // 상태 변화를 로컬 사본에 남긴다. 다음 실행(특히 오프라인)에서 이 사본으로
+    // 화면을 채운다. 저장 대상(toJson)이 바뀐 경우만 쓴다.
+    listenSelf((prev, next) {
+      if (prev == null) return;
+      if (!_persistedEquals(prev, next)) unawaited(_cache.write(next));
+    });
+
+    // 사본 먼저(즉시), 서버는 그 다음. 실패(오프라인)해도 앱은 뜬다.
+    unawaited(_restoreCache());
     unawaited(_ensureReady().catchError((_) {}));
     return const AppState();
+  }
+
+  /// 마지막 사본으로 화면을 채운다. 서버 응답이 이미 도착했으면 아무것도 안 한다.
+  Future<void> _restoreCache() async {
+    final cached = await _cache.read();
+    if (cached == null || _serverApplied) return;
+    state = state.copyWith(
+      leaves: cached.leaves,
+      clovers: cached.clovers,
+      coins: cached.coins,
+      statLeaves: cached.statLeaves,
+      statClovers: cached.statClovers,
+      statPulls: cached.statPulls,
+      tickets: cached.tickets,
+      customTickets: cached.customTickets,
+      // 사본의 기록은 바로 보여주되 '받았다'고 표시하지 않는다 —
+      // '나의 기록' 탭에 들어가면 서버 최신본으로 다시 채운다.
+      history: cached.history,
+      adCoinsToday: cached.adCoinsToday,
+      lastAdCoinDate: cached.lastAdCoinDate,
+    );
+  }
+
+  /// 사본에 남기는 필드만 비교한다 — 탭 전환·애니메이션 키 때문에
+  /// 매번 디스크에 쓰지 않도록.
+  static bool _persistedEquals(AppState a, AppState b) =>
+      a.leaves == b.leaves &&
+      a.clovers == b.clovers &&
+      a.coins == b.coins &&
+      a.statLeaves == b.statLeaves &&
+      a.statClovers == b.statClovers &&
+      a.statPulls == b.statPulls &&
+      a.adCoinsToday == b.adCoinsToday &&
+      a.lastAdCoinDate == b.lastAdCoinDate &&
+      identical(a.tickets, b.tickets) &&
+      identical(a.customTickets, b.customTickets) &&
+      identical(a.history, b.history);
+
+  /// 연결이 끊겨 있을 때 다시 시도한다 (오프라인 띠를 눌렀을 때).
+  Future<void> retrySync() async {
+    try {
+      await _ensureReady();
+    } catch (_) {
+      // 여전히 오프라인 — 띠가 그대로 남는다.
+    }
   }
 
   /// 테스트에서 부트스트랩 완료를 기다릴 때 사용.
@@ -69,7 +128,11 @@ class AppController extends Notifier<AppState> {
     if (existing != null) return existing;
     final run = _runBootstrap();
     _bootstrap = run;
-    run.catchError((_) => _bootstrap = null);
+    run.catchError((Object e) {
+      _bootstrap = null;
+      // 서버에 못 붙었다 — 사본으로 계속 돌되 그 사실을 화면에 알린다.
+      state = state.copyWith(offline: true);
+    });
     return run;
   }
 
@@ -88,6 +151,7 @@ class AppController extends Notifier<AppState> {
       }
     }
     _applySnapshot(snap.data);
+    _serverApplied = true;
   }
 
   /// 서버 스냅샷을 반영한다 (탭/애니메이션 등 UI 휘발 필드는 보존).
@@ -105,6 +169,7 @@ class AppController extends Notifier<AppState> {
       // 옛 계정 타임라인이 남지 않고, 다음에 탭을 열 때 다시 받는다.
       history: const [],
       historyLoaded: false,
+      offline: false, // 서버 응답이 왔다 = 연결됨
       adCoinsToday: data.adCoinsToday,
       lastAdCoinDate: data.lastAdCoinDate,
     );

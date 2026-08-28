@@ -970,6 +970,18 @@ abstract class AppLocalizations {
   /// **'{count} good deeds on this day.'**
   String heatmapDayCount(int count);
 
+  /// No description provided for @offlineBanner.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'re offline. Reconnect to keep going'**
+  String get offlineBanner;
+
+  /// No description provided for @offlineRetry.
+  ///
+  /// In en, this message translates to:
+  /// **'Retry'**
+  String get offlineRetry;
+
   /// No description provided for @loadingErrorTitle.
   ///
   /// In en, this message translates to:

@@ -164,6 +164,9 @@
   "heatmapDayTitle": "{date}の善行",
   "heatmapDayCount": "この日は{count}回の善行をされました。",
 
+  "offlineBanner": "オフラインです。接続すると続けられます",
+  "offlineRetry": "再試行",
+
   "loadingErrorTitle": "接続できませんでした",
   "loadingErrorBody": "ネットワーク状態を確認してください",
   "loadingRetry": "もう一度試す"
