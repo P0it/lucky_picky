@@ -51,7 +51,7 @@
       "count": { "type": "int" }
     }
   },
-  "historyCustomMade": "[Charm made] {text}",
+  "historyCustomMade": "[Wish] {text}",
   "@historyCustomMade": {
     "placeholders": {
       "text": { "type": "String" }
@@ -102,10 +102,10 @@
   "resultConfirm": "Claim lucky card",
   "resultRerollAd": "Watch an ad · pull again",
 
-  "customSectionTitle": "Lucky charms you made",
-  "customSectionEmpty": "Write your own luck — clovers from good deeds turn into a card",
-  "customCreateCta": "Make a charm",
-  "customCreateTitle": "Write your own luck",
+  "customSectionTitle": "Wishes you made",
+  "customSectionEmpty": "Clovers from good deeds become your wishes",
+  "customCreateCta": "Make a wish",
+  "customCreateTitle": "What do you wish for?",
   "customCreateHint": "Something you'd like to come true",
   "customCreateCounter": "{used}/{max}",
   "@customCreateCounter": {
@@ -114,7 +114,7 @@
       "max": { "type": "int" }
     }
   },
-  "customCreateConfirm": "Make it ({cost} clover)",
+  "customCreateConfirm": "Make a wish ({cost} clover)",
   "@customCreateConfirm": {
     "placeholders": {
       "cost": { "type": "int" }
@@ -126,17 +126,17 @@
       "cost": { "type": "int" }
     }
   },
-  "customCreateFailed": "Couldn't make it just now — your clover is untouched",
-  "customCreated": "Your luck is made",
-  "customEnhance": "Enhance ({cost} clovers)",
+  "customCreateFailed": "Couldn't make your wish just now — your clover is untouched",
+  "customCreated": "Your wish is made",
+  "customEnhance": "Grow it ({cost} clovers)",
   "@customEnhance": {
     "placeholders": {
       "cost": { "type": "int" }
     }
   },
-  "customEnhanceMax": "Fully enhanced",
+  "customEnhanceMax": "Fully grown",
   "customEnhanceNoClovers": "Not enough clovers",
-  "customBadge": "MADE",
+  "customBadge": "WISH",
 
   "dexTitle": "Collection",
   "dexSubtitle": "Every luck you've pulled lives here",

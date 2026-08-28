@@ -47,19 +47,19 @@ void main() {
     );
   }
 
-  /// 보관함 → "행운권 만들기" → 시트에 문구 입력 → 만들기.
+  /// 보관함 → "소원 빌기" → 시트에 문구 입력 → 빌기.
   Future<ProviderContainer> write(WidgetTester tester, String text) async {
     await tester.pumpAndSettle();
     final c =
         ProviderScope.containerOf(tester.element(find.byType(DexScreen)));
 
-    await tester.tap(find.text('행운권 만들기'));
+    await tester.tap(find.text('소원 빌기'));
     await tester.pumpAndSettle();
     if (find.byType(TextField).evaluate().isEmpty) return c; // 시트가 안 열림
 
     await tester.enterText(find.byType(TextField), text);
     await tester.pumpAndSettle();
-    await tester.tap(find.text('만들기 (클로버 1개)'));
+    await tester.tap(find.text('소원 빌기 (클로버 1개)'));
     await tester.pumpAndSettle();
     return c;
   }

@@ -9,9 +9,9 @@ import 'custom_detail_sheet.dart';
 import 'custom_ticket_card.dart';
 import 'pressable.dart';
 
-/// 보관함 맨 위의 "내가 만든 행운권" 구역.
+/// 보관함 맨 위의 "내가 빈 소원" 구역.
 ///
-/// 뽑기 카드 리스트보다 먼저 온다 — 내 손으로 만든 카드가 먼저 눈에 들어와야 한다.
+/// 뽑기 카드 리스트보다 먼저 온다 — 내 손으로 쓴 것이 먼저 눈에 들어와야 한다.
 /// 이 카드들은 재조합·강화의 재료 목록에 절대 나타나지 않는다(타입이 다르다).
 class CustomSection extends ConsumerWidget {
   const CustomSection({super.key});

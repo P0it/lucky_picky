@@ -10,7 +10,7 @@ import 'app_toast.dart';
 import 'custom_ticket_card.dart';
 import 'pressable.dart';
 
-/// 내가 만든 행운권 상세 — 카드 전문과 강화 버튼만 있는 하프 모달.
+/// 내가 빈 소원 상세 — 카드 전문과 키우기 버튼만 있는 하프 모달.
 ///
 /// 강화는 클로버를 현재 레벨 수만큼 쓰고 **실패하지 않는다.** 그래서
 /// `forge_overlay` 의 게이지·균열·폭발 연출을 쓰지 않고 +N 이 오르는 팝으로 끝낸다.

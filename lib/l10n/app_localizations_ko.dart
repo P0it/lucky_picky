@@ -93,7 +93,7 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String historyCustomMade(String text) {
-    return '[행운권 제작] $text';
+    return '[소원] $text';
   }
 
   @override
@@ -162,16 +162,16 @@ class AppLocalizationsKo extends AppLocalizations {
   String get resultRerollAd => '광고 보고 한 번 더';
 
   @override
-  String get customSectionTitle => '내가 만든 행운권';
+  String get customSectionTitle => '내가 빈 소원';
 
   @override
-  String get customSectionEmpty => '선행으로 모은 클로버가 내 문구의 행운권이 돼요';
+  String get customSectionEmpty => '선행으로 모은 클로버로 소원을 빌 수 있어요';
 
   @override
-  String get customCreateCta => '행운권 만들기';
+  String get customCreateCta => '소원 빌기';
 
   @override
-  String get customCreateTitle => '나만의 행운을 적어보세요';
+  String get customCreateTitle => '어떤 소원을 빌까요';
 
   @override
   String get customCreateHint => '이뤄졌으면 하는 한 마디';
@@ -183,7 +183,7 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String customCreateConfirm(int cost) {
-    return '만들기 (클로버 $cost개)';
+    return '소원 빌기 (클로버 $cost개)';
   }
 
   @override
@@ -192,24 +192,24 @@ class AppLocalizationsKo extends AppLocalizations {
   }
 
   @override
-  String get customCreateFailed => '지금은 만들 수 없어요 — 클로버는 그대로예요';
+  String get customCreateFailed => '지금은 빌 수 없어요 — 클로버는 그대로예요';
 
   @override
-  String get customCreated => '나만의 행운이 만들어졌어요';
+  String get customCreated => '소원을 빌었어요';
 
   @override
   String customEnhance(int cost) {
-    return '강화하기 (클로버 $cost개)';
+    return '소원 키우기 (클로버 $cost개)';
   }
 
   @override
-  String get customEnhanceMax => '최대 강화 완료';
+  String get customEnhanceMax => '더 키울 수 없어요';
 
   @override
   String get customEnhanceNoClovers => '클로버가 부족해요';
 
   @override
-  String get customBadge => '직접 만듦';
+  String get customBadge => '내 소원';
 
   @override
   String get dexTitle => '보관함';

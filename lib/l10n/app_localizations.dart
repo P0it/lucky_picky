@@ -253,7 +253,7 @@ abstract class AppLocalizations {
   /// No description provided for @historyCustomMade.
   ///
   /// In en, this message translates to:
-  /// **'[Charm made] {text}'**
+  /// **'[Wish] {text}'**
   String historyCustomMade(String text);
 
   /// No description provided for @historyCloverDelta.
@@ -373,25 +373,25 @@ abstract class AppLocalizations {
   /// No description provided for @customSectionTitle.
   ///
   /// In en, this message translates to:
-  /// **'Lucky charms you made'**
+  /// **'Wishes you made'**
   String get customSectionTitle;
 
   /// No description provided for @customSectionEmpty.
   ///
   /// In en, this message translates to:
-  /// **'Write your own luck — clovers from good deeds turn into a card'**
+  /// **'Clovers from good deeds become your wishes'**
   String get customSectionEmpty;
 
   /// No description provided for @customCreateCta.
   ///
   /// In en, this message translates to:
-  /// **'Make a charm'**
+  /// **'Make a wish'**
   String get customCreateCta;
 
   /// No description provided for @customCreateTitle.
   ///
   /// In en, this message translates to:
-  /// **'Write your own luck'**
+  /// **'What do you wish for?'**
   String get customCreateTitle;
 
   /// No description provided for @customCreateHint.
@@ -409,7 +409,7 @@ abstract class AppLocalizations {
   /// No description provided for @customCreateConfirm.
   ///
   /// In en, this message translates to:
-  /// **'Make it ({cost} clover)'**
+  /// **'Make a wish ({cost} clover)'**
   String customCreateConfirm(int cost);
 
   /// No description provided for @customCreateNoClovers.
@@ -421,25 +421,25 @@ abstract class AppLocalizations {
   /// No description provided for @customCreateFailed.
   ///
   /// In en, this message translates to:
-  /// **'Couldn\'t make it just now — your clover is untouched'**
+  /// **'Couldn\'t make your wish just now — your clover is untouched'**
   String get customCreateFailed;
 
   /// No description provided for @customCreated.
   ///
   /// In en, this message translates to:
-  /// **'Your luck is made'**
+  /// **'Your wish is made'**
   String get customCreated;
 
   /// No description provided for @customEnhance.
   ///
   /// In en, this message translates to:
-  /// **'Enhance ({cost} clovers)'**
+  /// **'Grow it ({cost} clovers)'**
   String customEnhance(int cost);
 
   /// No description provided for @customEnhanceMax.
   ///
   /// In en, this message translates to:
-  /// **'Fully enhanced'**
+  /// **'Fully grown'**
   String get customEnhanceMax;
 
   /// No description provided for @customEnhanceNoClovers.
@@ -451,7 +451,7 @@ abstract class AppLocalizations {
   /// No description provided for @customBadge.
   ///
   /// In en, this message translates to:
-  /// **'MADE'**
+  /// **'WISH'**
   String get customBadge;
 
   /// No description provided for @dexTitle.

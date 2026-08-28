@@ -23,7 +23,7 @@ class AppState {
   final int statPulls; // 총 뽑기 횟수
 
   final List<TicketInstance> tickets; // 보유 카드 (한 장 = 한 인스턴스, 최신 획득순)
-  final List<CustomTicket> customTickets; // 내가 만든 행운권 (최신순)
+  final List<CustomTicket> customTickets; // 내가 빈 소원 (최신순)
   final List<HistoryEntry> history;
 
   final int adCoinsToday; // 오늘 광고로 받은 코인 수

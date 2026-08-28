@@ -93,7 +93,7 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String historyCustomMade(String text) {
-    return '［チケット作成］$text';
+    return '［願い］$text';
   }
 
   @override
@@ -162,16 +162,16 @@ class AppLocalizationsJa extends AppLocalizations {
   String get resultRerollAd => '広告を見てもう1回';
 
   @override
-  String get customSectionTitle => '自分で作った幸運チケット';
+  String get customSectionTitle => 'わたしの願い';
 
   @override
-  String get customSectionEmpty => '善行で貯めたクローバーが、自分の言葉のチケットになります';
+  String get customSectionEmpty => '善行で貯めたクローバーで願いをかけられます';
 
   @override
-  String get customCreateCta => 'チケットを作る';
+  String get customCreateCta => '願いをかける';
 
   @override
-  String get customCreateTitle => '自分だけの幸運を書いてみよう';
+  String get customCreateTitle => 'どんな願いをかけますか';
 
   @override
   String get customCreateHint => '叶ってほしいひとこと';
@@ -183,7 +183,7 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String customCreateConfirm(int cost) {
-    return '作る（クローバー$cost個）';
+    return '願いをかける（クローバー$cost個）';
   }
 
   @override
@@ -192,24 +192,24 @@ class AppLocalizationsJa extends AppLocalizations {
   }
 
   @override
-  String get customCreateFailed => '今は作れませんでした — クローバーはそのままです';
+  String get customCreateFailed => '今は願いをかけられませんでした — クローバーはそのままです';
 
   @override
-  String get customCreated => '自分だけの幸運ができました';
+  String get customCreated => '願いをかけました';
 
   @override
   String customEnhance(int cost) {
-    return '強化する（クローバー$cost個）';
+    return '願いを育てる（クローバー$cost個）';
   }
 
   @override
-  String get customEnhanceMax => '最大強化済み';
+  String get customEnhanceMax => 'もう育てられません';
 
   @override
   String get customEnhanceNoClovers => 'クローバーが足りません';
 
   @override
-  String get customBadge => '自作';
+  String get customBadge => '願い';
 
   @override
   String get dexTitle => 'コレクション';
