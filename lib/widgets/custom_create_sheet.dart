@@ -1,10 +1,57 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../data/game_backend.dart';
 import '../l10n/app_localizations.dart';
 import '../models/custom_ticket.dart';
+import '../state/ads_controller.dart';
+import '../state/app_controller.dart';
 import '../theme/app_theme.dart';
+import 'app_toast.dart';
 import 'pressable.dart';
+
+/// 소원 만들기 한 판: 클로버 확인 → 문구 시트 → 광고 → 서버 제작.
+///
+/// 입구가 둘이다 — 홈의 클로버 배지, 보관함의 '만들기' 버튼. 두 곳이 같은
+/// 함수를 불러야 한다. 복사해두면 언젠가 한쪽만 고쳐지고, 그 입구에서만
+/// 클로버가 새기 시작한다.
+///
+/// **광고를 끝까지 본 경우에만 서버를 부른다.** 차감 후 환불이 아니라 아예
+/// 차감하지 않는 방식이다 — 환불식은 "차감됨 → 환불됨" 사이에 클로버가
+/// 사라져 보이는 구간이 생기고, 그 순간 앱이 죽으면 진짜로 날아간다.
+/// (가챠 `runGachaPullFlow` 와 같은 패턴)
+Future<void> runCustomCreateFlow(BuildContext context, WidgetRef ref) async {
+  final l = AppLocalizations.of(context);
+
+  if (ref.read(appControllerProvider).clovers < CustomTicket.createCost) {
+    showAppToast(context, l.customCreateNoClovers(CustomTicket.createCost));
+    return;
+  }
+
+  final text = await showCustomCreateSheet(context);
+  if (text == null || !context.mounted) return;
+
+  var rewarded = false;
+  ref.read(rewardedAdProvider)(
+    onReward: () async {
+      rewarded = true;
+      try {
+        final made =
+            await ref.read(appControllerProvider.notifier).createCustomTicket(text);
+        if (!context.mounted) return;
+        showAppToast(
+            context, made == null ? l.customCreateFailed : l.customCreated);
+      } on GameConnectionException {
+        if (context.mounted) showAppToast(context, l.errorNeedConnection);
+      }
+    },
+    onDone: () {
+      if (rewarded || !context.mounted) return;
+      showAppToast(context, l.customCreateFailed);
+    },
+  );
+}
 
 /// 나만의 행운권 문구를 적는 하프 모달 — 선행 기록 시트와 같은 결로 올라온다.
 ///
