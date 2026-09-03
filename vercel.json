@@ -1,0 +1,21 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": null,
+  "installCommand": "echo 'Flutter SDK 는 빌드 단계에서 받는다 — tool/build_web.sh'",
+  "buildCommand": "bash tool/build_web.sh",
+  "outputDirectory": "build/site",
+  "headers": [
+    {
+      "source": "/app/",
+      "headers": [
+        { "key": "Cache-Control", "value": "no-cache, no-store, must-revalidate" }
+      ]
+    },
+    {
+      "source": "/app/(index.html|flutter_bootstrap.js)",
+      "headers": [
+        { "key": "Cache-Control", "value": "no-cache, no-store, must-revalidate" }
+      ]
+    }
+  ]
+}
