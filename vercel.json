@@ -6,15 +6,21 @@
   "outputDirectory": "build/site",
   "headers": [
     {
-      "source": "/app/",
+      "source": "/",
       "headers": [
-        { "key": "Cache-Control", "value": "no-cache, no-store, must-revalidate" }
+        {
+          "key": "Cache-Control",
+          "value": "no-cache, no-store, must-revalidate"
+        }
       ]
     },
     {
-      "source": "/app/(index.html|flutter_bootstrap.js)",
+      "source": "/(index.html|flutter_bootstrap.js)",
       "headers": [
-        { "key": "Cache-Control", "value": "no-cache, no-store, must-revalidate" }
+        {
+          "key": "Cache-Control",
+          "value": "no-cache, no-store, must-revalidate"
+        }
       ]
     }
   ]

@@ -3,11 +3,10 @@
 # Vercel 빌드서버용 웹 빌드 — 깃헙에 푸시하면 여기서 build/site 가 만들어진다.
 # (로컬에서 손으로 굽고 싶으면 tool/build_web.ps1 이 같은 일을 한다.)
 #
-# 산출물 배치:
-#   /              site/index.html    — 소개 랜딩
-#   /privacy.html  site/privacy.html  — 개인정보처리방침
-#   /app-ads.txt   site/app-ads.txt   — AdMob 크롤러가 읽는 파일 (루트여야 한다)
-#   /app/          Flutter 웹 데모
+# 산출물 배치 — 앱이 곧 사이트다. 루트를 열면 바로 실행된다.
+#   /              Flutter 웹 데모
+#   /privacy.html  개인정보처리방침
+#   /app-ads.txt   AdMob 크롤러가 읽는 파일 (루트여야 크롤러가 찾는다)
 #
 set -euo pipefail
 
@@ -32,12 +31,13 @@ flutter pub get
 # --pwa-strategy=none: 서비스워커를 만들지 않는다. 재배포 후 낡은 번들을 물고
 # 스플래시에서 멈추는 사고를 막는다(vercel.json 의 no-cache 헤더와 한 쌍).
 # 데모 모드는 웹 기본값이라 따로 넘기지 않는다 — lib/config/app_mode.dart 참고.
-flutter build web --release --pwa-strategy=none --base-href /app/
+flutter build web --release --pwa-strategy=none
 
 rm -rf build/site
 mkdir -p build/site
+cp -r build/web/. build/site/
+# 앱 빌드 위에 문서를 얹는다. 겹치는 이름이 없어야 한다(앱은 index.html 을 쓴다).
 cp -r site/. build/site/
-cp -r build/web build/site/app
 
 echo "조립 완료:"
 ls -la build/site
