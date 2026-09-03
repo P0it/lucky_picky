@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
+import '../l10n/app_localizations.dart';
 import '../models/deed.dart';
 import '../theme/app_theme.dart';
 import 'pressable.dart';
@@ -15,7 +17,27 @@ class DeedHeatmap extends StatefulWidget {
 }
 
 class _DeedHeatmapState extends State<DeedHeatmap> {
-  static const _weekdays = ['일', '월', '화', '수', '목', '금', '토'];
+  /// 로케일별 요일 머리글(좁은 형태). 2024-01-07 이 일요일이라 거기서 7일치를 뽑는다.
+  static List<String> _weekdayLabels(String locale) {
+    final fmt = DateFormat('EEEEE', locale);
+    return [for (var i = 0; i < 7; i++) fmt.format(DateTime(2024, 1, 7 + i))];
+  }
+
+  /// 문장 속 숫자만 강조색으로 그린다 — 번역문마다 숫자 위치가 달라서,
+  /// 문장을 조각내는 대신 완성된 문장에서 숫자를 찾아 스팬을 나눈다.
+  static List<TextSpan> _accentNumber(String text, int value) {
+    final needle = '$value';
+    final at = text.indexOf(needle);
+    if (at < 0) return [TextSpan(text: text)];
+    return [
+      TextSpan(text: text.substring(0, at)),
+      TextSpan(
+          text: needle,
+          style: AppText.base(
+              size: 13, weight: FontWeight.w800, color: AppColors.accent)),
+      TextSpan(text: text.substring(at + needle.length)),
+    ];
+  }
 
   // 히트맵 4단계 — 옅은 연두 → 포인트 그린.
   static const _l1 = Color(0xFFDDEFCF);
@@ -68,6 +90,8 @@ class _DeedHeatmapState extends State<DeedHeatmap> {
 
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
+    final locale = Localizations.localeOf(context).toString();
     final byDay = _byDay();
     final total = byDay.values.fold<int>(0, (a, b) => a + b.length);
     final now = DateTime.now();
@@ -99,7 +123,7 @@ class _DeedHeatmapState extends State<DeedHeatmap> {
           children: [
             _navBtn(Icons.chevron_left_rounded, () => _step(-1)),
             const SizedBox(width: 18),
-            Text('${_month.year}년 ${_month.month}월',
+            Text(DateFormat.yMMMM(locale).format(_month),
                 style: AppText.base(
                     size: 18, weight: FontWeight.w800, letterSpacingEm: -0.03)),
             const SizedBox(width: 18),
@@ -112,16 +136,7 @@ class _DeedHeatmapState extends State<DeedHeatmap> {
             text: TextSpan(
               style: AppText.base(
                   size: 13, weight: FontWeight.w600, color: AppColors.muted),
-              children: [
-                const TextSpan(text: '이번 달 '),
-                TextSpan(
-                    text: '$total',
-                    style: AppText.base(
-                        size: 13,
-                        weight: FontWeight.w800,
-                        color: AppColors.accent)),
-                const TextSpan(text: '번의 선행'),
-              ],
+              children: _accentNumber(l.heatmapMonthTotal(total), total),
             ),
           ),
         ),
@@ -129,7 +144,7 @@ class _DeedHeatmapState extends State<DeedHeatmap> {
         // ---- 요일 헤더 ----
         Row(
           children: [
-            for (final w in _weekdays)
+            for (final w in _weekdayLabels(locale))
               Expanded(
                 child: Center(
                   child: Text(w,
@@ -156,7 +171,7 @@ class _DeedHeatmapState extends State<DeedHeatmap> {
         Row(
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
-            Text('적음',
+            Text(l.heatmapLegendLow,
                 style: AppText.base(
                     size: 11, weight: FontWeight.w600, color: AppColors.muted)),
             const SizedBox(width: 7),
@@ -165,14 +180,14 @@ class _DeedHeatmapState extends State<DeedHeatmap> {
               const SizedBox(width: 4),
             ],
             const SizedBox(width: 3),
-            Text('많음',
+            Text(l.heatmapLegendHigh,
                 style: AppText.base(
                     size: 11, weight: FontWeight.w600, color: AppColors.muted)),
           ],
         ),
         const SizedBox(height: 16),
         Center(
-          child: Text('색이 칠해진 날짜를 누르면 그날의 선행을 볼 수 있어요.',
+          child: Text(l.heatmapTapHint,
               style: AppText.base(
                   size: 12, weight: FontWeight.w500, color: AppColors.muted)),
         ),
@@ -257,6 +272,7 @@ class _DaySheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
     final safeBottom = MediaQuery.of(context).padding.bottom;
     return Container(
       width: double.infinity,
@@ -283,10 +299,10 @@ class _DaySheet extends StatelessWidget {
               ),
             ),
           ),
-          Text('${month.month}월 $day일의 선행',
+          Text(l.heatmapDayTitle(DateTime(month.year, month.month, day)),
               style: AppText.base(size: 22, weight: FontWeight.w700, letterSpacingEm: -0.03)),
           const SizedBox(height: 6),
-          Text('이날 ${entries.length}번의 선행을 베푸셨어요.',
+          Text(l.heatmapDayCount(entries.length),
               style: AppText.base(size: 14, weight: FontWeight.w500, color: AppColors.muted)),
           const SizedBox(height: 18),
           for (final h in entries)

@@ -157,7 +157,8 @@ void main() {
     await tester.tap(find.text('행운 카드 획득'));
     await tester.pumpAndSettle();
     expect(find.text('행운 뽑기'), findsOneWidget); // 가챠 화면 복귀
-    expect(find.text('4개'), findsOneWidget); // 클로버 5 → 4
+    // 시드 5 + 부트스트랩 무료 코인 1 = 6, 뽑기 1회 소모 → 5.
+    expect(find.text('5개'), findsOneWidget);
 
     // 도감에 1장 등록.
     await tester.tap(find.text('보관함'));

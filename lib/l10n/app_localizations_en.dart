@@ -94,7 +94,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String historyCustomMade(String text) {
-    return '[Charm made] $text';
+    return '[Wish] $text';
   }
 
   @override
@@ -164,17 +164,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get resultRerollAd => 'Watch an ad · pull again';
 
   @override
-  String get customSectionTitle => 'Lucky charms you made';
+  String get customSectionTitle => 'Wishes you made';
 
   @override
-  String get customSectionEmpty =>
-      'Write your own luck — clovers from good deeds turn into a card';
+  String get customSectionEmpty => 'Clovers from good deeds become your wishes';
 
   @override
-  String get customCreateCta => 'Make a charm';
+  String get customCreateCta => 'Make a wish';
 
   @override
-  String get customCreateTitle => 'Write your own luck';
+  String get customCreateTitle => 'What do you wish for?';
 
   @override
   String get customCreateHint => 'Something you\'d like to come true';
@@ -186,12 +185,8 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String customCreateConfirm(int cost) {
-    return 'Make it ($cost clover)';
+    return 'Make a wish ($cost clover)';
   }
-
-  @override
-  String get customCreateAdNote =>
-      'You\'ll watch a short ad, then your card appears';
 
   @override
   String customCreateNoClovers(int cost) {
@@ -200,24 +195,24 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get customCreateFailed =>
-      'Couldn\'t make it just now — your clover is untouched';
+      'Couldn\'t make your wish just now — your clover is untouched';
 
   @override
-  String get customCreated => 'Your luck is made';
+  String get customCreated => 'Your wish is made';
 
   @override
   String customEnhance(int cost) {
-    return 'Enhance ($cost clovers)';
+    return 'Grow it ($cost clovers)';
   }
 
   @override
-  String get customEnhanceMax => 'Fully enhanced';
+  String get customEnhanceMax => 'Fully grown';
 
   @override
   String get customEnhanceNoClovers => 'Not enough clovers';
 
   @override
-  String get customBadge => 'MADE';
+  String get customBadge => 'WISH';
 
   @override
   String get dexTitle => 'Collection';
@@ -458,6 +453,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get languageSystem => 'Follow system settings';
 
   @override
+  String get adPrivacySettings => 'Ad privacy settings';
+
+  @override
   String get recoveryTitle => 'Keep your luck safe';
 
   @override
@@ -484,7 +482,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get recoveryRestoreLabel => 'Restore with a code';
 
   @override
-  String get recoveryRestoreHint => 'e.g. brave tunafish sleepy spaghetti';
+  String get recoveryRestoreHint =>
+      'e.g. brave tunafish sleepy spaghetti odd fishbread';
 
   @override
   String get recoveryRestoreCta => 'Restore with this code';
@@ -494,6 +493,43 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get recoveryNotFound => 'Code not found. Please double-check it.';
+
+  @override
+  String get recoveryTooManyTries =>
+      'Too many attempts. Please try again later.';
+
+  @override
+  String heatmapMonthTotal(int count) {
+    return '$count good deeds this month';
+  }
+
+  @override
+  String get heatmapLegendLow => 'Less';
+
+  @override
+  String get heatmapLegendHigh => 'More';
+
+  @override
+  String get heatmapTapHint => 'Tap a colored date to see that day\'s deeds.';
+
+  @override
+  String heatmapDayTitle(DateTime date) {
+    final intl.DateFormat dateDateFormat = intl.DateFormat.MMMMd(localeName);
+    final String dateString = dateDateFormat.format(date);
+
+    return 'Good deeds on $dateString';
+  }
+
+  @override
+  String heatmapDayCount(int count) {
+    return '$count good deeds on this day.';
+  }
+
+  @override
+  String get offlineBanner => 'You\'re offline. Reconnect to keep going';
+
+  @override
+  String get offlineRetry => 'Retry';
 
   @override
   String get loadingErrorTitle => 'Couldn\'t connect';

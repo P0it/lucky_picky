@@ -27,8 +27,12 @@ void main() {
   }
 
   /// 잎 2 · 클로버 5(커스텀 제작용) · 코인 5(뽑기용). 두 재화는 서로 섞이지 않는다.
+  ///
+  /// 주의: 부트스트랩이 하루 무료 코인 1개를 얹는다. 그래서 `ready` 직후
+  /// 보유 코인은 시드 + [LocalGameBackend.kFreeCoinsPerDayRule] 이다.
   AppState seeded() => const AppState(
       leaves: 2, clovers: 5, coins: 5, statLeaves: 2, statClovers: 1);
+
 
   group('카탈로그', () {
     test('70종 — 등급별 30/20/12/6/2, ID 중복 없음', () {
@@ -120,7 +124,7 @@ void main() {
       final s = c.read(appControllerProvider);
       expect(r, isNotNull);
       expect(r!.isNew, true);
-      expect(s.coins, 4);
+      expect(s.coins, 5); // 시드 5 + 무료 1 − 뽑기 1
       expect(s.clovers, 5); // 선행으로 만든 클로버는 뽑기에 쓰이지 않는다
       expect(s.statPulls, 1);
       expect(s.tickets.length, 1);
@@ -134,7 +138,8 @@ void main() {
       final (c, _) = makeContainer(seed: seeded(), rng: math.Random(1));
       final n = c.read(appControllerProvider.notifier);
       await n.ready;
-      for (var i = 0; i < 5; i++) {
+      // 시드 5 + 무료 1 = 6회분.
+      for (var i = 0; i < 5 + LocalGameBackend.kFreeCoinsPerDayRule; i++) {
         expect(await n.pullGacha(), isNotNull);
       }
       final s = c.read(appControllerProvider);
@@ -185,7 +190,8 @@ void main() {
         expect(await n.grantAdCoin(), true);
       }
       final s = c.read(appControllerProvider);
-      expect(s.coins, 5 + kAdCoinsPerDay);
+      expect(s.coins,
+          5 + LocalGameBackend.kFreeCoinsPerDayRule + kAdCoinsPerDay);
       expect(s.clovers, 5); // 광고는 클로버를 주지 않는다
       expect(n.adCoinsLeft, 0);
       expect(await n.grantAdCoin(), false); // 한도 초과
@@ -225,6 +231,38 @@ void main() {
     });
   });
 
+  group('하루 무료 코인', () {
+    test('부트스트랩이 오늘 몫의 무료 코인을 얹는다', () async {
+      // 코인이 광고로만 나오면, 신규 이용자는 카드를 한 장 보기도 전에
+      // 광고부터 봐야 한다. 무료 1회가 그 벽을 없앤다.
+      final (c, _) = makeContainer(seed: const AppState());
+      final n = c.read(appControllerProvider.notifier);
+      await n.ready;
+      expect(c.read(appControllerProvider).coins,
+          LocalGameBackend.kFreeCoinsPerDayRule);
+      // 그 코인으로 광고 없이 한 번 뽑을 수 있다.
+      expect(await n.pullGacha(), isNotNull);
+      expect(c.read(appControllerProvider).coins, 0);
+    });
+
+    test('같은 날 다시 받아도 코인이 더 늘지 않는다', () async {
+      final (c, backend) = makeContainer(seed: const AppState());
+      final n = c.read(appControllerProvider.notifier);
+      await n.ready;
+      final after = c.read(appControllerProvider).coins;
+
+      final again = await backend.claimDailyCoin();
+      expect(again.claimed, false);
+      expect(again.coins, after);
+    });
+
+    test('클로버는 주지 않는다 — 무료분도 뽑기 전용이다', () async {
+      final (c, _) = makeContainer(seed: const AppState());
+      await c.read(appControllerProvider.notifier).ready;
+      expect(c.read(appControllerProvider).clovers, 0);
+    });
+  });
+
   group('커스텀 행운권', () {
     test('제작 → 클로버 -1, 카드 추가, 기록 남음', () async {
       final (c, _) = makeContainer(seed: seeded(), rng: math.Random(4));
@@ -237,7 +275,7 @@ void main() {
       expect(made!.text, '오늘은 좋은 일이 생긴다'); // 앞뒤 공백은 잘린다
       expect(made.level, 1);
       expect(s.clovers, 4);
-      expect(s.coins, 5); // 코인은 건드리지 않는다
+      expect(s.coins, 5 + LocalGameBackend.kFreeCoinsPerDayRule); // 코인은 건드리지 않는다
       expect(s.customTickets.single.id, made.id);
       expect(s.history.first.kind, HistoryKind.custom);
       expect(s.history.first.text, made.text);
@@ -539,7 +577,40 @@ void main() {
       expect(s.tickets.length, 2);
       expect(s.tickets.every((t) => t.ticketId == 'c01'), true);
       expect(s.tickets.map((t) => t.level).toList()..sort(), [1, 2]);
-      expect(s.history.single.text, '이관 테스트');
+
+      // 기록은 부트스트랩에 안 실린다 — '나의 기록' 탭에서 받는다.
+      expect(s.history, isEmpty);
+      await n.ensureHistoryLoaded();
+      expect(c.read(appControllerProvider).history.single.text, '이관 테스트');
+    });
+  });
+
+  group('기록 지연 로딩', () {
+    test('부트스트랩은 기록을 받지 않고, 탭 진입 시에 받는다', () async {
+      final (c, _) = makeContainer(seed: seeded());
+      final n = c.read(appControllerProvider.notifier);
+      await n.ready;
+      await n.recordDeed('먼저 인사했다');
+
+      // 낙관적으로 끼워 넣은 이번 세션 항목만 있고, 아직 '받은' 상태는 아니다.
+      expect(c.read(appControllerProvider).historyLoaded, false);
+
+      await n.ensureHistoryLoaded();
+      final s = c.read(appControllerProvider);
+      expect(s.historyLoaded, true);
+      expect(s.history.first.text, '먼저 인사했다');
+    });
+
+    test('이미 받았으면 다시 받지 않는다', () async {
+      final (c, backend) = makeContainer(seed: seeded());
+      final n = c.read(appControllerProvider.notifier);
+      await n.ready;
+      await n.ensureHistoryLoaded();
+
+      // 받은 뒤 백엔드에만 항목이 늘어도, 다시 받지 않으므로 화면은 그대로다.
+      await backend.recordDeed('두 번째');
+      await n.ensureHistoryLoaded();
+      expect(c.read(appControllerProvider).history, isEmpty);
     });
   });
 

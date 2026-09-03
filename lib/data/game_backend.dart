@@ -1,5 +1,6 @@
 import '../models/app_state.dart';
 import '../models/custom_ticket.dart';
+import '../models/deed.dart';
 import '../models/ticket_instance.dart';
 
 /// 서버가 거부한 게임 규칙 위반 — 재화 부족, 한도 초과 등.
@@ -19,11 +20,12 @@ class GameRuleException implements Exception {
   static const cannotReforge = 'CANNOT_REFORGE';
   static const alreadyImported = 'ALREADY_IMPORTED';
   static const recoveryNotFound = 'RECOVERY_NOT_FOUND';
+  static const recoveryRateLimited = 'RECOVERY_RATE_LIMITED';
 
   static const known = {
     noClover, noCoins, noAdCoins, noCloverReady, invalidDeed, invalidText,
     ticketNotOwned, cannotEnhance, cannotReforge, alreadyImported,
-    recoveryNotFound, 'AUTH_REQUIRED',
+    recoveryNotFound, recoveryRateLimited, 'AUTH_REQUIRED',
   };
 
   @override
@@ -74,6 +76,13 @@ class GachaOutcome {
 }
 
 /// 광고 보상으로 지급된 코인 — 뽑기는 이 코인을 쓴다.
+/// 하루 무료 코인 수령 결과.
+class DailyCoinResult {
+  final bool claimed; // 오늘 몫을 방금 받았는지 (이미 받았으면 false)
+  final int coins; // 반영 후 보유 코인
+  const DailyCoinResult({required this.claimed, required this.coins});
+}
+
 class AdCoinResult {
   final int coins; // 반영 후 보유 코인
   final int usedToday; // 오늘 받은 광고 코인 수
@@ -141,6 +150,11 @@ abstract class GameBackend {
   /// 광고 시청 보상 — 코인 1개 지급 (하루 한도).
   Future<AdCoinResult> grantAdCoin();
 
+  /// 하루 한 번 주는 무료 코인을 받는다. 이미 받은 날이면 claimed=false 로
+  /// 조용히 돌아온다 — 예외가 아니다. 앱 시작마다 불리는 곁가지라, 던지면
+  /// 이미 받은 날에는 매번 부트스트랩이 실패한다.
+  Future<DailyCoinResult> claimDailyCoin();
+
   /// 커스텀 행운권 제작 — 클로버를 소모해 [text] 문구의 카드를 만든다.
   Future<CustomTicketResult> createCustomTicket(String text);
 
@@ -156,15 +170,29 @@ abstract class GameBackend {
   Future<ReforgeOutcome> reforgeTickets(List<String> materialIds);
   Future<void> importLocalState(Map<String, dynamic> payload);
 
+  /// 타임라인 기록을 최신순으로 받아온다.
+  ///
+  /// [fetchState] 는 이걸 포함하지 않는다 — 기록은 '나의 기록' 탭에서만 쓰는데
+  /// 콜드 스타트 스냅샷에서 가장 큰 덩어리(300건)라, 대부분의 세션이 쓰지도
+  /// 않는 데이터를 매번 내려받게 된다.
+  Future<List<HistoryEntry>> fetchHistory({int limit = 300});
+
   /// 이 계정의 복구 코드를 발급한다(계정당 1개, 재사용). 표시용 원문을 반환한다.
-  Future<String> issueRecoveryCode();
+  /// [lang] 은 코드 단어를 만들 언어 — 읽고 입력할 수 있어야 코드가 쓸모 있다.
+  /// 한 번 발급되면 언어를 바꿔도 코드는 그대로다(적어둔 코드가 바뀌면 안 된다).
+  Future<String> issueRecoveryCode([String lang = 'en']);
 
   /// 복구 코드가 가리키는 계정의 자산을 현재 세션으로 이관한다.
   /// 코드를 찾을 수 없으면 [GameRuleException](RECOVERY_NOT_FOUND).
   Future<void> redeemRecoveryCode(String code);
 }
 
-/// 복구 코드 정규화 — 공백·구분자·대소문자를 지우고 글자만 남긴다.
+/// 복구 코드 정규화 — 공백·구두점을 지우고 소문자로 내린다.
 /// 서버 normalize_recovery_code 와 동일 규칙이라야 같은 코드로 인식된다.
-String normalizeRecoveryCode(String code) =>
-    code.replaceAll(RegExp(r'[^0-9a-zA-Z가-힣]'), '').toLowerCase();
+///
+/// 허용 목록(`[^0-9a-zA-Z가-힣]`)이 아니라 제거 목록인 이유: 허용 방식은 새 문자
+/// 체계를 넣을 때마다 규칙을 고쳐야 하고, 빠뜨리면 그 언어 코드가 통째로 빈
+/// 문자열이 된다(일본어가 그랬다).
+String normalizeRecoveryCode(String code) => code
+    .replaceAll(RegExp(r'[\s\p{P}]', unicode: true), '')
+    .toLowerCase();

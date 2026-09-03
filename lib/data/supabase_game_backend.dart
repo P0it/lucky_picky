@@ -28,20 +28,23 @@ class SupabaseGameBackend implements GameBackend {
 
   @override
   Future<BackendSnapshot> fetchState() => _guard(() async {
-        final profile = await _client.from('profiles').select().single();
+        // 컬럼을 명시한다 — select() 는 user_id·created_at·updated_at 까지 전부
+        // 실어 보낸다. 보유 카드는 유저마다 수백 장이 되고 콜드 스타트마다
+        // 통째로 내려오므로, 안 쓰는 컬럼 하나가 곧 대역폭 요금이다.
+        // (정렬 기준 created_at 은 선택하지 않아도 order 에 쓸 수 있다.)
+        final profile = await _client
+            .from('profiles')
+            .select('leaves,clovers,coins,stat_leaves,stat_clovers,stat_pulls,'
+                'ad_coins_today,last_ad_coin_date,imported_local')
+            .single();
         final tickets = await _client
             .from('ticket_instances')
-            .select()
+            .select('id,ticket_id,level,pulled_at')
             .order('created_at', ascending: false);
         final customs = await _client
             .from('custom_tickets')
-            .select()
+            .select('id,text,level,created_at')
             .order('created_at', ascending: false);
-        final history = await _client
-            .from('history')
-            .select()
-            .order('created_at', ascending: false)
-            .limit(300);
 
         return BackendSnapshot(
           importedLocal: profile['imported_local'] as bool? ?? false,
@@ -72,16 +75,7 @@ class SupabaseGameBackend implements GameBackend {
                   createdAt: _dotDate(c['created_at'] as String?),
                 ),
             ],
-            history: [
-              for (final h in history)
-                HistoryEntry(
-                  id: h['id'] as int,
-                  date: _dotDate(h['happened_on'] as String?),
-                  kind: historyKindOf(h['kind']),
-                  text: h['text'] as String? ?? '',
-                  amount: h['amount'] as int? ?? 0,
-                ),
-            ],
+            // history 는 여기서 받지 않는다 — fetchHistory 참고.
           ),
         );
       });
@@ -120,6 +114,15 @@ class SupabaseGameBackend implements GameBackend {
         return AdCoinResult(
           coins: r['coins'] as int,
           usedToday: r['ad_coins_today'] as int,
+        );
+      });
+
+  @override
+  Future<DailyCoinResult> claimDailyCoin() => _guard(() async {
+        final r = await _rpc('claim_daily_coin');
+        return DailyCoinResult(
+          claimed: r['claimed'] as bool? ?? false,
+          coins: r['coins'] as int,
         );
       });
 
@@ -186,14 +189,39 @@ class SupabaseGameBackend implements GameBackend {
       () async => _rpc('import_local_state', {'p_payload': payload}));
 
   @override
-  Future<String> issueRecoveryCode() => _guard(() async {
-        final r = await _rpc('issue_recovery_code');
+  Future<List<HistoryEntry>> fetchHistory({int limit = 300}) =>
+      _guard(() async {
+        final rows = await _client
+            .from('history')
+            .select('id,kind,text,amount,happened_on')
+            .order('created_at', ascending: false)
+            .limit(limit);
+        return [
+          for (final h in rows)
+            HistoryEntry(
+              id: h['id'] as int,
+              date: _dotDate(h['happened_on'] as String?),
+              kind: historyKindOf(h['kind']),
+              text: h['text'] as String? ?? '',
+              amount: h['amount'] as int? ?? 0,
+            ),
+        ];
+      });
+
+  @override
+  Future<String> issueRecoveryCode([String lang = 'en']) => _guard(() async {
+        final r = await _rpc('issue_recovery_code', {'p_lang': lang});
         return r['code'] as String;
       });
 
   @override
-  Future<void> redeemRecoveryCode(String code) => _guard(
-      () async => _rpc('redeem_recovery_code', {'p_code': code}));
+  Future<void> redeemRecoveryCode(String code) => _guard(() async {
+        // 서버는 실패를 예외가 아니라 error 필드로 돌려준다 — 예외로 던지면
+        // 트랜잭션이 롤백돼 대입 시도 카운터가 남지 않기 때문이다.
+        final r = await _rpc('redeem_recovery_code', {'p_code': code});
+        final err = r['error'] as String?;
+        if (err != null) throw GameRuleException(err);
+      });
 
   Future<Map<String, dynamic>> _rpc(String fn,
       [Map<String, dynamic>? params]) async {

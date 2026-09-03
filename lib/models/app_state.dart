@@ -23,11 +23,20 @@ class AppState {
   final int statPulls; // 총 뽑기 횟수
 
   final List<TicketInstance> tickets; // 보유 카드 (한 장 = 한 인스턴스, 최신 획득순)
-  final List<CustomTicket> customTickets; // 내가 만든 행운권 (최신순)
+  final List<CustomTicket> customTickets; // 내가 빈 소원 (최신순)
   final List<HistoryEntry> history;
 
   final int adCoinsToday; // 오늘 광고로 받은 코인 수
   final String lastAdCoinDate; // 광고 코인 카운트 기준일 'YYYY.MM.DD'
+
+  /// 서버와 아직 못 붙었는지. 화면은 마지막 사본(StateCache)으로 채워지고,
+  /// 이 값이 true 인 동안 상단에 오프라인 띠가 뜬다. UI 휘발 상태다.
+  final bool offline;
+
+  /// 타임라인 기록을 서버에서 받아왔는지. 기록은 '나의 기록' 탭에서만 쓰는데
+  /// 콜드 스타트 payload 에서 가장 큰 덩어리라, 그 탭을 열 때 받는다.
+  /// UI 휘발 상태다 — 직렬화하지 않는다.
+  final bool historyLoaded;
 
   const AppState({
     this.tab = AppTab.home,
@@ -46,6 +55,8 @@ class AppState {
     this.history = const [],
     this.adCoinsToday = 0,
     this.lastAdCoinDate = '',
+    this.historyLoaded = false,
+    this.offline = false,
   });
 
   /// 빈 초기 상태 — 실데이터는 서버에서 로드된다.
@@ -68,6 +79,8 @@ class AppState {
     List<HistoryEntry>? history,
     int? adCoinsToday,
     String? lastAdCoinDate,
+    bool? historyLoaded,
+    bool? offline,
   }) {
     return AppState(
       tab: tab ?? this.tab,
@@ -86,6 +99,8 @@ class AppState {
       history: history ?? this.history,
       adCoinsToday: adCoinsToday ?? this.adCoinsToday,
       lastAdCoinDate: lastAdCoinDate ?? this.lastAdCoinDate,
+      historyLoaded: historyLoaded ?? this.historyLoaded,
+      offline: offline ?? this.offline,
     );
   }
 

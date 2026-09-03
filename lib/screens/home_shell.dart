@@ -21,12 +21,16 @@ class HomeShell extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final tab = ref.watch(appControllerProvider.select((s) => s.tab));
+    final offline = ref.watch(appControllerProvider.select((s) => s.offline));
     final notifier = ref.read(appControllerProvider.notifier);
 
     return Scaffold(
       backgroundColor: AppColors.white,
       body: Column(
         children: [
+          // 서버에 못 붙은 동안 — 화면은 마지막 사본이라 최신이 아닐 수 있고,
+          // 선행 기록·뽑기 같은 쓰기는 실패한다. 숨기면 "왜 저장이 안 되지"가 된다.
+          if (offline) _OfflineBanner(onRetry: notifier.retrySync),
           Expanded(
             child: SafeArea(
               bottom: false,
@@ -54,6 +58,44 @@ class HomeShell extends ConsumerWidget {
           ),
           _TabBar(tab: tab, onSelect: notifier.setTab),
         ],
+      ),
+    );
+  }
+}
+
+/// 오프라인 안내 띠. 탭하면 다시 붙어 본다.
+class _OfflineBanner extends StatelessWidget {
+  final Future<void> Function() onRetry;
+  const _OfflineBanner({required this.onRetry});
+
+  @override
+  Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
+    final topPad = MediaQuery.of(context).padding.top;
+    return Pressable(
+      onTap: onRetry,
+      child: Container(
+        width: double.infinity,
+        padding: EdgeInsets.fromLTRB(20, 8 + topPad, 20, 8),
+        color: const Color(0xFFFFF4E0),
+        child: Row(
+          children: [
+            const Icon(Icons.cloud_off_rounded, size: 16, color: Color(0xFF9A6B18)),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(l.offlineBanner,
+                  style: AppText.base(
+                      size: 12,
+                      weight: FontWeight.w600,
+                      color: const Color(0xFF9A6B18))),
+            ),
+            Text(l.offlineRetry,
+                style: AppText.base(
+                    size: 12,
+                    weight: FontWeight.w800,
+                    color: const Color(0xFF9A6B18))),
+          ],
+        ),
       ),
     );
   }

@@ -1,0 +1,4 @@
+/* App Tracking Transparency — iOS のトラッキング許可ダイアログに表示されます。 */
+"NSUserTrackingUsageDescription" = "あなたに合った広告を表示するため、アクティビティのトラッキングを許可してください。";
+/* フォトライブラリ — 完成した幸運のお守り画像の保存。 */
+"NSPhotoLibraryAddUsageDescription" = "完成した幸運のお守り画像をフォトライブラリに保存するために使用します。";

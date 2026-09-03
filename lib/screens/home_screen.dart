@@ -10,6 +10,7 @@ import '../theme/app_theme.dart';
 import '../widgets/clover_count_badge.dart';
 import '../widgets/clover_flight.dart';
 import '../widgets/clover_widget.dart';
+import '../widgets/custom_create_sheet.dart';
 import '../widgets/pressable.dart';
 import '../widgets/record_sheet.dart';
 
@@ -145,8 +146,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       ],
                     ),
                   ),
+                  // 완성 클로버가 날아와 꽂히는 자리 = 클로버를 쓰는 자리.
+                  // 비행 중에는 잠가둔다 — 착지 전에 눌리면 방금 얻은
+                  // 클로버가 아직 없는 상태로 시트가 뜬다.
                   CloverCountBadge(
-                      count: _shownClovers, markKey: _badgeMarkKey),
+                    count: _shownClovers,
+                    markKey: _badgeMarkKey,
+                    onTap: _flight != null
+                        ? null
+                        : () => runCustomCreateFlow(context, ref),
+                  ),
                 ],
               ),
               // ---- 중앙 클로버 + 상태 ----

@@ -66,7 +66,7 @@ class DexScreen extends ConsumerWidget {
             ],
           ),
         ),
-        // 내가 만든 행운권이 먼저 온다 — 뽑은 것보다 만든 것이 앞이다.
+        // 내가 빈 소원이 먼저 온다 — 뽑은 것보다 내가 쓴 것이 앞이다.
         const CustomSection(),
         const SizedBox(height: 10),
         if (tickets.isEmpty)

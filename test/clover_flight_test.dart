@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:luckypicky/data/game_backend.dart';
 import 'package:luckypicky/data/local_game_backend.dart';
+import 'package:luckypicky/models/deed.dart';
 import 'package:luckypicky/l10n/app_localizations.dart';
 import 'package:luckypicky/models/app_state.dart';
 import 'package:luckypicky/screens/home_screen.dart';
@@ -28,6 +29,13 @@ class _OfflineOnFinishBackend implements GameBackend {
   Future<void> ensureSignedIn() => _inner.ensureSignedIn();
   @override
   Future<BackendSnapshot> fetchState() => _inner.fetchState();
+
+  @override
+  Future<List<HistoryEntry>> fetchHistory({int limit = 300}) =>
+      _inner.fetchHistory(limit: limit);
+
+  @override
+  Future<DailyCoinResult> claimDailyCoin() => _inner.claimDailyCoin();
   @override
   Future<DeedResult> recordDeed(String text) => _inner.recordDeed(text);
   @override
@@ -49,12 +57,12 @@ class _OfflineOnFinishBackend implements GameBackend {
   @override
   Future<void> importLocalState(Map<String, dynamic> payload) =>
       _inner.importLocalState(payload);
-
   @override
-  Future<String> issueRecoveryCode() => _inner.issueRecoveryCode();
-
+  Future<String> issueRecoveryCode([String lang = 'en']) =>
+      _inner.issueRecoveryCode(lang);
   @override
-  Future<void> redeemRecoveryCode(String code) => _inner.redeemRecoveryCode(code);
+  Future<void> redeemRecoveryCode(String code) =>
+      _inner.redeemRecoveryCode(code);
 }
 
 Widget _host(GameBackend backend) => ProviderScope(

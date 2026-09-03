@@ -93,7 +93,7 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String historyCustomMade(String text) {
-    return '[행운권 제작] $text';
+    return '[소원] $text';
   }
 
   @override
@@ -162,16 +162,16 @@ class AppLocalizationsKo extends AppLocalizations {
   String get resultRerollAd => '광고 보고 한 번 더';
 
   @override
-  String get customSectionTitle => '내가 만든 행운권';
+  String get customSectionTitle => '내가 빈 소원';
 
   @override
-  String get customSectionEmpty => '선행으로 모은 클로버가 내 문구의 행운권이 돼요';
+  String get customSectionEmpty => '선행으로 모은 클로버로 소원을 빌 수 있어요';
 
   @override
-  String get customCreateCta => '행운권 만들기';
+  String get customCreateCta => '소원 빌기';
 
   @override
-  String get customCreateTitle => '나만의 행운을 적어보세요';
+  String get customCreateTitle => '어떤 소원을 빌까요';
 
   @override
   String get customCreateHint => '이뤄졌으면 하는 한 마디';
@@ -183,11 +183,8 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String customCreateConfirm(int cost) {
-    return '만들기 (클로버 $cost개)';
+    return '소원 빌기 (클로버 $cost개)';
   }
-
-  @override
-  String get customCreateAdNote => '짧은 광고를 본 뒤 카드가 나와요';
 
   @override
   String customCreateNoClovers(int cost) {
@@ -195,24 +192,24 @@ class AppLocalizationsKo extends AppLocalizations {
   }
 
   @override
-  String get customCreateFailed => '지금은 만들 수 없어요 — 클로버는 그대로예요';
+  String get customCreateFailed => '지금은 빌 수 없어요 — 클로버는 그대로예요';
 
   @override
-  String get customCreated => '나만의 행운이 만들어졌어요';
+  String get customCreated => '소원을 빌었어요';
 
   @override
   String customEnhance(int cost) {
-    return '강화하기 (클로버 $cost개)';
+    return '소원 키우기 (클로버 $cost개)';
   }
 
   @override
-  String get customEnhanceMax => '최대 강화 완료';
+  String get customEnhanceMax => '더 키울 수 없어요';
 
   @override
   String get customEnhanceNoClovers => '클로버가 부족해요';
 
   @override
-  String get customBadge => '직접 만듦';
+  String get customBadge => '내 소원';
 
   @override
   String get dexTitle => '보관함';
@@ -450,6 +447,9 @@ class AppLocalizationsKo extends AppLocalizations {
   String get languageSystem => '시스템 설정 따르기';
 
   @override
+  String get adPrivacySettings => '광고 개인정보 설정';
+
+  @override
   String get recoveryTitle => '행운 지키기';
 
   @override
@@ -474,7 +474,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get recoveryRestoreLabel => '코드로 복구하기';
 
   @override
-  String get recoveryRestoreHint => '명란한 참치마요 오붓한 스파게티';
+  String get recoveryRestoreHint => '명란한 참치마요 오붓한 스파게티 수상한 붕어빵';
 
   @override
   String get recoveryRestoreCta => '이 코드로 복구';
@@ -484,6 +484,42 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get recoveryNotFound => '코드를 찾을 수 없어요. 다시 확인해 주세요.';
+
+  @override
+  String get recoveryTooManyTries => '시도가 너무 많아요. 잠시 후 다시 해주세요.';
+
+  @override
+  String heatmapMonthTotal(int count) {
+    return '이번 달 $count번의 선행';
+  }
+
+  @override
+  String get heatmapLegendLow => '적음';
+
+  @override
+  String get heatmapLegendHigh => '많음';
+
+  @override
+  String get heatmapTapHint => '색이 칠해진 날짜를 누르면 그날의 선행을 볼 수 있어요.';
+
+  @override
+  String heatmapDayTitle(DateTime date) {
+    final intl.DateFormat dateDateFormat = intl.DateFormat.MMMMd(localeName);
+    final String dateString = dateDateFormat.format(date);
+
+    return '$dateString의 선행';
+  }
+
+  @override
+  String heatmapDayCount(int count) {
+    return '이날 $count번의 선행을 베푸셨어요.';
+  }
+
+  @override
+  String get offlineBanner => '오프라인이에요. 연결되면 이어서 할 수 있어요';
+
+  @override
+  String get offlineRetry => '다시 시도';
 
   @override
   String get loadingErrorTitle => '연결에 실패했어요';

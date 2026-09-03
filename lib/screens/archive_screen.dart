@@ -13,15 +13,30 @@ import '../widgets/language_sheet.dart';
 import '../widgets/pressable.dart';
 import '../widgets/recovery_sheet.dart';
 
-class ArchiveScreen extends ConsumerWidget {
+class ArchiveScreen extends ConsumerStatefulWidget {
   const ArchiveScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<ArchiveScreen> createState() => _ArchiveScreenState();
+}
+
+class _ArchiveScreenState extends ConsumerState<ArchiveScreen> {
+  @override
+  Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
     final s = ref.watch(appControllerProvider);
     final notifier = ref.read(appControllerProvider.notifier);
     final isCalendar = s.archiveView == ArchiveView.calendar;
+
+    // 기록은 이 탭에서만 쓰므로 여기 들어올 때 받는다. 빌드 중에는 상태를
+    // 못 바꾸니 프레임 뒤로 미룬다. 이미 받았으면 즉시 반환한다.
+    if (!s.historyLoaded) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          ref.read(appControllerProvider.notifier).ensureHistoryLoaded();
+        }
+      });
+    }
 
     return ListView(
       padding: EdgeInsets.zero,
@@ -99,7 +114,11 @@ class ArchiveScreen extends ConsumerWidget {
                 ),
               ),
               const SizedBox(height: 14),
-              if (isCalendar)
+              // 아직 못 받았으면 "기록 없음"이라고 단정하지 않는다 —
+              // 캘린더도 마찬가지다(전부 0으로 칠해지면 거짓말이 된다).
+              if (!s.historyLoaded && s.history.isEmpty)
+                _loadingState()
+              else if (isCalendar)
                 DeedHeatmap(history: s.history)
               else if (s.history.isEmpty)
                 _emptyState(context)
@@ -150,6 +169,20 @@ class ArchiveScreen extends ConsumerWidget {
                   weight: FontWeight.w700,
                   color: active ? activeColor : AppColors.muted)),
         ),
+      ),
+    );
+  }
+
+  /// 기록을 받아오는 동안. 빈 상태와 높이를 맞춰 목록이 들어올 때 덜 튄다.
+  Widget _loadingState() {
+    return const Padding(
+      padding: EdgeInsets.symmetric(vertical: 32),
+      child: Column(
+        children: [
+          Opacity(opacity: 0.3, child: CloverMark(size: 30, withStem: true)),
+          SizedBox(height: 10),
+          SizedBox(height: 18),
+        ],
       ),
     );
   }

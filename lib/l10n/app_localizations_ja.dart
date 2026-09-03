@@ -93,7 +93,7 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String historyCustomMade(String text) {
-    return '［チケット作成］$text';
+    return '［願い］$text';
   }
 
   @override
@@ -162,16 +162,16 @@ class AppLocalizationsJa extends AppLocalizations {
   String get resultRerollAd => '広告を見てもう1回';
 
   @override
-  String get customSectionTitle => '自分で作った幸運チケット';
+  String get customSectionTitle => 'わたしの願い';
 
   @override
-  String get customSectionEmpty => '善行で貯めたクローバーが、自分の言葉のチケットになります';
+  String get customSectionEmpty => '善行で貯めたクローバーで願いをかけられます';
 
   @override
-  String get customCreateCta => 'チケットを作る';
+  String get customCreateCta => '願いをかける';
 
   @override
-  String get customCreateTitle => '自分だけの幸運を書いてみよう';
+  String get customCreateTitle => 'どんな願いをかけますか';
 
   @override
   String get customCreateHint => '叶ってほしいひとこと';
@@ -183,11 +183,8 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String customCreateConfirm(int cost) {
-    return '作る（クローバー$cost個）';
+    return '願いをかける（クローバー$cost個）';
   }
-
-  @override
-  String get customCreateAdNote => '短い広告のあとにカードが出ます';
 
   @override
   String customCreateNoClovers(int cost) {
@@ -195,24 +192,24 @@ class AppLocalizationsJa extends AppLocalizations {
   }
 
   @override
-  String get customCreateFailed => '今は作れませんでした — クローバーはそのままです';
+  String get customCreateFailed => '今は願いをかけられませんでした — クローバーはそのままです';
 
   @override
-  String get customCreated => '自分だけの幸運ができました';
+  String get customCreated => '願いをかけました';
 
   @override
   String customEnhance(int cost) {
-    return '強化する（クローバー$cost個）';
+    return '願いを育てる（クローバー$cost個）';
   }
 
   @override
-  String get customEnhanceMax => '最大強化済み';
+  String get customEnhanceMax => 'もう育てられません';
 
   @override
   String get customEnhanceNoClovers => 'クローバーが足りません';
 
   @override
-  String get customBadge => '自作';
+  String get customBadge => '願い';
 
   @override
   String get dexTitle => 'コレクション';
@@ -450,6 +447,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String get languageSystem => 'システム設定に従う';
 
   @override
+  String get adPrivacySettings => '広告のプライバシー設定';
+
+  @override
   String get recoveryTitle => '幸運を守る';
 
   @override
@@ -474,7 +474,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get recoveryRestoreLabel => 'コードで復旧する';
 
   @override
-  String get recoveryRestoreHint => '例: めいらんなツナマヨ のどかなスパゲティ';
+  String get recoveryRestoreHint => '例: めいらんなツナマヨ のどかなスパゲティ あやしいたい焼き';
 
   @override
   String get recoveryRestoreCta => 'このコードで復旧';
@@ -484,6 +484,42 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get recoveryNotFound => 'コードが見つかりません。もう一度ご確認ください。';
+
+  @override
+  String get recoveryTooManyTries => '試行が多すぎます。しばらくしてからお試しください。';
+
+  @override
+  String heatmapMonthTotal(int count) {
+    return '今月 $count回の善行';
+  }
+
+  @override
+  String get heatmapLegendLow => '少ない';
+
+  @override
+  String get heatmapLegendHigh => '多い';
+
+  @override
+  String get heatmapTapHint => '色のついた日付をタップすると、その日の善行を見られます。';
+
+  @override
+  String heatmapDayTitle(DateTime date) {
+    final intl.DateFormat dateDateFormat = intl.DateFormat.MMMMd(localeName);
+    final String dateString = dateDateFormat.format(date);
+
+    return '$dateStringの善行';
+  }
+
+  @override
+  String heatmapDayCount(int count) {
+    return 'この日は$count回の善行をされました。';
+  }
+
+  @override
+  String get offlineBanner => 'オフラインです。接続すると続けられます';
+
+  @override
+  String get offlineRetry => '再試行';
 
   @override
   String get loadingErrorTitle => '接続できませんでした';

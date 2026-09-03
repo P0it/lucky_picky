@@ -8,10 +8,10 @@ import 'clover_mark.dart';
 import 'collection_card.dart';
 import 'rarity_style.dart';
 
-/// 내가 만든 행운권 한 장.
+/// 내가 빈 소원 한 장.
 ///
 /// 뽑기 카드와 같은 [CollectionCard] 면을 쓰되 등급 자리에는 등급명 대신
-/// "직접 만듦" 배지가 온다 — 커스텀 카드에는 희귀도가 없다.
+/// "내 소원" 배지가 온다 — 소원 카드에는 희귀도가 없다.
 class CustomTicketCard extends StatelessWidget {
   final CustomTicket card;
 

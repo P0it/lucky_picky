@@ -2,18 +2,27 @@ import 'package:flutter/material.dart';
 
 import '../theme/app_theme.dart';
 import 'clover_mark.dart';
+import 'pressable.dart';
 
 /// 보유 클로버 수 배지. [count] 가 바뀌면 클로버 마크가 통 튀어오른다.
 ///
 /// 언제 새 값을 받을지는 이 위젯이 정하지 않는다 — 비행 연출이 착지할 때까지
 /// 이전 값을 붙들고 있는 판단은 호출부(HomeScreen)의 몫이다.
+///
+/// 완성 클로버가 날아와 꽂히는 자리라, 여기가 곧 클로버를 쓰는 입구다 —
+/// [onTap] 으로 소원 만들기로 보낸다. 연출이 "여기 쌓였어요"라고 가리켜 놓고
+/// 눌러도 아무 일이 없으면 쌓인 걸 어디서 쓰는지 알 길이 없다.
 class CloverCountBadge extends StatefulWidget {
   final int count;
 
   /// 비행 연출의 도착 지점을 재기 위해 클로버 마크에 붙는 키.
   final GlobalKey? markKey;
 
-  const CloverCountBadge({super.key, required this.count, this.markKey});
+  /// 누르면 실행할 동작. null 이면 표시 전용.
+  final VoidCallback? onTap;
+
+  const CloverCountBadge(
+      {super.key, required this.count, this.markKey, this.onTap});
 
   @override
   State<CloverCountBadge> createState() => _CloverCountBadgeState();
@@ -53,7 +62,7 @@ class _CloverCountBadgeState extends State<CloverCountBadge>
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    final badge = Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
       decoration: BoxDecoration(
         color: AppColors.card,
@@ -73,5 +82,8 @@ class _CloverCountBadgeState extends State<CloverCountBadge>
         ],
       ),
     );
+    final onTap = widget.onTap;
+    if (onTap == null) return badge;
+    return Pressable(onTap: onTap, child: badge);
   }
 }

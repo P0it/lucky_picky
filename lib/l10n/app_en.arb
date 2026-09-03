@@ -51,7 +51,7 @@
       "count": { "type": "int" }
     }
   },
-  "historyCustomMade": "[Charm made] {text}",
+  "historyCustomMade": "[Wish] {text}",
   "@historyCustomMade": {
     "placeholders": {
       "text": { "type": "String" }
@@ -102,10 +102,10 @@
   "resultConfirm": "Claim lucky card",
   "resultRerollAd": "Watch an ad · pull again",
 
-  "customSectionTitle": "Lucky charms you made",
-  "customSectionEmpty": "Write your own luck — clovers from good deeds turn into a card",
-  "customCreateCta": "Make a charm",
-  "customCreateTitle": "Write your own luck",
+  "customSectionTitle": "Wishes you made",
+  "customSectionEmpty": "Clovers from good deeds become your wishes",
+  "customCreateCta": "Make a wish",
+  "customCreateTitle": "What do you wish for?",
   "customCreateHint": "Something you'd like to come true",
   "customCreateCounter": "{used}/{max}",
   "@customCreateCounter": {
@@ -114,30 +114,29 @@
       "max": { "type": "int" }
     }
   },
-  "customCreateConfirm": "Make it ({cost} clover)",
+  "customCreateConfirm": "Make a wish ({cost} clover)",
   "@customCreateConfirm": {
     "placeholders": {
       "cost": { "type": "int" }
     }
   },
-  "customCreateAdNote": "You'll watch a short ad, then your card appears",
   "customCreateNoClovers": "You need {cost} clover — record a good deed first",
   "@customCreateNoClovers": {
     "placeholders": {
       "cost": { "type": "int" }
     }
   },
-  "customCreateFailed": "Couldn't make it just now — your clover is untouched",
-  "customCreated": "Your luck is made",
-  "customEnhance": "Enhance ({cost} clovers)",
+  "customCreateFailed": "Couldn't make your wish just now — your clover is untouched",
+  "customCreated": "Your wish is made",
+  "customEnhance": "Grow it ({cost} clovers)",
   "@customEnhance": {
     "placeholders": {
       "cost": { "type": "int" }
     }
   },
-  "customEnhanceMax": "Fully enhanced",
+  "customEnhanceMax": "Fully grown",
   "customEnhanceNoClovers": "Not enough clovers",
-  "customBadge": "MADE",
+  "customBadge": "WISH",
 
   "dexTitle": "Collection",
   "dexSubtitle": "Every luck you've pulled lives here",
@@ -312,6 +311,7 @@
 
   "languageSheetTitle": "Language",
   "languageSystem": "Follow system settings",
+  "adPrivacySettings": "Ad privacy settings",
 
   "recoveryTitle": "Keep your luck safe",
   "recoverySubtitle": "Switch phones or delete the app — this code brings your luck back.",
@@ -321,10 +321,36 @@
   "recoveryCopy": "Copy",
   "recoveryCopied": "Recovery code copied",
   "recoveryRestoreLabel": "Restore with a code",
-  "recoveryRestoreHint": "e.g. brave tunafish sleepy spaghetti",
+  "recoveryRestoreHint": "e.g. brave tunafish sleepy spaghetti odd fishbread",
   "recoveryRestoreCta": "Restore with this code",
   "recoveryRestored": "Your luck is back 🍀",
   "recoveryNotFound": "Code not found. Please double-check it.",
+  "recoveryTooManyTries": "Too many attempts. Please try again later.",
+
+  "heatmapMonthTotal": "{count} good deeds this month",
+  "@heatmapMonthTotal": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "heatmapLegendLow": "Less",
+  "heatmapLegendHigh": "More",
+  "heatmapTapHint": "Tap a colored date to see that day's deeds.",
+  "heatmapDayTitle": "Good deeds on {date}",
+  "@heatmapDayTitle": {
+    "placeholders": {
+      "date": { "type": "DateTime", "format": "MMMMd" }
+    }
+  },
+  "heatmapDayCount": "{count} good deeds on this day.",
+  "@heatmapDayCount": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+
+  "offlineBanner": "You're offline. Reconnect to keep going",
+  "offlineRetry": "Retry",
 
   "loadingErrorTitle": "Couldn't connect",
   "loadingErrorBody": "Please check your network connection",

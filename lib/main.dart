@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io' show Platform;
 
 import 'package:app_tracking_transparency/app_tracking_transparency.dart';
@@ -11,8 +12,10 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'l10n/app_localizations.dart';
 import 'screens/home_shell.dart';
 import 'state/ads_controller.dart';
+import 'state/consent_controller.dart';
 import 'state/locale_controller.dart';
 import 'theme/app_theme.dart';
+import 'util/error_reporter.dart';
 import 'widgets/app_loading_screen.dart';
 
 /// Supabase 접속 정보 — publishable key 는 RLS 전제하에 공개 가능한 값.
@@ -33,13 +36,22 @@ final bootstrapProvider = FutureProvider<void>((ref) async {
 });
 
 Future<void> main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
-    statusBarColor: Colors.transparent,
-    statusBarIconBrightness: Brightness.dark, // Android: 어두운 아이콘
-    statusBarBrightness: Brightness.light, // iOS: 밝은 배경 → 어두운 아이콘
-  ));
-  runApp(const ProviderScope(child: LuckyPickyApp()));
+  // runZonedGuarded 안에서 바인딩을 초기화해야 프레임워크가 같은 존을 쓴다 —
+  // 존이 갈리면 비동기 예외가 이 핸들러로 안 올라온다.
+  runZonedGuarded(() async {
+    WidgetsFlutterBinding.ensureInitialized();
+    installErrorHandlers();
+    SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+      statusBarIconBrightness: Brightness.dark, // Android: 어두운 아이콘
+      statusBarBrightness: Brightness.light, // iOS: 밝은 배경 → 어두운 아이콘
+    ));
+    // 세로 고정 — 레이아웃이 폰 폭(_PhoneFrame) 기준이라 가로에서는 깨진다.
+    await SystemChrome.setPreferredOrientations(const [
+      DeviceOrientation.portraitUp,
+    ]);
+    runApp(const ProviderScope(child: LuckyPickyApp()));
+  }, (error, stack) => reportError(error, stack, context: 'zone'));
 }
 
 /// 넓은 화면(웹/데스크톱)에서 앱을 폰 폭으로 가운데 고정한다.
@@ -82,7 +94,12 @@ class _LuckyPickyAppState extends ConsumerState<LuckyPickyApp> {
   Future<void> _initAds() async {
     if (kIsWeb || !(Platform.isAndroid || Platform.isIOS)) return;
 
-    // iOS 14.5+ : 광고 초기화 전에 App Tracking Transparency 권한 요청.
+    // 1) UMP 동의 — EEA·영국은 광고 SDK 초기화 전에 동의를 받아야 한다.
+    //    동의가 필요 없는 지역에서는 폼 없이 그대로 통과한다.
+    await ConsentGate.instance.gather();
+
+    // 2) iOS 14.5+ : ATT 권한 요청. UMP 메시지 다음에 오는 것이 Google 권장 순서다
+    //    (동의 폼이 ATT 사전 안내 역할을 겸할 수 있어서).
     if (Platform.isIOS) {
       final status = await AppTrackingTransparency.trackingAuthorizationStatus;
       if (status == TrackingStatus.notDetermined) {
@@ -90,6 +107,8 @@ class _LuckyPickyAppState extends ConsumerState<LuckyPickyApp> {
       }
     }
 
+    // 3) 동의가 확보된 경우에만 광고를 켠다. 거부·실패면 광고 없이 앱만 돈다.
+    if (!await ConsentGate.instance.canRequestAds()) return;
     await MobileAds.instance.initialize();
     AdsController.instance.preload();
   }
