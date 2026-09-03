@@ -5,9 +5,8 @@
 # 로 접근 가능해야 한다. 서브도메인에 두면 크롤러가 못 찾는다 — 크롤러는
 # 개발자 웹사이트 URL 의 루트 도메인만 본다.
 #
-# 이 site/ 폴더 전체가 그 도메인의 루트로 서빙되는 것을 전제한다.
-# Flutter 웹 빌드(web/)와 분리해 둔 이유는 docs/launch-checklist.md 참고 —
-# 웹 빌드는 광고가 없어 보상형을 그냥 지급하므로 공개 배포하면 안 된다.
+# 배포는 tool/build_web.sh 가 Flutter 웹 빌드 위에 이 폴더를 얹어 루트로 서빙한다.
+# (웹은 서버에 쓰지 않는 데모 모드로 돈다 — lib/config/app_mode.dart 참고.)
 #
 # 퍼블리셔 pub-4235844602701475 는 iOS/Android 공통(AdMob 계정 단위).
 google.com, pub-4235844602701475, DIRECT, f08c47fec0942fa0

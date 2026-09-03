@@ -5,41 +5,36 @@
 
 ## 반드시 먼저 (이거 없으면 심사에서 막힌다)
 
-- [ ] **도메인 확보 + `site/` 배포**
-  `site/` 가 배포 대상이다 — 랜딩(`index.html`), 개인정보처리방침(`privacy.html`),
-  `app-ads.txt`. 정적 파일뿐이라 빌드 과정이 없다. Cloudflare Pages·Vercel 등
-  아무 정적 호스트에 폴더째 올리면 된다.
+- [x] **웹 배포** — Vercel `p0its-projects/luckypicky`, 깃헙 연결로 푸시마다 자동 빌드
+  (2026-09-03). 루트를 열면 **앱이 바로 실행되는 데모**다. 소개 랜딩은 없앴다.
 
-  **`web/` 은 배포하지 않는다.** Flutter 웹 빌드는 광고 SDK 가 없어
-  `AdsController.showRewarded` 가 광고 없이 즉시 보상을 지급한다 — 공개하면
-  아무도 광고를 안 보고 매일 한도만큼 재화를 가져간다. 두 정적 파일을 `web/`
-  에서 `site/` 로 옮긴 이유가 이것이다.
+  | 공개 URL | 내용 |
+  |---|---|
+  | `/` | Flutter 웹 데모 |
+  | `/privacy.html` | 개인정보처리방침 |
+  | `/app-ads.txt` | AdMob 크롤러용 (루트여야 찾는다) |
 
-  **배포처: `hynu.app`** (개인 블로그, Vercel). 없는 경로에 정상 404 를 주는 것을
-  확인했으므로 그대로 쓴다. 별도 Vercel 프로젝트를 파지 말 것 — app-ads.txt 는
-  루트에 있어야 하는데 루트는 블로그가 쓰고 있다. 블로그 리포에 파일을 얹는다.
+  빌드는 `tool/build_web.sh`(Vercel/Linux) — 빌드서버에 Flutter 가 없어 SDK 를
+  3.41.6 으로 고정해 clone 한다. 로컬 대응판이 `tool/build_web.ps1` 이고, 규칙을
+  바꾸면 두 파일을 함께 고친다. 설정은 루트 `vercel.json` 하나가 쥔다.
 
-  블로그 리포의 정적 디렉터리(Next.js 면 `public/`)에 이렇게 넣는다:
+  **웹을 공개해도 되는 이유**: 예전에는 웹 빌드에 광고 SDK 가 없어
+  `AdsController.showRewarded` 가 즉시 보상을 지급했고, 익명 로그인이 실서비스
+  Supabase 에 방문자 계정을 쌓았다. 지금은 `kDemoMode`(웹 기본값)이면
+  `gameBackendProvider` 가 `DemoGameBackend` 를 내놓아 **쓰기가 서버에 닿지
+  않는다**(`lib/config/app_mode.dart`). 문구(copy_lines)만 anon 읽기로 실서버에서
+  받아온다.
 
-  | 이 리포 | 블로그 리포 | 공개 URL |
-  |---|---|---|
-  | `site/app-ads.txt` | `public/app-ads.txt` | `https://hynu.app/app-ads.txt` |
-  | `site/index.html` | `public/luckypicky/index.html` | `https://hynu.app/luckypicky/index.html` |
-  | `site/privacy.html` | `public/luckypicky/privacy.html` | `https://hynu.app/luckypicky/privacy.html` |
-  | `site/favicon.png` | `public/luckypicky/favicon.png` | — |
+- [ ] **개발자 웹사이트 도메인 확정** — 스토어 등록에 쓸 루트 도메인.
+  현재 `luckypicky-seven.vercel.app` 에서 `/app-ads.txt` 가 200 + `text/plain`
+  으로 서빙된다. 이 주소를 그대로 쓸지, `hynu.app`(개인 블로그, Vercel) 이나
+  별도 커스텀 도메인을 붙일지 정해야 한다.
 
-  `app-ads.txt` 만 루트다. 나머지는 `luckypicky/` 아래 같은 폴더에 모여 있어야
-  페이지 안의 상대 링크(`privacy.html`, `favicon.png`)가 그대로 동작한다.
-
-  이 리포의 `site/` 가 원본이다. 방침 내용을 고치면 블로그 리포로 복사해야 한다
-  (정적 파일 4개라 자동화할 만큼은 아니다).
-
-  배포 후 스토어 등록:
-  - 두 스토어의 **개발자 웹사이트** = `https://hynu.app` — 루트여야 한다.
-    AdMob 크롤러는 이 URL 의 루트 도메인에서만 app-ads.txt 를 찾는다.
-  - 두 스토어의 **개인정보처리방침 URL** = `https://hynu.app/luckypicky/privacy.html`
-  - 확인: `curl -i https://hynu.app/app-ads.txt` → 200 + `text/plain`, 본문이
-    실제 텍스트인지 볼 것.
+  - 두 스토어의 **개발자 웹사이트** = 정한 루트 도메인. AdMob 크롤러는 이 URL 의
+    루트 도메인에서만 app-ads.txt 를 찾는다.
+  - 두 스토어의 **개인정보처리방침 URL** = 그 도메인의 `/privacy.html`
+  - 확인: `curl -i <도메인>/app-ads.txt` → 200 + `text/plain`, 본문이 실제
+    텍스트인지 볼 것.
   - AdMob → 앱 → app-ads.txt 상태가 "확인됨" 으로 바뀌기까지 최대 24시간.
 
 - [ ] **Supabase 마이그레이션 적용** (SQL 에디터에서 순서대로)
