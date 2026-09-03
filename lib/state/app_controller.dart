@@ -6,7 +6,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' show Supabase;
 
+import '../config/app_mode.dart';
 import '../config/luck_tickets.dart';
+import '../data/demo_game_backend.dart';
 import '../data/game_backend.dart';
 import '../data/state_cache.dart';
 import '../data/supabase_game_backend.dart';
@@ -23,9 +25,12 @@ const _legacyPrefsKey = 'luckypicky_app_state_v1';
 const int kAdCoinsPerDay = 5;
 
 /// 게임 상태 백엔드 — 실서비스는 Supabase RPC(서버 권위).
+/// 데모 모드(웹)는 같은 규칙을 브라우저 안에서 도는 [DemoGameBackend] 로 —
+/// 서버에 쓰지 않는다(config/app_mode.dart 참고).
 /// 테스트는 LocalGameBackend 로 override 한다.
-final gameBackendProvider = Provider<GameBackend>(
-    (ref) => SupabaseGameBackend(Supabase.instance.client));
+final gameBackendProvider = Provider<GameBackend>((ref) => kDemoMode
+    ? DemoGameBackend()
+    : SupabaseGameBackend(Supabase.instance.client));
 
 final appControllerProvider =
     NotifierProvider<AppController, AppState>(AppController.new);

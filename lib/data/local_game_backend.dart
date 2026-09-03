@@ -48,6 +48,11 @@ class LocalGameBackend implements GameBackend {
 
   String get _today => _fmt(DateTime.now().toUtc());
 
+  /// 저장된 사본으로 상태를 되돌린다.
+  /// 서버가 없는 실행(데모 모드)에서 새로고침을 넘겨 진행 상황을 잇는 데 쓴다 —
+  /// 실서비스에서는 서버 스냅샷이 진실이므로 호출하지 않는다.
+  void restore(AppState seed) => _data = seed;
+
   @override
   Future<void> ensureSignedIn() async {}
 
