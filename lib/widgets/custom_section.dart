@@ -31,6 +31,14 @@ class CustomSection extends ConsumerWidget {
       return;
     }
 
+    // 광고가 아직 없으면 문구부터 받지 않는다 — 입력한 문구가 광고 실패로 날아간다.
+    final ads = AdsController.instance;
+    if (!ads.rewardedAvailable) {
+      ads.preload();
+      showAppToast(context, l.gachaAdNotReady);
+      return;
+    }
+
     final text = await showCustomCreateSheet(context);
     if (text == null || !context.mounted) return;
 

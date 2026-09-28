@@ -44,6 +44,10 @@ class AdsController {
   /// 보상형 광고가 지금 준비되어 있는지 — 무료 뽑기 버튼 활성화 판단용.
   bool get rewardedReady => _rewarded != null;
 
+  /// 지금 누르면 광고(또는 미지원 플랫폼의 즉시 보상)가 실제로 나오는지.
+  /// 미로드면 false — 광고를 요구하는 흐름은 입력을 받기 전에 이걸로 먼저 막는다.
+  bool get rewardedAvailable => !_supported || _rewarded != null;
+
   /// 앱 시작 시 1회, 그리고 광고 소비 후마다 미리 로드.
   void preload() {
     _preloadInterstitial();
