@@ -218,6 +218,8 @@ class AppController extends Notifier<AppState> {
     try {
       r = await _backend.grantAdCoin();
     } on GameRuleException {
+      // 앱이 알던 남은 횟수가 서버와 달랐다 — 버튼 표시를 서버 기준으로 맞춘다.
+      unawaited(refresh().catchError((_) {}));
       return false;
     }
 

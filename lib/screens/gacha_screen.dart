@@ -27,18 +27,30 @@ class GachaScreen extends ConsumerWidget {
 
   /// 광고 시청 → 코인 1개 적립. 뽑기는 사용자가 직접 돌린다.
   /// 적립 성공은 버튼 안 코인 수가 올라가는 것으로 보여준다 — 별도 알림 없음.
+  /// 코인을 못 받은 경우(광고 미로드/중도 종료/서버 한도)는 이유를 알려준다.
   void _watchAdForCoin(BuildContext context, WidgetRef ref) {
+    final l = AppLocalizations.of(context);
     final n = ref.read(appControllerProvider.notifier);
     if (n.adCoinsLeft <= 0) return;
-    ref.read(rewardedAdProvider)(onReward: () async {
-      try {
-        await n.grantAdCoin();
-      } on GameConnectionException {
-        if (context.mounted) {
-          showAppToast(context, AppLocalizations.of(context).errorNeedConnection);
+    final wasReady = AdsController.instance.rewardedReady;
+    var rewarded = false;
+    ref.read(rewardedAdProvider)(
+      onReward: () async {
+        rewarded = true;
+        try {
+          final granted = await n.grantAdCoin();
+          if (!granted && context.mounted) {
+            showAppToast(context, l.gachaAdLimitReached);
+          }
+        } on GameConnectionException {
+          if (context.mounted) showAppToast(context, l.errorNeedConnection);
         }
-      }
-    });
+      },
+      onDone: () {
+        if (rewarded || !context.mounted) return;
+        showAppToast(context, wasReady ? l.gachaAdIncomplete : l.gachaAdNotReady);
+      },
+    );
   }
 
   @override

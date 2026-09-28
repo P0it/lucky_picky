@@ -131,7 +131,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get gachaAdCoinNone => 'Coins are back tomorrow';
+  String get gachaAdCoinNone => 'All of today\'s coins collected';
 
   @override
   String get gachaRatesButton => 'Drop rates';
@@ -142,6 +142,16 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get gachaPullFailed =>
       'Can\'t pull right now. Please try again in a moment.';
+
+  @override
+  String get gachaAdNotReady =>
+      'Getting an ad ready. Please try again in a moment.';
+
+  @override
+  String get gachaAdIncomplete => 'Watch the ad to the end to get a coin';
+
+  @override
+  String get gachaAdLimitReached => 'You\'ve collected all of today\'s coins';
 
   @override
   String get ratesTitle => 'Drop rates';

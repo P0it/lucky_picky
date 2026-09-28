@@ -84,10 +84,13 @@
       "total": { "type": "int" }
     }
   },
-  "gachaAdCoinNone": "Coins are back tomorrow",
+  "gachaAdCoinNone": "All of today's coins collected",
   "gachaRatesButton": "Drop rates",
   "gachaTapCapsule": "Tap the capsule to open it!",
   "gachaPullFailed": "Can't pull right now. Please try again in a moment.",
+  "gachaAdNotReady": "Getting an ad ready. Please try again in a moment.",
+  "gachaAdIncomplete": "Watch the ad to the end to get a coin",
+  "gachaAdLimitReached": "You've collected all of today's coins",
 
   "ratesTitle": "Drop rates",
   "ratesDisclaimer": "* Luck effects are not scientifically proven,\nbut the good mood definitely is.",

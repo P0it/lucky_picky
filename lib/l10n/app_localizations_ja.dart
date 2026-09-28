@@ -130,7 +130,7 @@ class AppLocalizationsJa extends AppLocalizations {
   }
 
   @override
-  String get gachaAdCoinNone => 'コインは明日また回復します';
+  String get gachaAdCoinNone => '今日のコインはすべて受け取りました';
 
   @override
   String get gachaRatesButton => '提供割合';
@@ -140,6 +140,15 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get gachaPullFailed => '今は引けません。しばらくしてからもう一度お試しください。';
+
+  @override
+  String get gachaAdNotReady => '広告を準備しています。しばらくしてからもう一度お試しください。';
+
+  @override
+  String get gachaAdIncomplete => '広告を最後まで見るとコインがもらえます';
+
+  @override
+  String get gachaAdLimitReached => '今日もらえるコインはすべて受け取りました';
 
   @override
   String get ratesTitle => '提供割合';

@@ -130,7 +130,7 @@ class AppLocalizationsKo extends AppLocalizations {
   }
 
   @override
-  String get gachaAdCoinNone => '코인은 내일 다시 채워져요';
+  String get gachaAdCoinNone => '오늘 코인을 모두 받았어요';
 
   @override
   String get gachaRatesButton => '확률 정보';
@@ -140,6 +140,15 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get gachaPullFailed => '지금은 뽑을 수 없어요. 잠시 후 다시 시도해 주세요.';
+
+  @override
+  String get gachaAdNotReady => '광고를 준비하고 있어요. 잠시 후 다시 시도해 주세요.';
+
+  @override
+  String get gachaAdIncomplete => '광고를 끝까지 보면 코인을 받을 수 있어요';
+
+  @override
+  String get gachaAdLimitReached => '오늘 받을 수 있는 코인을 모두 받았어요';
 
   @override
   String get ratesTitle => '획득 확률';

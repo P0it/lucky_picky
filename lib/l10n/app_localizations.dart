@@ -313,7 +313,7 @@ abstract class AppLocalizations {
   /// No description provided for @gachaAdCoinNone.
   ///
   /// In en, this message translates to:
-  /// **'Coins are back tomorrow'**
+  /// **'All of today\'s coins collected'**
   String get gachaAdCoinNone;
 
   /// No description provided for @gachaRatesButton.
@@ -333,6 +333,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Can\'t pull right now. Please try again in a moment.'**
   String get gachaPullFailed;
+
+  /// No description provided for @gachaAdNotReady.
+  ///
+  /// In en, this message translates to:
+  /// **'Getting an ad ready. Please try again in a moment.'**
+  String get gachaAdNotReady;
+
+  /// No description provided for @gachaAdIncomplete.
+  ///
+  /// In en, this message translates to:
+  /// **'Watch the ad to the end to get a coin'**
+  String get gachaAdIncomplete;
+
+  /// No description provided for @gachaAdLimitReached.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'ve collected all of today\'s coins'**
+  String get gachaAdLimitReached;
 
   /// No description provided for @ratesTitle.
   ///
