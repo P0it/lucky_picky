@@ -445,7 +445,7 @@ abstract class AppLocalizations {
   /// No description provided for @customCreateNoClovers.
   ///
   /// In en, this message translates to:
-  /// **'You need {cost} clover — record a good deed first'**
+  /// **'You need {cost, plural, =1{1 clover} other{{cost} clovers}} — record a good deed first'**
   String customCreateNoClovers(int cost);
 
   /// No description provided for @customCreateFailed.
@@ -463,7 +463,7 @@ abstract class AppLocalizations {
   /// No description provided for @customEnhance.
   ///
   /// In en, this message translates to:
-  /// **'Enhance ({cost} clovers)'**
+  /// **'Enhance ({cost, plural, =1{1 clover} other{{cost} clovers}})'**
   String customEnhance(int cost);
 
   /// No description provided for @customEnhanceMax.
@@ -517,7 +517,7 @@ abstract class AppLocalizations {
   /// No description provided for @dexOwnedCount.
   ///
   /// In en, this message translates to:
-  /// **'{count} cards'**
+  /// **'{count, plural, =1{1 card} other{{count} cards}}'**
   String dexOwnedCount(int count);
 
   /// No description provided for @dexRarityCount.
@@ -841,7 +841,7 @@ abstract class AppLocalizations {
   /// No description provided for @fortuneDeedCheer.
   ///
   /// In en, this message translates to:
-  /// **'Your {count} good deeds are cheering for you'**
+  /// **'{count, plural, =1{Your good deed is cheering for you} other{Your {count} good deeds are cheering for you}}'**
   String fortuneDeedCheer(int count);
 
   /// No description provided for @fortuneLuckyColor.

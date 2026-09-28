@@ -209,7 +209,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String customCreateNoClovers(int cost) {
-    return 'You need $cost clover — record a good deed first';
+    String _temp0 = intl.Intl.pluralLogic(
+      cost,
+      locale: localeName,
+      other: '$cost clovers',
+      one: '1 clover',
+    );
+    return 'You need $_temp0 — record a good deed first';
   }
 
   @override
@@ -221,7 +227,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String customEnhance(int cost) {
-    return 'Enhance ($cost clovers)';
+    String _temp0 = intl.Intl.pluralLogic(
+      cost,
+      locale: localeName,
+      other: '$cost clovers',
+      one: '1 clover',
+    );
+    return 'Enhance ($_temp0)';
   }
 
   @override
@@ -253,7 +265,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String dexOwnedCount(int count) {
-    return '$count cards';
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count cards',
+      one: '1 card',
+    );
+    return '$_temp0';
   }
 
   @override
@@ -452,7 +470,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String fortuneDeedCheer(int count) {
-    return 'Your $count good deeds are cheering for you';
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Your $count good deeds are cheering for you',
+      one: 'Your good deed is cheering for you',
+    );
+    return '$_temp0';
   }
 
   @override

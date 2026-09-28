@@ -125,7 +125,7 @@
     }
   },
   "customCreateAdNote": "You'll watch a short ad, then your card appears",
-  "customCreateNoClovers": "You need {cost} clover — record a good deed first",
+  "customCreateNoClovers": "You need {cost, plural, =1{1 clover} other{{cost} clovers}} — record a good deed first",
   "@customCreateNoClovers": {
     "placeholders": {
       "cost": { "type": "int" }
@@ -133,7 +133,7 @@
   },
   "customCreateFailed": "Couldn't make it just now — your clover is untouched",
   "customCreated": "Your luck is made",
-  "customEnhance": "Enhance ({cost} clovers)",
+  "customEnhance": "Enhance ({cost, plural, =1{1 clover} other{{cost} clovers}})",
   "@customEnhance": {
     "placeholders": {
       "cost": { "type": "int" }
@@ -153,7 +153,7 @@
       "plus": { "type": "int" }
     }
   },
-  "dexOwnedCount": "{count} cards",
+  "dexOwnedCount": "{count, plural, =1{1 card} other{{count} cards}}",
   "@dexOwnedCount": {
     "placeholders": {
       "count": { "type": "int" }
@@ -299,7 +299,7 @@
   },
   "fortuneRetryAd": "Watch an ad · one more try",
   "fortuneTomorrow": "Come back tomorrow to catch a new one 🍀",
-  "fortuneDeedCheer": "Your {count} good deeds are cheering for you",
+  "fortuneDeedCheer": "{count, plural, =1{Your good deed is cheering for you} other{Your {count} good deeds are cheering for you}}",
   "@fortuneDeedCheer": {
     "placeholders": {
       "count": { "type": "int" }
