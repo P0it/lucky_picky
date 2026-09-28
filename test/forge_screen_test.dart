@@ -226,4 +226,19 @@ void main() {
     expect(find.byType(ForgeScreen), findsNothing);
     expect(find.text('wallet'), findsOneWidget);
   });
+
+  testWidgets('target step hides cards without enough other cards to feed',
+      (tester) async {
+    final backend = _SpyBackend(LocalGameBackend(
+        seed: const AppState(tickets: [
+      TicketInstance(id: 'a', ticketId: 'c01', level: 3, pulledAt: '2026.01.01'),
+      TicketInstance(id: 'b', ticketId: 'c02', pulledAt: '2026.01.01'),
+    ])));
+    await tester.pumpWidget(_host(
+        const ForgeScreen(mode: ForgeMode.enhance), backend));
+    await tester.pumpAndSettle();
+
+    // +3 카드('a')는 재료 3장이 필요한데 다른 카드는 1장뿐 — 후보에서 빠진다.
+    expect(find.byType(ForgePickCard), findsOneWidget);
+  });
 }

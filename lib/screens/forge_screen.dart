@@ -295,8 +295,11 @@ class _ForgeScreenState extends ConsumerState<ForgeScreen> {
 
   Widget _enhanceTargetStep(
       AppLocalizations l, List<TicketInstance> tickets) {
-    // 만렙 카드는 더 올릴 수 없으니 후보에서 뺀다.
-    final candidates = tickets.where((t) => !t.isMaxLevel).toList()
+    // 만렙 카드, 그리고 먹일 다른 카드가 모자란 카드는 STEP 2 에서 막히니 후보에서 뺀다.
+    final candidates = tickets
+        .where((t) =>
+            !t.isMaxLevel && t.materialsNeeded <= tickets.length - 1)
+        .toList()
       ..sort((a, b) {
         final rankA = LuckCatalog.byId(a.ticketId)?.rarity.index ?? 0;
         final rankB = LuckCatalog.byId(b.ticketId)?.rarity.index ?? 0;
