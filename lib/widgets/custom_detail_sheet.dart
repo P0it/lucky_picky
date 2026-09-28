@@ -56,7 +56,8 @@ class _CustomDetailSheetState extends ConsumerState<_CustomDetailSheet> {
         _busy = false;
         if (r != null) _popKey++;
       });
-      if (r == null) showAppToast(context, l.customEnhanceNoClovers);
+      // 클로버 부족은 위에서 걸렀다 — 여기 오는 거절은 서버와 어긋난 경우다.
+      if (r == null) showAppToast(context, l.customEnhanceFailed);
     } on GameConnectionException {
       if (!mounted) return;
       setState(() => _busy = false);

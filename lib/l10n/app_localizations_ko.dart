@@ -224,6 +224,9 @@ class AppLocalizationsKo extends AppLocalizations {
   String get customEnhanceNoClovers => '클로버가 부족해요';
 
   @override
+  String get customEnhanceFailed => '지금은 강화할 수 없어요 — 보관함을 새로 불러올게요';
+
+  @override
   String get customBadge => '직접 만듦';
 
   @override

@@ -315,7 +315,7 @@ class AppController extends Notifier<AppState> {
 
   /// 커스텀 행운권 강화 — 클로버를 현재 레벨 수만큼 쓰고 한 단계 오른다.
   /// 실패 판정이 없으므로 성공하면 반드시 레벨이 오른다.
-  /// 규칙 위반(최고 단계/클로버 부족)이면 null, 오프라인이면 예외.
+  /// 규칙 위반(최고 단계/클로버 부족)이면 재동기화하고 null, 오프라인이면 예외.
   Future<CustomEnhanceResult?> enhanceCustomTicket(String id) async {
     await _ensureReady();
 
@@ -323,6 +323,8 @@ class AppController extends Notifier<AppState> {
     try {
       r = await _backend.enhanceCustomTicket(id);
     } on GameRuleException {
+      // 화면의 클로버·레벨이 서버와 어긋났다 — 서버 기준으로 다시 맞춘다.
+      unawaited(refresh().catchError((_) {}));
       return null;
     }
 

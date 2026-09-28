@@ -231,6 +231,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get customEnhanceNoClovers => 'Not enough clovers';
 
   @override
+  String get customEnhanceFailed =>
+      'Can\'t enhance right now — refreshing your collection';
+
+  @override
   String get customBadge => 'MADE';
 
   @override

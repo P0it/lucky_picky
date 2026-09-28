@@ -224,6 +224,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String get customEnhanceNoClovers => 'クローバーが足りません';
 
   @override
+  String get customEnhanceFailed => '今は強化できません — コレクションを更新します';
+
+  @override
   String get customBadge => '自作';
 
   @override

@@ -141,6 +141,7 @@
   },
   "customEnhanceMax": "Fully enhanced",
   "customEnhanceNoClovers": "Not enough clovers",
+  "customEnhanceFailed": "Can't enhance right now — refreshing your collection",
   "customBadge": "MADE",
 
   "dexTitle": "Collection",

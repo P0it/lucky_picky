@@ -73,6 +73,7 @@
   "customEnhance": "強化する（クローバー{cost}個）",
   "customEnhanceMax": "最大強化済み",
   "customEnhanceNoClovers": "クローバーが足りません",
+  "customEnhanceFailed": "今は強化できません — コレクションを更新します",
   "customBadge": "自作",
 
   "dexTitle": "コレクション",

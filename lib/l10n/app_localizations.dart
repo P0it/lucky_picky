@@ -478,6 +478,12 @@ abstract class AppLocalizations {
   /// **'Not enough clovers'**
   String get customEnhanceNoClovers;
 
+  /// No description provided for @customEnhanceFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Can\'t enhance right now — refreshing your collection'**
+  String get customEnhanceFailed;
+
   /// No description provided for @customBadge.
   ///
   /// In en, this message translates to:

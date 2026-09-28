@@ -73,6 +73,7 @@
   "customEnhance": "강화하기 (클로버 {cost}개)",
   "customEnhanceMax": "최대 강화 완료",
   "customEnhanceNoClovers": "클로버가 부족해요",
+  "customEnhanceFailed": "지금은 강화할 수 없어요 — 보관함을 새로 불러올게요",
   "customBadge": "직접 만듦",
 
   "dexTitle": "보관함",
