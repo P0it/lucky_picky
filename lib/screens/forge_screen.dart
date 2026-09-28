@@ -87,8 +87,10 @@ class _ForgeScreenState extends ConsumerState<ForgeScreen> {
     );
     if (!mounted) return;
     if (ran) {
-      // 연출까지 끝났으면 지갑으로 돌아간다.
-      Navigator.of(context).maybePop();
+      // 연출까지 끝났으면 지갑으로 돌아간다. maybePop 은 STEP 2 의 PopScope
+      // (canPop: false)에 걸려 STEP 1 로 되돌아갈 뿐이라, 직접 닫는다.
+      _popping = true;
+      Navigator.of(context).pop();
     } else {
       // 오프라인이거나 규칙에 걸려 아무 일도 없었다 — 고른 카드를 그대로 두고 다시 누를 수 있게.
       setState(() => _busy = false);
@@ -101,7 +103,8 @@ class _ForgeScreenState extends ConsumerState<ForgeScreen> {
     final ran = await runReforgeFlow(context, ref, materialIds: _picked.toList());
     if (!mounted) return;
     if (ran) {
-      Navigator.of(context).maybePop();
+      _popping = true;
+      Navigator.of(context).pop();
     } else {
       setState(() => _busy = false);
     }

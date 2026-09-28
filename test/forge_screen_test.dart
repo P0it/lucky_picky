@@ -185,4 +185,45 @@ void main() {
     // +0 → +1 은 재료 1장. 대상('a')은 후보에서 빠지므로 2장이 남는다.
     expect(find.text('강화하기 (0/1)'), findsOneWidget);
   });
+
+  testWidgets('enhance started from the wallet closes the screen when done',
+      (tester) async {
+    final backend = _SpyBackend(LocalGameBackend(seed: _seed()));
+    tester.view.physicalSize = const Size(440, 1200);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    await tester.pumpWidget(_host(
+      Builder(
+        builder: (context) => TextButton(
+          onPressed: () => Navigator.of(context).push(MaterialPageRoute(
+              builder: (_) => const ForgeScreen(mode: ForgeMode.enhance))),
+          child: const Text('wallet'),
+        ),
+      ),
+      backend,
+    ));
+    await tester.tap(find.text('wallet'));
+    await tester.pumpAndSettle();
+
+    // 대상 → 다음 → 재료 1장 → 강화하기.
+    await tester.tap(find.byType(ForgePickCard).first);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('다음'));
+    await tester.pumpAndSettle();
+    // 맨 위는 고정 표시된 대상 카드 — 재료 후보는 그 아래부터다.
+    await tester.tap(find.byType(ForgePickCard).at(1));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('강화하기 (1/1)'));
+    await tester.pumpAndSettle();
+    expect(backend.enhanceCalls, 1);
+
+    // 결과 연출 → 확인.
+    await tester.tap(find.text('확인'));
+    await tester.pumpAndSettle();
+
+    // STEP 1 에 갇히지 않고 지갑으로 돌아와야 한다.
+    expect(find.byType(ForgeScreen), findsNothing);
+    expect(find.text('wallet'), findsOneWidget);
+  });
 }
