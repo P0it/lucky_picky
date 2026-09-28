@@ -205,35 +205,40 @@ class _GachaPullOverlayState extends ConsumerState<_GachaPullOverlay>
 
     final tier = result.ticket.rarity.index;
 
-    return Scaffold(
-      backgroundColor: AppColors.white,
-      body: Stack(
-        children: [
-          // 상위 등급 개봉은 화면 전체가 등급색으로 물든다.
-          if (_phase == _Phase.open && tier >= 2)
-            Positioned.fill(
-              child: IgnorePointer(
-                child: CustomPaint(
-                  painter: _AuraFlashPainter(_burst.value, style.color, tier),
-                ),
-              ),
-            ),
-          SafeArea(
-            child: Column(
-              children: [
-                Expanded(
-                  child: Center(
-                    child: revealing
-                        ? _resultCard(l, result, style)
-                        : _machineStage(result, style),
+    // 결과가 나오기 전에는 뒤로가기로 닫지 않는다 — 코인은 이미 썼는데
+    // 무엇을 얻었는지 못 본 채 끝나 버린다.
+    return PopScope(
+      canPop: revealing,
+      child: Scaffold(
+        backgroundColor: AppColors.white,
+        body: Stack(
+          children: [
+            // 상위 등급 개봉은 화면 전체가 등급색으로 물든다.
+            if (_phase == _Phase.open && tier >= 2)
+              Positioned.fill(
+                child: IgnorePointer(
+                  child: CustomPaint(
+                    painter: _AuraFlashPainter(_burst.value, style.color, tier),
                   ),
                 ),
-                if (revealing) _resultButtons(l),
-                const SizedBox(height: 24),
-              ],
+              ),
+            SafeArea(
+              child: Column(
+                children: [
+                  Expanded(
+                    child: Center(
+                      child: revealing
+                          ? _resultCard(l, result, style)
+                          : _machineStage(result, style),
+                    ),
+                  ),
+                  if (revealing) _resultButtons(l),
+                  const SizedBox(height: 24),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
