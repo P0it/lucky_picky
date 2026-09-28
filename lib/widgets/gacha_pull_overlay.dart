@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
@@ -18,21 +19,46 @@ import 'rarity_style.dart';
 
 /// 뽑기 전체 플로우: 코인 투입 → 레버 → 캡슐 낙하 → 자동 개봉 → 결과 카드.
 /// 뽑기 도중에는 어떤 광고도 끼어들지 않는다 — 광고는 뽑기 화면에서 사용자가
-/// 직접 누르는 '광고 보고 클로버 받기' 하나뿐이다.
-/// 호출 전에 클로버 보유 여부를 확인해야 한다 (뽑기는 언제나 클로버 1개).
+/// 직접 누르는 '광고 보고 코인 받기' 하나뿐이다.
+/// 호출 전에 코인 보유 여부를 확인해야 한다 (뽑기는 언제나 코인 1개).
+///
+/// 서버 응답을 기다리는 동안의 재호출은 무시한다 — 연타로 코인이 두 번
+/// 빠지고 결과 화면이 겹쳐 뜨는 것을 막는다.
 Future<void> runGachaPullFlow(BuildContext context, WidgetRef ref) async {
+  if (_pullInFlight) return;
+  _pullInFlight = true;
+  try {
+    await _pullAndReveal(context, ref);
+  } finally {
+    _pullInFlight = false;
+  }
+}
+
+bool _pullInFlight = false;
+
+Future<void> _pullAndReveal(BuildContext context, WidgetRef ref) async {
+  // 결과 화면은 루트 내비게이터에 올린다. 응답을 기다리는 사이 탭을 바꿔
+  // 이 화면이 사라져도, 이미 코인을 쓴 뽑기의 결과는 보여줘야 한다.
+  final navigator = Navigator.of(context, rootNavigator: true);
+  final l = AppLocalizations.of(context);
+  final notifier = ref.read(appControllerProvider.notifier);
+
   // 뽑기는 라우트 진입 전에 서버에서 확정한다 (빌드 중 상태 변경 방지).
   final PullResult? result;
   try {
-    result = await ref.read(appControllerProvider.notifier).pullGacha();
+    result = await notifier.pullGacha();
   } on GameConnectionException {
-    if (context.mounted) {
-      showAppToast(context, AppLocalizations.of(context).errorNeedConnection);
-    }
+    // 서버는 처리했는데 응답만 못 받았을 수도 있다 — 연결되면 다시 맞춘다.
+    unawaited(notifier.refresh().catchError((_) {}));
+    if (context.mounted) showAppToast(context, l.errorNeedConnection);
     return;
   }
-  if (result == null || !context.mounted) return;
-  await Navigator.of(context, rootNavigator: true).push(
+  if (result == null) {
+    if (context.mounted) showAppToast(context, l.gachaPullFailed);
+    return;
+  }
+  if (!navigator.mounted) return;
+  await navigator.push(
     PageRouteBuilder(
       opaque: true,
       transitionDuration: const Duration(milliseconds: 260),

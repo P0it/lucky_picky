@@ -45,6 +45,7 @@
   "gachaAdCoinNone": "コインは明日また回復します",
   "gachaRatesButton": "提供割合",
   "gachaTapCapsule": "カプセルをタップして開けよう！",
+  "gachaPullFailed": "今は引けません。しばらくしてからもう一度お試しください。",
 
   "ratesTitle": "提供割合",
   "ratesDisclaimer": "※ 幸運の効能は科学的に証明されていませんが、\n気分が上がるのは確実です。",

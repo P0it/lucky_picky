@@ -140,6 +140,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get gachaTapCapsule => 'Tap the capsule to open it!';
 
   @override
+  String get gachaPullFailed =>
+      'Can\'t pull right now. Please try again in a moment.';
+
+  @override
   String get ratesTitle => 'Drop rates';
 
   @override

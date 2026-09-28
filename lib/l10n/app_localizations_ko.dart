@@ -139,6 +139,9 @@ class AppLocalizationsKo extends AppLocalizations {
   String get gachaTapCapsule => '캡슐을 탭해서 열어보세요!';
 
   @override
+  String get gachaPullFailed => '지금은 뽑을 수 없어요. 잠시 후 다시 시도해 주세요.';
+
+  @override
   String get ratesTitle => '획득 확률';
 
   @override

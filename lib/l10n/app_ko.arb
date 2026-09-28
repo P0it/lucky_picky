@@ -45,6 +45,7 @@
   "gachaAdCoinNone": "코인은 내일 다시 채워져요",
   "gachaRatesButton": "확률 정보",
   "gachaTapCapsule": "캡슐을 탭해서 열어보세요!",
+  "gachaPullFailed": "지금은 뽑을 수 없어요. 잠시 후 다시 시도해 주세요.",
 
   "ratesTitle": "획득 확률",
   "ratesDisclaimer": "※ 행운의 효능은 과학적으로 증명되지 않았지만,\n기분이 좋아지는 건 확실합니다.",

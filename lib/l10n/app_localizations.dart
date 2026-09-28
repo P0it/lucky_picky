@@ -328,6 +328,12 @@ abstract class AppLocalizations {
   /// **'Tap the capsule to open it!'**
   String get gachaTapCapsule;
 
+  /// No description provided for @gachaPullFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Can\'t pull right now. Please try again in a moment.'**
+  String get gachaPullFailed;
+
   /// No description provided for @ratesTitle.
   ///
   /// In en, this message translates to:

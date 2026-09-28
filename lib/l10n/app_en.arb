@@ -87,6 +87,7 @@
   "gachaAdCoinNone": "Coins are back tomorrow",
   "gachaRatesButton": "Drop rates",
   "gachaTapCapsule": "Tap the capsule to open it!",
+  "gachaPullFailed": "Can't pull right now. Please try again in a moment.",
 
   "ratesTitle": "Drop rates",
   "ratesDisclaimer": "* Luck effects are not scientifically proven,\nbut the good mood definitely is.",

@@ -139,6 +139,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String get gachaTapCapsule => 'カプセルをタップして開けよう！';
 
   @override
+  String get gachaPullFailed => '今は引けません。しばらくしてからもう一度お試しください。';
+
+  @override
   String get ratesTitle => '提供割合';
 
   @override

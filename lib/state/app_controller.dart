@@ -230,7 +230,7 @@ class AppController extends Notifier<AppState> {
   }
 
   /// 뽑기 1회 — 코인 1개를 소모하고, 추첨은 서버에서 실행된다.
-  /// 뽑을 수 없으면(코인 부족) null, 오프라인이면 [GameConnectionException].
+  /// 뽑을 수 없으면(코인 부족) 서버 상태로 재동기화하고 null, 오프라인이면 [GameConnectionException].
   Future<PullResult?> pullGacha() async {
     await _ensureReady();
 
@@ -238,6 +238,8 @@ class AppController extends Notifier<AppState> {
     try {
       r = await _backend.pullGacha();
     } on GameRuleException {
+      // 화면에 보이던 코인이 서버와 어긋났다(다른 기기에서 사용, 복구 이관 등).
+      unawaited(refresh().catchError((_) {}));
       return null;
     }
 
