@@ -32,7 +32,9 @@ class _CustomCreateSheetState extends State<_CustomCreateSheet> {
   final _controller = TextEditingController();
 
   String get _text => _controller.text.trim();
-  bool get _canMake => _text.isNotEmpty;
+  // 조합 중이던 글자로 한도를 넘긴 채 끝났을 수 있다 — 서버와 같은 기준으로 한 번 더 본다.
+  bool get _canMake =>
+      _text.isNotEmpty && _text.runes.length <= CustomTicket.maxTextLength;
 
   @override
   void dispose() {
@@ -109,9 +111,11 @@ class _CustomCreateSheetState extends State<_CustomCreateSheet> {
                             required isFocused,
                             maxLength}) =>
                         null,
-                    inputFormatters: [
-                      LengthLimitingTextInputFormatter(
-                          CustomTicket.maxTextLength),
+                    // 서버(char_length)와 같은 단위 — 코드포인트로 센다. 기본 포매터는
+                    // 글자(grapheme) 단위라 이모지가 섞이면 앱은 통과시키고 서버는
+                    // 광고를 다 본 뒤에 거절한다.
+                    inputFormatters: const [
+                      _CodePointLimitFormatter(CustomTicket.maxTextLength),
                     ],
                     style: AppText.base(
                         size: 16, weight: FontWeight.w500, height: 1.5),
@@ -126,7 +130,7 @@ class _CustomCreateSheetState extends State<_CustomCreateSheet> {
                   ),
                   const SizedBox(height: 6),
                   Text(
-                    l.customCreateCounter(_controller.text.characters.length,
+                    l.customCreateCounter(_controller.text.runes.length,
                         CustomTicket.maxTextLength),
                     style: AppText.base(
                         size: 12,
@@ -162,5 +166,19 @@ class _CustomCreateSheetState extends State<_CustomCreateSheet> {
         ),
       ),
     );
+  }
+}
+
+/// 코드포인트 수로 길이를 제한한다 — 넘치는 입력은 받아들이지 않는다.
+class _CodePointLimitFormatter extends TextInputFormatter {
+  final int max;
+  const _CodePointLimitFormatter(this.max);
+
+  @override
+  TextEditingValue formatEditUpdate(
+      TextEditingValue oldValue, TextEditingValue newValue) {
+    // 한글 조합 중에는 자르지 않는다 — 조합이 끝난 뒤에 판정한다.
+    if (newValue.composing.isValid) return newValue;
+    return newValue.text.runes.length <= max ? newValue : oldValue;
   }
 }

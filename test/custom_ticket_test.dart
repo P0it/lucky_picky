@@ -92,4 +92,30 @@ void main() {
     expect(c.read(appControllerProvider).customTickets, isEmpty);
     await tester.pump(const Duration(milliseconds: 2200));
   });
+
+  testWidgets('문구 길이는 서버와 같이 코드포인트로 센다 — 이모지가 섞여도 한도 안이면 만들어진다',
+      (tester) async {
+    await tester.pumpWidget(host(_adWatched));
+    final fits = '${'가' * 38}❤️'; // ❤️ = 코드포인트 2개 → 딱 40
+    final c = await write(tester, fits);
+
+    expect(c.read(appControllerProvider).customTickets.single.text, fits);
+    await tester.pump(const Duration(milliseconds: 2200));
+  });
+
+  testWidgets('코드포인트 40개를 넘는 문구는 입력되지 않아 광고도 서버 거절도 없다',
+      (tester) async {
+    var adShown = false;
+    await tester.pumpWidget(host(({required onReward, onDone}) {
+      adShown = true;
+      _adWatched(onReward: onReward, onDone: onDone);
+    }));
+    // 글자(grapheme)로는 40자지만 코드포인트로는 42개 — 서버가 거절하는 길이.
+    final c = await write(tester, '${'가' * 38}❤️❤️');
+
+    expect(adShown, isFalse);
+    expect(c.read(appControllerProvider).customTickets, isEmpty);
+    expect(c.read(appControllerProvider).clovers, 3);
+    await tester.pump(const Duration(milliseconds: 2200));
+  });
 }

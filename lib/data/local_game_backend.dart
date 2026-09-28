@@ -141,7 +141,7 @@ class LocalGameBackend implements GameBackend {
   @override
   Future<CustomTicketResult> createCustomTicket(String text) async {
     final body = text.trim();
-    if (body.isEmpty || body.length > CustomTicket.maxTextLength) {
+    if (body.isEmpty || body.runes.length > CustomTicket.maxTextLength) {
       throw const GameRuleException(GameRuleException.invalidText);
     }
     if (_data.clovers < kCustomTicketCost) {
